@@ -1,8 +1,8 @@
 node_modules/
-dist/
-out/
+/dist/
+/out/
 renderer/index.html
-web/
+/web/
 tests/t.html
 tests/*.png
 *.log
