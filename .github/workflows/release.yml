@@ -37,11 +37,22 @@ jobs:
         run: npm ci
       - if: steps.check.outputs.new == 'true'
         run: npm run typecheck
+      # build without publishing, then create the release in one step (electron-builder's own
+      # publishing races itself when it creates the release and fails with 422)
       - if: steps.check.outputs.new == 'true'
         shell: bash
-        run: set -o pipefail; npm run release 2>&1 | tee release.log
+        run: set -o pipefail; npm run dist 2>&1 | tee release.log
+      - if: steps.check.outputs.new == 'true'
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          v="${{ steps.check.outputs.tag }}"
+          ls dist
+          gh release create "$v" dist/PipFarm-Setup-*.exe dist/PipFarm-Setup-*.exe.blockmap dist/latest.yml \
+            --target "$GITHUB_SHA" --title "חוות הפיפים $v" \
+            --notes "להתקנה ראשונה: להוריד את PipFarm-Setup ולהפעיל. מי שכבר מותקן אצלו מקבל את הגרסה לבד." 2>&1 | tee -a release.log
       # if the build fails, leave the end of the log as a comment on the commit so it is easy to read
       - if: failure()
         shell: bash
