@@ -15,6 +15,8 @@ function hideBlocked(){
   if(hideCandidates().length<2)return "צריך לפחות 2 פיפים ערים ופנויים";
   return null;
 }
+// a spot must be tappable: not under the top bar, the minimap, or the bottom message line
+function clearOfHud(x,y){const sx=(x-cam.x)*cam.z/CW,sy=(y-cam.y)*cam.z/CH;return sx>.04&&sx<.96&&sy>.16&&sy<.88&&!(sx<.24&&sy<.36)}
 function hideCandidates(){return S.pips.filter(p=>{const r=rt(p);return ["idle","walk","celebrate","stare","chat","eat"].includes(r.state)&&!r.job&&(!r.goal||r.goal==="wander")&&!p.question&&inView(p.x,p.y,40)})}
 function startHide(){
   const why=hideBlocked();if(why){toast(why);return}
@@ -22,14 +24,14 @@ function startHide(){
   const cand=hideCandidates().sort((a,b)=>(b.id===sel?1:0)-(a.id===sel?1:0)||(b.trust??30)-(a.trust??30));
   const hiders=cand.slice(0,5),cx=cam.x+CW/cam.z/2,cy=cam.y+CH/cam.z/2,spots=[];
   // spots: bushes that appear for the game (a few stay empty), plus trees and the burrow close to the view
-  const far=(x,y)=>spots.every(s=>Math.hypot(s.x-x,s.y-y)>22);
+  const far=(x,y)=>spots.every(s=>Math.hypot(s.x-x,s.y-y)>22)&&clearOfHud(x,y);
   for(let i=0;i<80&&spots.length<hiders.length+3;i++){
     const x=cx+rand(-CW/cam.z/2+14,CW/cam.z/2-14),y=cy+rand(-CH/cam.z/2+26,CH/cam.z/2-10);
     if(!walkable(x,y)||!far(x,y)||Math.hypot(x-FIRE.x,y-FIRE.y)<16||PLOTS.some(g=>x>g.x-6&&x<g.x+PW+6&&y>g.y-8&&y<g.y+PH+8))continue;
     spots.push({x:Math.round(x),y:Math.round(y),k:"bush",pip:null,found:false});
   }
   TREES.forEach((tr,i)=>{if(zoneOpen(tr.z)&&treeUp(i)&&inView(tr.x,tr.y,-10)&&far(tr.x,tr.y))spots.push({x:tr.x,y:tr.y,k:"tree",tree:i,pip:null,found:false})});
-  if(inView(BURROW.x,BURROW.y,-10))spots.push({x:BURROW.x,y:BURROW.y+2,k:"burrow",pip:null,found:false});
+  if(inView(BURROW.x,BURROW.y,-10)&&clearOfHud(BURROW.x,BURROW.y))spots.push({x:BURROW.x,y:BURROW.y+2,k:"burrow",pip:null,found:false});
   if(spots.length<hiders.length){toast("אין כאן מספיק מקומות להתחבא. תזיז את המפה למקום פתוח");return}
   const free=spots.slice().sort(()=>Math.random()-.5);
   hiders.forEach((p,i)=>{const s=free[i];s.pip=p.id;const r=rt(p);dropNeed(p);r.goal="hide";r.state="walk";r.spot=s;setT(p,s.x,s.y);say(p,pick(["!","הי!","♪"]),1.2,"snd","excited")});

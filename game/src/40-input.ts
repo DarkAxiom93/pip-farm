@@ -77,8 +77,8 @@ function tapAt(e){
     const st=S.stars.find(q=>{const{fx,fy}=starPos(q);return Math.hypot(fx*CW-sx,fy*CH-sy)<9});
     if(st){openStar(st);return}}
   const[x,y]=toWorld(e),m=2/cam.z*2;
+  if(hideTap(x,y))return; // during hide and seek the search comes first
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
-  if(hideTap(x,y))return;
   if(fireTap(x,y))return; // the fire sits in a ring of pips, so it is checked before them
   // a pip that is remembering something is tapped first, even in a crowd
   const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall||rt(b).dream?1:0)-(rt(a).recall||rt(a).dream?1:0)||b.y-a.y);

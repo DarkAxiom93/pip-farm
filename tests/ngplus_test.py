@@ -17,8 +17,8 @@ async def main():
         await btn(pg,"להמשיך")
         st=await state(pg);f=st["pips"][0]
         print("NG loop",st["loop"],"runs",len(st["runs"]),"run ending",st["runs"][0]["ending"],"pips",len(st["pips"]))
-        print("NG founder echo",f.get("echo"),"trust",f["trust"],"lang",sorted(f["lang"].keys()))
-        print("NG kept lex",sorted(st["lex"].keys()),"album",len(st["album"])>=3,"tasks",len(st["tasks"]),"streak",st["streak"]["days"])
+        print("NG founder echo",f.get("echo"),"trust",f["trust"],"remembers food word","food" in f["lang"])
+        print("NG kept lex","בלופ" in st["lex"],"no screen word","זיגי" not in st["lex"],"album",len(st["album"])>=3,"tasks",len(st["tasks"]))
         print("NG story ch",st["story"]["ch"],"ending",st["story"]["ending"],"wood",st["wood"],"sparks",st["sparks"])
         
         # reload: the new run must be what loads

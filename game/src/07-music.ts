@@ -5,7 +5,7 @@
    - rain darkens the sound, a focus session turns it into calm study music
    - the story leaks in: from chapter 3 some notes glitch, after a reset it is a lonely music box
    It goes quiet while a story card is open, during a choir, and when the window is hidden. */
-const MUS={gain:null as GainNode|null,filter:null as BiquadFilterNode|null,step:0,next:0,timer:0 as any,chord:0,motif:[] as number[],motifAge:0,level:0};
+const MUS={cur:[0,4,7] as number[],eighth:0,gain:null as GainNode|null,filter:null as BiquadFilterNode|null,step:0,next:0,timer:0 as any,chord:0,motif:[] as number[],motifAge:0,level:0};
 const MUS_PROG:Record<string,number[][]>={
   day:[[0,4,7,11],[9,12,16,19],[5,9,12,16],[7,11,14,17]],        // Imaj7 vi IV V
   night:[[9,12,16,19],[5,9,12,16],[0,4,7,12],[7,11,14,19]],      // vi IV I V, slower and lower
@@ -58,13 +58,14 @@ function musicTick(){
   const wet=rainy()?900:S.weather&&S.weather.k==="cloudy"?1700:night?1900:2800;MUS.filter.frequency.setTargetAtTime(wet,AC.currentTime,1.5);
   if(MUS.level<.02){MUS.next=AC.currentTime+.2;return}
   const mode=musicMode(),bpm=mode==="day"?(curSeason==="summer"?84:76):mode==="focus"?66:mode==="sad"?54:60,eighth=60/bpm/2;
+  MUS.eighth=eighth;
   const prog=MUS_PROG[mode],glitchy=S.story&&S.story.ch>=3&&!S.story.ending,winter=curSeason==="winter";
   while(MUS.next<AC.currentTime+.4){
     const t=MUS.next,s=MUS.step%16;
     if(s===0){MUS.chord=Math.floor(MUS.step/16)%prog.length;
       if(MUS.chord===0&&(MUS.motifAge++%2===0||!MUS.motif.length))MUS.motif=newMotif(mode);
       else if(Math.random()<.35){const k=ri(0,7);MUS.motif[k]=MUS.motif[k]<0?ri(2,7):clamp(MUS.motif[k]+pick([-1,1]),0,MUS_PENTA.length-1)}}
-    const ch=prog[MUS.chord],bar=eighth*16;
+    const ch=prog[MUS.chord],bar=eighth*16;MUS.cur=ch;
     // pad: the whole chord, slow in and out
     if(s===0&&mode!=="sad")ch.forEach((n,i)=>mnote(mhz(n),t,bar+.5,i%2?"sine":"triangle",.035,.9));
     // bass on 1 and 3
@@ -83,3 +84,31 @@ function musicTick(){
   }
 }
 document.addEventListener("visibilitychange",()=>{if(MUS.gain&&document.hidden)MUS.gain.gain.setTargetAtTime(0,AC.currentTime,.1)});
+
+/* the pips sing along: while the music plays, their voices land on the notes of the current chord
+   and start on the beat. Now and then one of them hums the tune. */
+function musicSync(){return !!(AC&&MUS.gain&&MUS.level>.3&&musicOn()&&!cardOn&&!choir)}
+function snapF(f){
+  if(!musicSync())return f;
+  const s=12*Math.log2(f/196),ch=MUS.cur.map(n=>((n%12)+12)%12);
+  let best=s,bd=99;for(let o=-2;o<=5;o++)for(const c of ch){const v=o*12+c,d=Math.abs(v-s);if(d<bd){bd=d;best=v}}
+  return 196*Math.pow(2,best/12);
+}
+// how long to wait so a sound starts on the next sixteenth note
+function beatDelay(){
+  if(!musicSync()||!MUS.eighth)return 0;
+  const g=MUS.eighth/2,t=AC.currentTime;let n=MUS.next;
+  while(n-g>=t)n-=g;while(n<t)n+=g;
+  return Math.max(0,n-t);
+}
+let humT=rand(12,25);
+function humTick(dt){
+  humT-=dt;if(humT>0)return;humT=rand(15,35);
+  if(!musicSync()||night||!MUS.motif.length)return;
+  const p=pick(S.pips.filter(q=>["idle","walk"].includes(rt(q).state)&&inView(q.x,q.y,-10)&&!rt(q).need));if(!p)return;
+  const notes=MUS.motif.filter(v=>v>=0).slice(0,4);if(!notes.length)return;
+  const d=beatDelay(),oct=Math.round(Math.log2(p.pitch/392));
+  notes.forEach((v,i)=>{const f=392*Math.pow(2,MUS_PENTA[v]/12+oct);tone(f,MUS.eighth*.9,"triangle",d+i*MUS.eighth,1.02,.3)});
+  say(p,"♪ ♫",notes.length*MUS.eighth+.6,"snd","content");p.mood=Math.min(100,p.mood+2);
+  S.stats.hums=(S.stats.hums||0)+1;
+}

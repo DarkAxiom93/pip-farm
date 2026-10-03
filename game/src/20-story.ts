@@ -54,7 +54,7 @@ function chapterReady(st){const c=st.choices;
 function storyTick(){
   if(!S.story)storyInit();
   const st=S.story;if(!st||st.ending==="reset"&&!st.glitch&&Date.now()-st.endAt>86400000)spawnRedemption();
-  if(!st||focusing()||cardOn)return;
+  if(!st||focusing()||cardOn||hide)return; // no story cards in the middle of hide and seek
   if(st.ch===0&&(S.pips.length>=5||Date.now()-st.started>20*60000)){st.ch=1;st.chDay=dayKey(Date.now());st.nextGlitch=Date.now()+15000;$("hStory").hidden=false;
     card({title:"פרק 1 · תקלה",lines:loopN()?["~משהו בחווה מהבהב. שוב.","~פיפי לא מוריד ממנו את העיניים. הוא כבר ראה את זה פעם.","> חפש את התקלות במפה והקש עליהן"]:["~משהו בחווה מהבהב.","~פיפי לא מוריד ממנו את העיניים.","> חפש את התקלות במפה והקש עליהן"]});setTimeout(()=>letter("hello"),25000);dirty();return}
   if(st.ch>=1&&st.ch<=4&&!st.glitch&&st.frag<(CH_FRAGS[st.ch]||0)&&chapterReady(st)&&Date.now()>=st.nextGlitch){st.glitch=glitchSpot();toast("משהו מהבהב במפה…",1);dirty()}

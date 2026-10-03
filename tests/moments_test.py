@@ -14,7 +14,10 @@ async def main():
         print("PET moment",await pg.evaluate("(__pip.S.moments||[]).filter(m=>m.k==='pet').length"))
         # an old moment gets remembered by a pip that was there
         await pg.evaluate("(()=>{const P=__pip,m=P.moment('choir',P.S.pips.slice(0,12));m.t=Date.now()-2*86400000;P.S.moments.filter(x=>x.k==='pet').forEach(x=>x.t=Date.now()-5*60000);P.S.pips.forEach(p=>{const r=P.rt(p);r.state='idle';r.need=null;p.x=120+Math.random()*60;p.y=60+Math.random()*30})})()")
-        await pg.wait_for_timeout(400);await pg.mouse.move(600,300);await pg.evaluate("__pip.recallTick(99999)");await pg.wait_for_timeout(500)
+        await pg.wait_for_timeout(400);await pg.mouse.move(600,300);await pg.wait_for_timeout(100)
+        for i in range(8):
+            await pg.evaluate("__pip.recallTick(99999)");await pg.wait_for_timeout(500)
+            if await pg.evaluate("__pip.S.pips.some(q=>__pip.rt(q).recall)"): break
         who=await pg.evaluate("(()=>{const P=__pip;const p=P.S.pips.find(q=>P.rt(q).recall);return p?{id:p.id,x:p.x,y:p.y}:null})()")
         print("RECALL started",bool(who),"memo bubble",await pg.locator(".bub.memo canvas.doodle").count()>0)
         if who:

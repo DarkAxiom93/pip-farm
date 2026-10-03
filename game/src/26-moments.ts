@@ -53,7 +53,7 @@ function recallTick(dt){
   const now=Date.now(),cand=[];
   for(const m of S.moments){
     if(now-m.t<15*60000||now-m.last<3600000)continue;
-    const ps=m.who.map(byId).filter(p=>p&&["idle","walk"].includes(rt(p).state)&&!rt(p).need&&inView(p.x,p.y,-10));
+    const ps=m.who.map(byId).filter(p=>p&&["idle","walk"].includes(rt(p).state)&&!rt(p).need&&!bubbleEls.has(p.id)&&inView(p.x,p.y,-10));
     if(ps.length)cand.push([m,pick(ps),1+Math.min(5,(now-m.t)/86400000)]);
   }
   if(!cand.length)return;
@@ -64,7 +64,9 @@ function remember(p,m){
   const r=rt(p);m.last=Date.now();
   r.state="stare";r.ct=6;r.recall={id:m.id,until:performance.now()+12000};
   say(p," ",8,"memo","content");
-  const b=bubbleEls.get(p.id);if(b){b.textContent="";b.appendChild(doodleCanvas(MOMENTS[m.k].i))}
+  const b=bubbleEls.get(p.id);
+  if(!b||!b.classList.contains("memo")){r.recall=null;r.state="idle";m.last=0;recallT=5;return} // too many bubbles right now, try again soon
+  b.textContent="";b.appendChild(doodleCanvas(MOMENTS[m.k].i));
   SFX.q(p.pitch*.8);
   toast(`${p.name} נזכר: ${momentText(m)} (${ago(m.t)}). הקש עליו כדי להיזכר איתו`,1);
   dirty();

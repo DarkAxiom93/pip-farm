@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 node scripts/build-game.mjs --test
 cd tests
 fail=0
-for t in branch_test branch_test2 ngplus_test outside_test moments_test hide_test achievements_test night_test nature_test decor_test campfire_test soak; do
+for t in branch_test branch_test2 ngplus_test outside_test moments_test hide_test achievements_test night_test nature_test decor_test campfire_test singalong_test soak; do
   echo "== $t"
   out=$(python3 "$t.py" 2>&1) || { echo "$out" | tail -20; echo "FAIL: $t crashed"; fail=1; continue; }
   echo "$out" | grep -av '^\s'
