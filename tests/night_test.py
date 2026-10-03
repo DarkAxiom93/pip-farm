@@ -11,7 +11,10 @@ async def main():
         await pg.add_init_script("if(!sessionStorage.x){sessionStorage.x=1;localStorage.setItem('pipfarm.v1',"+json.dumps(json.dumps(d))+")}")
         await pg.goto("file://"+os.path.join(os.path.dirname(os.path.abspath(__file__)),"t.html"));await pg.wait_for_timeout(2000);await pg.mouse.click(5,5)
         # dreams
-        await pg.evaluate("__pip.S.pips.forEach((p,i)=>{const r=__pip.rt(p);r.state='sleep';r.nap=false;p.lang={food:'בלופ'};p.x=110+i*8;p.y=90})");await pg.evaluate("__pip.dreamTick(999)");await pg.wait_for_timeout(300)
+        await pg.evaluate("__pip.S.pips.forEach((p,i)=>{const r=__pip.rt(p);r.state='sleep';r.nap=false;p.lang={food:'בלופ'};p.x=110+i*8;p.y=90})");await pg.wait_for_timeout(200)
+        for i in range(8):
+            await pg.evaluate("__pip.dreamTick(999)");await pg.wait_for_timeout(400)
+            if await pg.evaluate("__pip.S.pips.some(q=>__pip.rt(q).dream)"): break
         who=await pg.evaluate("(()=>{const p=__pip.S.pips.find(q=>__pip.rt(q).dream);return p?{x:p.x,y:p.y}:null})()")
         print("DREAM shown",bool(who),"bubble",await pg.locator(".bub.dream canvas").count()>0)
         if who: await tapw(pg,who["x"],who["y"]-4);await pg.wait_for_timeout(1500)

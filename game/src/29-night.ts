@@ -42,14 +42,16 @@ function drawLanternGlow(t){
 // ---------- dreams ----------
 function dreamTick(dt){
   if(!night)return;dreamT-=dt;if(dreamT>0)return;dreamT=rand(12,25);
-  const ps=S.pips.filter(p=>{const r=rt(p);return r.state==="sleep"&&!r.dream&&inView(p.x,p.y,-10)});
+  const ps=S.pips.filter(p=>{const r=rt(p);return r.state==="sleep"&&!r.dream&&!bubbleEls.has(p.id)&&inView(p.x,p.y,-10)});
   const p=pick(ps);if(!p)return;
   const ms=momentsOf(p),st=S.story;
   let icon=ms.length&&Math.random()<.5?MOMENTS[pick(ms).k].i:pick(["sun","heart","rain","question"]);
   if(st&&st.ch>=2&&!st.ending&&Math.random()<.3)icon=pick(["screen","keeper"]);
   rt(p).dream={icon,until:performance.now()+11000};
   say(p," ",11,"memo dream","sleepy");
-  const b=bubbleEls.get(p.id);if(b){b.textContent="";b.appendChild(doodleCanvas(icon,2))}
+  const b=bubbleEls.get(p.id);
+  if(!b||!b.classList.contains("dream")){rt(p).dream=null;dreamT=3;return} // too many bubbles right now, try again soon
+  b.textContent="";b.appendChild(doodleCanvas(icon,2));
 }
 function dreamCount(){const today=dayKey(Date.now());if(!S.dreams||S.dreams.day!==today)S.dreams={day:today,n:0,word:false};return S.dreams}
 function peekDream(p){

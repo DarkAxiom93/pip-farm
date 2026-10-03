@@ -50,6 +50,7 @@ function renderAlbum(){
   const have=Object.keys(S.album).length;
   $("albTop").innerHTML=`גילית <b>${have}/${albumTotal()}</b>. כל פיפ שנולד יורש את רוב הגנים מההורה, ולפעמים משהו משתנה. פיפ מאושר במיוחד (מצב רוח מעל 90) כשהוא מתפצל מוליד מוטציה פי 2 יותר`;
   const body=$("albBody");body.innerHTML="";
+  {const sec=document.createElement("div");sec.className="alb-sec";sec.innerHTML=collectionHtml();body.appendChild(sec)}
   if(S.moments&&S.moments.length){const sec=document.createElement("div");sec.className="alb-sec";
     sec.innerHTML=`<h3>ספר הרגעים<small>${S.moments.length}</small></h3><ul class="mem">${momentsHtml(S.moments,20)}</ul><p class="albtop">רגעים גדולים שעברתם ביחד. מדי פעם פיפ שהיה שם נזכר באחד מהם. כשזה קורה, הקש עליו כדי להיזכר איתו</p>`;
     body.appendChild(sec)}

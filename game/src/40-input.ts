@@ -85,6 +85,7 @@ function tapAt(e){
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}
   }
   if(catchFlyAt(x,y))return; // pips first, then the fireflies around them
+  if(natureTap(x,y))return;
   for(let i=0;i<PLOTS.length;i++){const g=PLOTS[i];if(g.z&&!zoneOpen(g.z))continue;if(x>=g.x-2&&x<=g.x+PW+2&&y>=g.y-2&&y<=g.y+PH+4){openPlot(i);return}}
   if(S.visitor&&Math.abs(x-S.visitor.x)<8&&y>S.visitor.y-22&&y<S.visitor.y+3){openVisitor();return}
   if(S.meteor&&S.meteor.landed&&!S.meteor.taken&&Math.hypot(x-S.meteor.x,y-S.meteor.y+3)<10){takeMeteor();return}
@@ -94,6 +95,7 @@ function tapAt(e){
   for(const d of S.drawings)if(Math.abs(x-(d.x-4))<10&&Math.abs(y-(d.y-6))<10){openDrawing(d);return}
   if(S.statue&&Math.abs(x-STATUE.x)<9&&y>STATUE.y-38&&y<STATUE.y+2){openStatue();return}
   const z=zoneAt(x,y);if(z&&!zoneOpen(z.id)){openZone(z);return}
+  if(waterTap(x,y))return;
   closePlot();
 }
 /* minimap and zone locks */

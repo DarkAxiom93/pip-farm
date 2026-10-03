@@ -65,3 +65,11 @@ night_test|STARS mode True
 night_test|STARS saved 1 lines 2
 night_test|SAVED night 1 1
 night_test|ERR []
+nature_test|BUGS spawned True
+nature_test|BUG caught True
+nature_test|DIG found True spot gone True
+nature_test|POND frog True
+nature_test|FLOWERS song 1
+nature_test|BOOK shown 1 items True
+nature_test|SAVED col True
+nature_test|ERR []

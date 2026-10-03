@@ -32,6 +32,9 @@ const ACH=[
   {id:"lantern3",n:"אור בלילה",d:"להדליק 3 פנסים עם גחליליות",r:20,v:()=>S.lanterns||0,g:3},
   {id:"stars1",n:"אסטרונום",d:"לצייר קבוצת כוכבים",r:15,v:()=>(S.constellations||[]).length,g:1},
   {id:"dream10",n:"שומר החלומות",d:"להציץ ל-10 חלומות",r:20,v:()=>S.stats.dreams||0,g:10},
+  {id:"col15",n:"חוקר טבע",d:"15 דברים שונים בספר האוסף",r:20,v:()=>Object.keys(S.col||{}).length,g:15},
+  {id:"colall",n:"מוזיאון",d:"ספר אוסף מלא",r:120,v:()=>Object.keys(S.col||{}).length,g:()=>SPECIES.length},
+  {id:"dig20",n:"ארכיאולוג",d:"לחפור 20 פעמים",r:20,v:()=>S.stats.digs||0,g:20},
   {id:"daily10",n:"קבוע",d:"לסיים את כל מטרות היום 10 פעמים",r:40,v:()=>S.stats.dailyDone||0,g:10}
 ];
 const achGoal=a=>typeof a.g==="function"?a.g():a.g;
@@ -73,6 +76,9 @@ const DAILY={
   focus:{n:"זמן ריכוז אחד עד הסוף",g:1},
   decode:{n:"לפענח מילה פיפית",g:1,ok:()=>Object.values(S.lex||{}).some((w:any)=>!w.ok)},
   flies:{n:"לתפוס גחליליות בלילה",g:5},
+  collect:{n:"לתפוס חרקים או דגים",g:4},
+  dig:{n:"לחפור בנקודה נוצצת",g:1,ok:()=>(S.digs||[]).length>0},
+  flowers:{n:"לנגן את שיר הפרחים (8 פרחים ברצף)",g:1},
   dream:{n:"להציץ לחלום של פיפ ישן",g:1},
   split:{n:"שפיפ יתפצל",g:1,ok:()=>S.pips.length<cap()}
 };
