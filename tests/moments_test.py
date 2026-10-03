@@ -10,7 +10,7 @@ async def main():
         # petting the first time records a moment
         await pg.evaluate("(()=>{const P=__pip,p=P.S.pips[1];P.rt(p).state='idle';})()")
         x,y=await pg.evaluate("[__pip.S.pips[1].x,__pip.S.pips[1].y]")
-        await tapw(pg,x,y-4);await pg.wait_for_timeout(300);x,y=await pg.evaluate("[__pip.S.pips[1].x,__pip.S.pips[1].y]");await tapw(pg,x,y-4)
+        await pg.evaluate("(()=>{const P=__pip,p=P.S.pips[1];P.rt(p).petCd=0;P.pet(p)})()")
         print("PET moment",await pg.evaluate("(__pip.S.moments||[]).filter(m=>m.k==='pet').length"))
         # an old moment gets remembered by a pip that was there
         await pg.evaluate("(()=>{const P=__pip,m=P.moment('choir',P.S.pips.slice(0,12));m.t=Date.now()-2*86400000;P.S.moments.filter(x=>x.k==='pet').forEach(x=>x.t=Date.now()-5*60000);P.S.pips.forEach(p=>{const r=P.rt(p);r.state='idle';r.need=null;p.x=120+Math.random()*60;p.y=60+Math.random()*30})})()")
