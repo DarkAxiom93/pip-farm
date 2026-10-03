@@ -26,9 +26,8 @@ async def main():
         for i in range(10): await pg.evaluate("(()=>{const f=__pip.flies[0];__pip.catchFlyAt(f.x,f.y)})()")
         r=await pg.evaluate("({jar:__pip.S.jar,l:__pip.S.lanterns,sp:__pip.S.sparks})");print("FLIES jar",r["jar"],"lanterns",r["l"],"paid",r["sp"]-sp>=15)
         # a tap on a firefly on screen catches it too
-        f=await pg.evaluate("(()=>{const c=__pip.cam,v=__pip.flies.find(f=>f.x>c.x+20&&f.x<c.x+230&&f.y>c.y+20&&f.y<c.y+150&&!__pip.S.pips.some(p=>Math.abs(p.x-f.x)<14&&Math.abs(p.y-f.y)<18)&&!(__pip.S.decor||[]).length);return v?[v.x,v.y]:null})()")
-        if f: await tapw(pg,f[0],f[1]);await pg.wait_for_timeout(200)
-        print("FLIES tap",await pg.evaluate("__pip.S.jar")==1 if f else True)
+        await pg.evaluate("(()=>{const f=__pip.flies[1];f.x=150;f.y=146})()");await tapw(pg,150,146);await pg.wait_for_timeout(200)
+        print("FLIES tap",await pg.evaluate("__pip.S.jar")==1)
         # constellation
         await pg.locator("#hStars").click();print("STARS mode",await pg.evaluate("__pip.starMode"))
         box=await pg.locator("#cv").bounding_box()
