@@ -50,9 +50,15 @@ jobs:
           set -o pipefail
           v="${{ steps.check.outputs.tag }}"
           ls dist
-          gh release create "$v" dist/PipFarm-Setup-*.exe dist/PipFarm-Setup-*.exe.blockmap dist/latest.yml \
-            --target "$GITHUB_SHA" --title "חוות הפיפים $v" \
-            --notes "להתקנה ראשונה: להוריד את PipFarm-Setup ולהפעיל. מי שכבר מותקן אצלו מקבל את הגרסה לבד." 2>&1 | tee -a release.log
+          # GitHub sometimes answers 5xx for a moment: try up to 4 times
+          for try in 1 2 3 4; do
+            gh release delete "$v" --cleanup-tag -y >/dev/null 2>&1 || true
+            if gh release create "$v" dist/PipFarm-Setup-*.exe dist/PipFarm-Setup-*.exe.blockmap dist/latest.yml \
+              --target "$GITHUB_SHA" --title "חוות הפיפים $v" \
+              --notes "להתקנה ראשונה: להוריד את PipFarm-Setup ולהפעיל. מי שכבר מותקן אצלו מקבל את הגרסה לבד." 2>&1 | tee -a release.log; then exit 0; fi
+            echo "attempt $try failed, waiting" | tee -a release.log; sleep $((try*20))
+          done
+          exit 1
       # if the build fails, leave the end of the log as a comment on the commit so it is easy to read
       - if: failure()
         shell: bash
