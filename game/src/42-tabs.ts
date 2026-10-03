@@ -120,6 +120,7 @@ $("optStory").addEventListener("change",e=>{S.fastStory=e.target.checked;dirty()
 $("optSeason").addEventListener("change",e=>{S.fastSeasons=e.target.checked;seasonT=0;dirty()});
 $("optAi").addEventListener("change",e=>{S.ai=e.target.checked;voiceNote();dirty()});
 function soundBtn(){const b=$("hSound");b.textContent="צליל: "+(S.sound?"פועל":"כבוי");b.setAttribute("aria-pressed",String(S.sound))}
+$("hStars").addEventListener("click",()=>{audio();toggleStarMode()});
 $("hHide").addEventListener("click",()=>{if(hide){toast(hide.phase==="seek"?"משחקים! חפש אותם במפה":"הם עוד מתחבאים…");return}startHide()});
 $("hChoir").addEventListener("click",()=>{audio();if(choir){toast("המקהלה כבר מתאספת");return}startChoir(true)});
 $("hSound").addEventListener("click",()=>{audio();S.sound=!S.sound;soundBtn();if(tab==="farm")renderFarm();dirty()});

@@ -71,6 +71,7 @@ cv.addEventListener("wheel",e=>{e.preventDefault();const b=cv.getBoundingClientR
 $("zIn").addEventListener("click",()=>{zoomAt(cam.z*1.5,.5,.5)});
 $("zOut").addEventListener("click",()=>{zoomAt(cam.z/1.5,.5,.5)});
 function tapAt(e){
+  if(starMode){starTap(e);return}
   if(night&&S.stars.length){const b=cv.getBoundingClientRect(),sx=(e.clientX-b.left)/b.width*CW,sy=(e.clientY-b.top)/b.height*CH;
     const st=S.stars.find(q=>{const{fx,fy}=starPos(q);return Math.hypot(fx*CW-sx,fy*CH-sy)<9});
     if(st){openStar(st);return}}
@@ -78,11 +79,12 @@ function tapAt(e){
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
   if(hideTap(x,y))return;
   // a pip that is remembering something is tapped first, even in a crowd
-  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall?1:0)-(rt(a).recall?1:0)||b.y-a.y);
+  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall||rt(b).dream?1:0)-(rt(a).recall||rt(a).dream?1:0)||b.y-a.y);
   for(const p of ord){
     const bw=7+Math.floor(Math.min(level(p),10)*.4);
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}
   }
+  if(catchFlyAt(x,y))return; // pips first, then the fireflies around them
   for(let i=0;i<PLOTS.length;i++){const g=PLOTS[i];if(g.z&&!zoneOpen(g.z))continue;if(x>=g.x-2&&x<=g.x+PW+2&&y>=g.y-2&&y<=g.y+PH+4){openPlot(i);return}}
   if(S.visitor&&Math.abs(x-S.visitor.x)<8&&y>S.visitor.y-22&&y<S.visitor.y+3){openVisitor();return}
   if(S.meteor&&S.meteor.landed&&!S.meteor.taken&&Math.hypot(x-S.meteor.x,y-S.meteor.y+3)<10){takeMeteor();return}
@@ -137,6 +139,7 @@ function tapPip(p){
   r.taps=(r.taps||[]).filter(x=>now-x<2500);r.taps.push(now);
   if(r.taps.length>=6){r.taps=[];bond(p,-4,"poke");r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,"!!",1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
   if((p.trust??30)<-20&&Math.random()<.5&&r.state!=="sleep"){r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,pick(["!?","איק!"]),1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
+  if(peekDream(p)){if(sel!==p.id)select(p.id);return}
   if(shareRecall(p)){if(sel!==p.id)select(p.id);return}
   if(r.state==="argue"){calm(p);if(sel!==p.id)select(p.id);return}
   if(r.state==="choir"){SFX.happy(p.pitch*2);burst(p.x,p.y-12,"heart",1);if(sel!==p.id)select(p.id);return}

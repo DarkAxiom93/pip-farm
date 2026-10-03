@@ -36,6 +36,8 @@ button,input,select{font:inherit;color:inherit}
 .bub.lang::after{border-top-color:var(--sky)}
 .bub.memo{background:#fff7d6;border:2px solid var(--butter);padding:4px 6px 3px;line-height:0}
 .bub.memo::after{border-top-color:var(--butter)}
+.bub.dream{background:#ece6ff;border-color:#b9a7ff;opacity:.92}
+.bub.dream::after{border-top-color:#b9a7ff}
 canvas.doodle{display:block;image-rendering:pixelated}
 .need{position:absolute;transform:translate(-20%,-100%);width:clamp(18px,2.6vw,26px);height:clamp(18px,2.6vw,26px);border-radius:50%;background:var(--ink);border:2px solid var(--ember);display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.3);animation:pop .2s ease-out,bob 1.2s ease-in-out infinite}
 .need.late{border-color:var(--berry);animation:pop .2s ease-out,shake .5s linear infinite}
@@ -278,6 +280,7 @@ details.more[open] summary::before{content:"▾ "}
       <button class="chip storychip" id="hStory" type="button" hidden>סיפור</button>
       <button class="chip sec" id="hLog" type="button">יומן</button>
       <button class="chip choirbtn sec" id="hHide" type="button">מחבואים</button>
+      <button class="chip choirbtn sec" id="hStars" type="button">✦ כוכבים</button>
       <button class="chip choirbtn sec" id="hChoir" type="button">♪ מקהלה</button>
       <button class="chip sec" id="hSound" type="button" aria-pressed="true">צליל: פועל</button>
     </div>

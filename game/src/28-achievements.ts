@@ -29,6 +29,9 @@ const ACH=[
   {id:"letters5",n:"דואר",d:"5 מכתבים מ-pip_001",r:20,v:()=>Object.keys(S.letters||{}).length,g:5},
   {id:"ending",n:"סוף",d:"להגיע לסוף של הסיפור",r:40,v:()=>endingsFound().size,g:1},
   {id:"endings3",n:"כל הסופים",d:"בחוץ, בפנים ואיפוס",r:150,v:()=>endingsFound().size,g:3},
+  {id:"lantern3",n:"אור בלילה",d:"להדליק 3 פנסים עם גחליליות",r:20,v:()=>S.lanterns||0,g:3},
+  {id:"stars1",n:"אסטרונום",d:"לצייר קבוצת כוכבים",r:15,v:()=>(S.constellations||[]).length,g:1},
+  {id:"dream10",n:"שומר החלומות",d:"להציץ ל-10 חלומות",r:20,v:()=>S.stats.dreams||0,g:10},
   {id:"daily10",n:"קבוע",d:"לסיים את כל מטרות היום 10 פעמים",r:40,v:()=>S.stats.dailyDone||0,g:10}
 ];
 const achGoal=a=>typeof a.g==="function"?a.g():a.g;
@@ -69,6 +72,8 @@ const DAILY={
   task:{n:"לסיים משימה אמיתית",g:1},
   focus:{n:"זמן ריכוז אחד עד הסוף",g:1},
   decode:{n:"לפענח מילה פיפית",g:1,ok:()=>Object.values(S.lex||{}).some((w:any)=>!w.ok)},
+  flies:{n:"לתפוס גחליליות בלילה",g:5},
+  dream:{n:"להציץ לחלום של פיפ ישן",g:1},
   split:{n:"שפיפ יתפצל",g:1,ok:()=>S.pips.length<cap()}
 };
 function dailyToday(){

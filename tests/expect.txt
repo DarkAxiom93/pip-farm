@@ -56,3 +56,12 @@ achievements_test|DAILY all True counted 1 paid True streak True
 achievements_test|DAILY no double 1
 achievements_test|RELOAD same goals True no double pay True
 achievements_test|ERR []
+night_test|DREAM shown True bubble True
+night_test|DREAM peek True
+night_test|DREAM decoded word True counted 1
+night_test|FLIES jar 0 lanterns 1 paid True
+night_test|FLIES tap True
+night_test|STARS mode True
+night_test|STARS saved 1 lines 2
+night_test|SAVED night 1 1
+night_test|ERR []

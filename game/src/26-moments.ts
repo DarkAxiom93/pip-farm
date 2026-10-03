@@ -22,6 +22,8 @@ const MOMENTS={
   wave:{i:"keeper",x:()=>"הפעם שנופפת להם מאחורי המסך"},
   gate:{i:"door",x:()=>"היום שבו השער נפתח"},
   together:{i:"keeper",x:()=>"היום שבו נכנסת אליהם"},
+  lantern:{i:"sun",x:()=>"הפנס הראשון שהדלקתם בלילה"},
+  stars:{i:"sun",x:()=>"קבוצת הכוכבים הראשונה שציירת להם"},
   hide:{i:"sun",x:m=>`המחבואים הראשונים. מצאת את כולם ב-${m.v} שניות`}
 };
 // add a moment. who: one pip, a list of pips, or null for whoever is around (up to 12)
