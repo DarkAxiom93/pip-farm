@@ -31,7 +31,7 @@ async def main():
         print("PANEL moments",await pg.locator("#momList li").count()>0)
         # saved
         await pg.wait_for_timeout(2500);s=json.loads(await pg.evaluate("localStorage.getItem('pipfarm.v1')"))
-        print("SAVED moments",len(s.get("moments",[]))>=3)
+        print("SAVED moments",len(s.get("moments",[]))>=3,"n",len(s.get("moments",[])),"live",await pg.evaluate("__pip.S.moments.length"))
         # reset ending forgets them; New Game+ keeps pip_001's own moments as old ones
         await pg.evaluate("__pip.S.story.site={k:'gate',p:100,x:244,y:163};__pip.S.story.ch=5;__pip.storyChoose('reset')");await pg.wait_for_timeout(500)
         print("RESET forgot",await pg.evaluate("__pip.S.moments.length"))

@@ -95,7 +95,7 @@ function endHide(won){
   for(const s of h.spots){if(!s.pip||s.found)continue;const p=byId(s.pip);if(!p)continue;const r=rt(p);r.state="celebrate";r.ct=1.6;r.spot=null;p.y=s.y+3;burst(p.x,p.y-8,"dust",8);say(p,pick(["הה!","כאן!","♪♪"]),2,"snd","excited")}
   S.stats.hides=(S.stats.hides||0)+1;
   if(won){
-    const bonus=Math.max(5,Math.round(30-secs/2));S.sparks+=bonus;
+    const bonus=Math.max(5,Math.round(30-secs/2));S.sparks+=bonus;S.stats.hideWins=(S.stats.hideWins||0)+1;goal("hide");
     const best=S.stats.hideBest||0,record=!best||secs<best;if(record)S.stats.hideBest=secs;
     SFX.level();toast(`מצאת את כולם ב-${secs} שניות! ‎+${bonus} ניצוצות${record&&best?" · שיא חדש!":""}`,1);
     moment("hide",h.spots.filter(s=>s.pip).map(s=>byId(s.pip)),secs);

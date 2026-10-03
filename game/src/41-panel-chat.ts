@@ -114,6 +114,7 @@ $("chatForm").addEventListener("submit",async e=>{
   e.preventDefault();audio();
   const p=sel&&byId(sel),inp=$("chatInput"),text=inp.value.trim();
   if(!p||!text||pending)return;
+  goal("talk");
   inp.value="";
   addMsg("u",text);
   const hadQ=p.question;

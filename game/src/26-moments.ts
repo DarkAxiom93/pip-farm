@@ -69,7 +69,7 @@ function remember(p,m){
 function shareRecall(p){
   const r=rt(p);if(!r.recall||performance.now()>r.recall.until)return false;
   const m=(S.moments||[]).find(x=>x.id===r.recall.id);r.recall=null;if(!m)return false;
-  m.shared++;bond(p,4,"shared");p.mood=Math.min(100,p.mood+8);
+  m.shared++;bond(p,4,"shared");goal("remember");p.mood=Math.min(100,p.mood+8);
   r.state="celebrate";r.ct=1.4;burst(p.x,p.y-10,"heart",3);SFX.happy(p.pitch);
   if(!langSpeak(p,"keeper",.7))say(p,pick(["♪","כן!","זוכר"]),2,"word","excited");
   if(S.drawings.length<20)S.drawings.push({x:Math.round(p.x+6),y:Math.round(p.y+8),k:MOMENTS[m.k].i,by:p.id,name:p.name,t:Date.now(),away:0});

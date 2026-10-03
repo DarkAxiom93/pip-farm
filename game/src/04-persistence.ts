@@ -1,16 +1,21 @@
 /* ================= persistence ================= */
 let db=null,userId=null,writing=false,again=false,dirtyT=null;
+let lastCloud=0,cloudT=null;
 function saveNow(){
   const d=serialize();
   try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}
   platformSave(d);
   if(!db||!userId)return;
+  // the cloud copy is written at most every 10 s; this device's copy above is always fresh
+  const wait=10000-(Date.now()-lastCloud);
+  if(wait>0){if(!cloudT)cloudT=setTimeout(()=>{cloudT=null;saveNow()},wait);return}
   if(writing){again=true;return}
   let body=d;try{if(JSON.stringify(d).length>230000){body=Object.assign({},d,{pips:d.pips.map(p=>Object.assign({},p,{convo:p.convo.slice(-2),vocab:p.vocab.slice(-12),mem:p.mem.slice(-2)})),stars:d.stars.slice(-30),drawings:[]})}}catch(_){}
-  writing=true;
+  writing=true;lastCloud=Date.now();
   db.doc("data/users/"+userId+"/pipfarm").set(body).catch(()=>{}).finally(()=>{writing=false;if(again){again=false;saveNow()}});
 }
-function dirty(){clearTimeout(dirtyT);dirtyT=setTimeout(saveNow,1500)}
+// save 1.5 s after the first change (a steady stream of changes must not keep pushing the save back)
+function dirty(){if(dirtyT)return;dirtyT=setTimeout(()=>{dirtyT=null;saveNow()},1500)}
 setInterval(saveNow,30000);
 addEventListener("pagehide",()=>{try{localStorage.setItem(KEY,JSON.stringify(serialize()))}catch(e){}});
 

@@ -38,7 +38,7 @@ function stopFocus(){
 }
 function finishFocus(){
   const f=S.focus;S.focus=null;document.title="חוות הפיפים";
-  const reward=Math.round(f.len/5*2);S.sparks+=reward;S.stats.focusMin+=f.len;S.stats.focusRuns++;
+  const reward=Math.round(f.len/5*2);S.sparks+=reward;goal("focus");S.stats.focusMin+=f.len;S.stats.focusRuns++;
   S.pips.forEach(p=>{p.xp+=5;p.growth+=5;p.mood=Math.min(100,p.mood+8);p.trust=clamp((p.trust??30)+2,-100,100);const r=rt(p);if(r.state==="idle"||r.state==="walk"){r.state="celebrate";r.ct=1.5}});
   SFX.level();burst(cam.x+CW/cam.z/2,cam.y+CH/cam.z/2,"confetti",40);
   toast(`סיימת ${f.len} דקות ריכוז! ‎+${reward} ניצוצות`);if(f.len>=25)moment("focus",null,f.len,false);notify("זמן הריכוז נגמר",`סיימת ${f.len} דקות. הפיפים חוגגים איתך`,true);

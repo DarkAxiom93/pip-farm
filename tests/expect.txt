@@ -49,3 +49,10 @@ hide_test|WON over True best set True moment True none hidden True sparks up Tru
 hide_test|TIMEOUT over True hides 2 none hidden True
 hide_test|NIGHT blocked True
 hide_test|ERR []
+achievements_test|ACH unlocked pips10 True harv50 True not harv250 True
+achievements_test|ACH panel True total True
+achievements_test|DAILY goals 3 distinct True shown 3
+achievements_test|DAILY all True counted 1 paid True streak True
+achievements_test|DAILY no double 1
+achievements_test|RELOAD same goals True no double pay True
+achievements_test|ERR []

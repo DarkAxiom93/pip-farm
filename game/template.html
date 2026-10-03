@@ -131,6 +131,18 @@ button.chip{cursor:pointer}
 .tform .row select{flex:1}
 
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.achbox h3,.daily h3{font-size:14px;margin:12px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.achbox h3 small,.daily h3 small{font-weight:500;opacity:.7;font-size:11px}
+.achs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.ach{background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;padding:5px 7px;display:flex;flex-direction:column;gap:2px;opacity:.75}
+.ach.done{opacity:1;border-color:var(--butter)}
+.ach b{font-size:12.5px}.ach span{font-size:11px;opacity:.85;line-height:1.25}.ach small{font-size:10.5px;opacity:.7}
+.ach i,.dgoal i{display:block;height:5px;border-radius:3px;background:rgba(0,0,0,.25);overflow:hidden}
+.ach i em,.dgoal i em{display:block;height:100%;background:var(--butter)}
+.daily{background:var(--ground);border:2px solid var(--butter);border-radius:10px;padding:2px 9px 8px;margin-bottom:8px}
+.daily h3{margin-top:6px}
+.dgoal{display:grid;grid-template-columns:1fr 70px 34px;gap:8px;align-items:center;font-size:12.5px;margin-top:5px}
+.dgoal.done span{opacity:.6;text-decoration:line-through}.dgoal small{font-size:11px;opacity:.75;text-align:left}
 .stat{background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:10px;padding:6px 8px}
 .stat b{display:block;font-family:var(--pixel);font-weight:400;font-size:16px;font-variant-numeric:tabular-nums;color:var(--butter)}
 .stat span{font-size:11px;color:var(--ink-dim)}
@@ -302,6 +314,7 @@ details.more[open] summary::before{content:"▾ "}
     </section>
 
     <section class="tab" id="tab-tasks" hidden>
+      <div class="daily" id="dailyBox"></div>
       <div class="streak" id="streakBox"></div>
       <div class="focus" id="focusBox">
         <h3>זמן ריכוז<small>הפיפים עובדים בשקט איתך</small></h3>
@@ -344,6 +357,7 @@ details.more[open] summary::before{content:"▾ "}
 
     <section class="tab" id="tab-farm" hidden>
       <div class="stats" id="farmStats"></div>
+      <div class="achbox" id="achBox"></div>
       <div>
         <p class="label">חנות</p>
         <div class="shop" id="shopBox"></div>

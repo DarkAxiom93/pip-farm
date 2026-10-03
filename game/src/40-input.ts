@@ -158,13 +158,13 @@ function pet(p){
   const r=rt(p);
   burst(p.x,p.y-10,"heart",1);parts[parts.length-1].vx=0;parts[parts.length-1].vy=-14;
   SFX.purr(p.pitch);p.mood=Math.min(100,p.mood+5);quest("pet");
-  if(r.petCd<=0){award(p,3,"pet");r.petCd=2;langSpeak(p,"love",.3);bond(p,2,"pet");moment("pet",p);if(stormy()&&!S.weather.calmed){S.weather.calmed=1;moment("storm",p,null,false)}}
+  if(r.petCd<=0){award(p,3,"pet");r.petCd=2;goal("pet");langSpeak(p,"love",.3);bond(p,2,"pet");moment("pet",p);if(stormy()&&!S.weather.calmed){S.weather.calmed=1;moment("storm",p,null,false)}}
   if(r.state==="sleep"){say(p,"זזז…",1.5,"snd","sleepy")}
   else if(r.state==="idle"){r.state="celebrate";r.ct=.6}
   refresh();
 }
 function feed(p){
-  S.basket--;p.food=Math.min(100,p.food+30);p.mood=Math.min(100,p.mood+6);award(p,4,"pet");bond(p,3,"fed");quest("feed");
+  S.basket--;p.food=Math.min(100,p.food+30);p.mood=Math.min(100,p.mood+6);award(p,4,"pet");bond(p,3,"fed");quest("feed");goal("feed");
   const r=rt(p);if(["idle","walk","chat"].includes(r.state)){r.state="eat";r.ct=1.4}
   SFX.crunch();if(!langSpeak(p,"food",.5))say(p,pick(["נום נום","ממממ ♪","קראנץ"]),1.6,"snd","happy");
   if(sel===p.id)renderHead();refresh();dirty();

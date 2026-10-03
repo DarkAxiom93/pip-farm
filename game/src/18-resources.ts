@@ -8,7 +8,7 @@ function needWood(){if(Date.now()-woodWarn>300000){woodWarn=Date.now();toast("ה
 function chop(i){
   const tr=TREES[i];if(!treeUp(i))return;
   if(S.treeCut[i]!=null)delete S.treeCut[i];
-  treeHp[i]=(treeHp[i]??3)-1;treeShake[i]=.45;
+  treeHp[i]=(treeHp[i]??3)-1;treeShake[i]=.45;S.stats.chops=(S.stats.chops||0)+1;goal("chop");
   tone(150,.07,"square",0,.6,.25);tone(90,.1,"triangle",.03,.8,.3);
   for(let k=0;k<5;k++)parts.push({x:tr.x+rand(-2,2),y:tr.y-4,vx:rand(-18,18),vy:rand(-26,-8),life:.7,kind:"c",c:"#c89c63"});
   if(treeHp[i]<=0){
@@ -60,7 +60,7 @@ function startForage(p){
 }
 function pickWild(w,p){
   S.wild.splice(S.wild.indexOf(w),1);wildClaims.delete(w.id);
-  addFood(1);SFX.crunch();burst(w.x,w.y-3,"spark",4);
+  addFood(1);SFX.crunch();burst(w.x,w.y-3,"spark",4);if(!p)goal("forage");
   if(p){if(p.food<40)p.food=Math.min(100,p.food+20);award(p,3,null);if(!langSpeak(p,"food",.25))say(p,pick(["נום!","♪","מצאתי!"]),1.4,"snd","happy")}
   dirty();
 }

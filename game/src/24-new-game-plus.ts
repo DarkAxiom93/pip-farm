@@ -26,7 +26,7 @@ function newGamePlus(){
   const lex={};for(const w in old.lex)if(old.lex[w].ok&&!["screen","outside","game"].includes(old.lex[w].c))lex[w]=old.lex[w];
   const story=Object.assign({},old.story);
   freshState();
-  Object.assign(S,{loop:sum.loop+1,runs:[...(old.runs||[]),sum].slice(-12),album:old.album,letters:old.letters,lex,tasks:old.tasks,streak:old.streak,stats:Object.assign({},S.stats,{tasksDone:old.stats.tasksDone||0}),
+  Object.assign(S,{loop:sum.loop+1,runs:[...(old.runs||[]),sum].slice(-12),album:old.album,letters:old.letters,ach:old.ach,daily:old.daily,lex,tasks:old.tasks,streak:old.streak,stats:Object.assign({},S.stats,{tasksDone:old.stats.tasksDone||0}),
     hol:old.hol,sound:old.sound,music:old.music,ai:old.ai,fastStory:old.fastStory,fastSeasons:old.fastSeasons,seeds:old.seeds,quest:99,sparks:5+15*Math.min(sum.loop+1,4)});
   const f=S.pips[0];f.echo=true;
   const oldF=old.pips.find(p=>p.founder);

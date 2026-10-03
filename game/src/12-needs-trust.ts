@@ -14,7 +14,7 @@ function giveNeed(p){
 }
 function dropNeed(p){const r=rt(p);r.need=null;const el=needEls.get(p.id);if(el){el.remove();needEls.delete(p.id)}}
 function fulfill(p){
-  const r=rt(p);if(!r.need)return;
+  const r=rt(p);if(!r.need)return;goal("need");
   const type=r.need.type;dropNeed(p);
   p.mood=Math.min(100,p.mood+15);bond(p,5,"need");award(p,8,type==="talk"?"talk":"pet");S.stats.needs++;
   SFX.happy(p.pitch);burst(p.x,p.y-10,"spark",8);
