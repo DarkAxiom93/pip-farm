@@ -1,0 +1,3 @@
+{ "extends": "./tsconfig.base.json",
+  "compilerOptions": { "outFile": "out/game.web.js" },
+  "include": ["game/types.d.ts", "game/src/*.ts", "game/platform/web/*.ts", "game/main.ts"] }

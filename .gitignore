@@ -1,0 +1,8 @@
+node_modules/
+dist/
+out/
+renderer/index.html
+web/
+tests/t.html
+tests/*.png
+*.log

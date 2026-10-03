@@ -1,0 +1,13 @@
+branch_test|A ch 3 
+branch_test|B ch 4 
+branch_test|C ch 5 
+branch_test|D ending reset blank pips 12 
+branch_test|D2 after restore ending None ch 5 
+branch_test|E ending free awake 12
+branch_test|E2 note drawings 1
+branch_test|ERR []
+branch_test2|C2 request again True
+branch_test2|D2 ending None ch 5 
+branch_test2|ERR []
+soak|pips 112 
+soak|ERR []

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><title>חברים על שולחן העבודה</title>
+<style>
+html,body{margin:0;height:100%;background:transparent;overflow:hidden}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+</style></head><body>
+<canvas id="c"></canvas>
+<script>
+// A strip along the bottom of the screen where a few pips from the farm walk around.
+// Click a pip to answer its need (or pet it); double-click to open the farm on it.
+const S=3,c=document.getElementById("c"),g=c.getContext("2d");
+let W=0,H=0;
+function size(){W=Math.floor(innerWidth/S);H=Math.floor(innerHeight/S);c.width=W;c.height=H;g.imageSmoothingEnabled=false}
+addEventListener("resize",size);size();
+const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)};
+let snap={pips:[]},walkers=new Map(),AC=null;
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+function pickShown(){
+  const list=snap.pips||[],needy=list.filter(p=>p.need),rest=list.filter(p=>!p.need);
+  return [...needy,...rest].slice(0,Math.min(10,Math.max(3,Math.floor(W/40))));
+}
+pipDesktop.onSnapshot(s=>{
+  snap=s||{pips:[]};
+  const shown=pickShown(),ids=new Set(shown.map(p=>p.id));
+  for(const id of [...walkers.keys()])if(!ids.has(id))walkers.delete(id);
+  for(const p of shown){
+    let w=walkers.get(p.id);
+    if(!w){w={x:rand(10,W-10),tx:0,dir:1,wait:rand(0,3),hop:0,anim:rand(0,9)};w.tx=w.x;walkers.set(p.id,w)}
+    w.p=p;
+  }
+});
+function chirp(f){
+  try{if(!AC)AC=new AudioContext();const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.type="triangle";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*1.5,t+.12);v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(.12,t+.01);v.gain.exponentialRampToValueAtTime(.0001,t+.15);o.connect(v);v.connect(AC.destination);o.start(t);o.stop(t+.2)}catch(_){}
+}
+function drawPip(w,t){
+  const p=w.p,base=H-2,bw=p.g&&p.g.body?11:9,bh=bw-1;
+  const hop=w.hop>0?Math.abs(Math.sin(w.hop*12))*6:(w.moving?Math.abs(Math.sin(w.anim*11))*1.5:0);
+  const x0=Math.round(w.x-bw/2),y0=Math.round(base-bh-hop);
+  const hue=p.mut==="rainbow"?(p.hue+t*70)%360:p.hue,sat=p.elder?45:80;
+  const C=l=>p.mut==="gold"?`hsl(46,92%,${l}%)`:`hsl(${hue},${sat}%,${l}%)`;
+  R(w.x-bw/2+1,base-1,bw-2,2,"rgba(0,0,0,.25)");
+  if(p.mut==="glow"){R(x0-2,y0-2,bw+4,bh+4,`hsla(${hue},100%,82%,${.2+.15*Math.sin(t*3)})`)}
+  if(p.mut==="wings"){const f=Math.floor(t*9)%2;R(x0-3,y0+1-f,3,2+f,"#eef7ff");R(x0+bw,y0+1-f,3,2+f,"#eef7ff")}
+  R(x0,y0-1,bw,bh+2,C(24));R(x0-1,y0,bw+2,bh,C(24));
+  R(x0+1,y0,bw-2,bh,C(72));R(x0,y0+1,bw,bh-2,C(72));R(x0+1,y0+bh-2,bw-2,2,C(52));R(x0+1,y0+1,2,1,C(86));
+  const cx=x0+(bw>>1);
+  if(p.sprout===0){R(cx,y0-2,1,2,"#3f8f3a");R(cx-2,y0-3,2,1,"#6fcf5a");R(cx+1,y0-4,2,1,"#6fcf5a")}
+  else if(p.sprout===1){R(x0+1,y0-2,2,2,C(72));R(x0+bw-3,y0-2,2,2,C(72))}
+  else if(p.sprout===2){R(cx,y0-3,1,3,C(52));R(cx-1,y0-5,3,2,C(86))}
+  else if(p.sprout===4){R(cx-1,y0-3,3,1,"#ff9db5");R(cx,y0-4,1,3,"#ff9db5")}
+  else if(p.sprout===5){R(x0+1,y0-2,1,2,"#f5eddc");R(x0+bw-2,y0-2,1,2,"#f5eddc")}
+  else{R(cx,y0-2,1,2,C(52))}
+  const off=w.dir>0?1:0,ey=y0+3,el=cx-2+off,er=cx+1+off;
+  if(p.sleep){R(el,ey+1,2,1,"#2a1830");R(er,ey+1,2,1,"#2a1830")}
+  else if(Math.sin(t*1.3+w.anim)>.97){R(el,ey+1,1,1,"#2a1830");R(er,ey+1,1,1,"#2a1830")}
+  else{R(el,ey,1,2,"#2a1830");R(er,ey,1,2,"#2a1830");R(el,ey,1,1,"#fff")}
+  if(p.mood>55){R(el-1,ey+2,1,1,"#ff9db5");R(er+1,ey+2,1,1,"#ff9db5")}
+  if(p.elder){R(cx-2+off,ey+3,4,2,"#f4f1ea")}
+  if(snap.season==="winter")R(x0,y0+bh-4,bw,1,"#e8433f");
+  if(p.need){
+    const ny=y0-12+Math.round(Math.sin(t*4)*1),nx=w.x+2;
+    R(nx-3,ny-3,7,7,"#f5eddc");R(nx-4,ny-2,9,5,"#f5eddc");R(nx-1,ny+4,2,2,"#f5eddc");
+    const col={food:"#ff5d73",pet:"#ff7aa2",play:"#8fbfff",talk:"#2a1830"}[p.need];
+    if(p.need==="talk"){R(nx-2,ny,1,1,col);R(nx,ny,1,1,col);R(nx+2,ny,1,1,col)}
+    else if(p.need==="pet"){R(nx-2,ny-1,2,1,col);R(nx+1,ny-1,2,1,col);R(nx-2,ny,5,1,col);R(nx-1,ny+1,3,1,col);R(nx,ny+2,1,1,col)}
+    else{R(nx-1,ny-1,3,3,col);if(p.need==="food")R(nx,ny-2,1,1,"#6fcf5a")}
+  }
+}
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000);last=now;const t=now/1000;
+  g.clearRect(0,0,W,H);
+  for(const w of walkers.values()){
+    w.anim+=dt;if(w.hop>0)w.hop=Math.max(0,w.hop-dt);
+    if(w.p.sleep){w.moving=false}
+    else{const d=w.tx-w.x;
+      if(Math.abs(d)<1){w.moving=false;w.wait-=dt;if(w.wait<=0){w.tx=Math.max(8,Math.min(W-8,w.x+rand(-120,120)));w.wait=rand(2,8)}}
+      else{w.moving=true;w.dir=d>0?1:-1;w.x+=Math.sign(d)*Math.min(Math.abs(d),12*dt)}}
+    drawPip(w,t);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+function hit(e){const x=e.clientX/S,y=e.clientY/S;for(const w of walkers.values()){if(Math.abs(x-w.x)<8&&y>H-26)return w}return null}
+let over=false;
+addEventListener("mousemove",e=>{const o=!!hit(e);if(o!==over){over=o;pipDesktop.buddyMouse(o);c.style.cursor=o?"pointer":"default"}});
+addEventListener("mouseleave",()=>{if(over){over=false;pipDesktop.buddyMouse(false)}});
+let clickT=null;
+addEventListener("click",e=>{const w=hit(e);if(!w)return;
+  clearTimeout(clickT);clickT=setTimeout(()=>{w.hop=.6;chirp(500+(w.p.hue%200));pipDesktop.buddyCommand({type:"tap",id:w.p.id});if(w.p.need)w.p.need=null},220)});
+addEventListener("dblclick",e=>{const w=hit(e);if(!w)return;clearTimeout(clickT);pipDesktop.buddyCommand({type:"open",id:w.p.id})});
+</script>
+</body></html>

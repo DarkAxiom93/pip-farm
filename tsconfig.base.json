@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "none",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": false,
+    "noImplicitAny": false,
+    "allowJs": false,
+    "removeComments": false,
+    "newLine": "lf",
+    "skipLibCheck": true,
+    "alwaysStrict": false,
+    "noEmitOnError": true
+  }
+}

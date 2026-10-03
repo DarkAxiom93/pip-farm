@@ -1,0 +1,387 @@
+<title>חוות הפיפים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Silkscreen&display=swap">
+<style>
+[hidden]{display:none!important}
+/* Layout: pixel farm stage on the left with floating HUD and speech bubbles; a carved plum-wood panel on the right (stacks under the farm on phones) */
+:root{
+  --ground:#16221a;
+  --wood:#2b2231; --wood-2:#372b3f; --wood-edge:#4f3f58;
+  --ink:#f5eddc; --ink-dim:#bcaec4; --ink-dark:#2a2030;
+  --butter:#ffd166; --leaf:#86d47f; --berry:#ff7aa2; --sky:#8fbfff; --ember:#ffb347;
+  --display:"Fredoka","Varela Round","Rubik",system-ui,sans-serif;
+  --pixel:"Silkscreen",ui-monospace,"Courier New",monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--display);font-size:15px}
+*{box-sizing:border-box}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--butter);outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;padding-block:14px;padding-inline:16px}
+@media (max-width:860px){.app{grid-template-columns:minmax(0,1fr);height:auto;min-height:100%;gap:10px;padding-block:10px}}
+
+.stage{position:relative;align-self:start;border-radius:12px;overflow:hidden;box-shadow:0 0 0 3px var(--wood-edge),0 14px 40px rgba(0,0,0,.45);background:#3f6e38;user-select:none;-webkit-user-select:none}
+#cv{display:block;width:100%;height:auto;aspect-ratio:256/168;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer;touch-action:none}
+.bubbles{position:absolute;inset:0;pointer-events:none}
+.bub{position:absolute;transform:translate(-50%,-100%);background:var(--ink);color:var(--ink-dark);font-weight:600;font-size:clamp(11px,1.5vw,14px);line-height:1.25;padding:3px 9px 4px;border-radius:10px;max-width:46%;white-space:normal;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.3);animation:pop .2s ease-out;transition:opacity .35s}
+.bub::after{content:"";position:absolute;bottom:-5px;left:50%;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:var(--ink)}
+.bub.q{background:var(--butter);animation:pop .2s ease-out,bob 1.4s ease-in-out .2s infinite}
+.bub.q::after{border-top-color:var(--butter)}
+.bub.snd{font-weight:500;font-style:italic;letter-spacing:.02em;padding:2px 7px 3px}
+.bub.word{background:#fff7d6;border:2px solid var(--butter);font-size:clamp(13px,1.8vw,17px);font-weight:700}
+.bub.word::after{border-top-color:var(--butter)}
+.bub.lang{background:#e3f1ff;border:2px solid var(--sky);font-size:clamp(13px,1.8vw,17px);font-weight:700;letter-spacing:.04em}
+.bub.lang::after{border-top-color:var(--sky)}
+.need{position:absolute;transform:translate(-20%,-100%);width:clamp(18px,2.6vw,26px);height:clamp(18px,2.6vw,26px);border-radius:50%;background:var(--ink);border:2px solid var(--ember);display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.3);animation:pop .2s ease-out,bob 1.2s ease-in-out infinite}
+.need.late{border-color:var(--berry);animation:pop .2s ease-out,shake .5s linear infinite}
+@keyframes shake{25%{margin-left:-1px}75%{margin-left:1px}}
+.ni{display:block;width:55%;height:55%}
+.ni.food{background:var(--berry);border-radius:50% 50% 45% 45%;box-shadow:inset 0 3px 0 -1px var(--leaf)}
+.ni.pet{background:var(--berry);clip-path:path("M5 9 L1 5 A2.2 2.2 0 0 1 5 2 A2.2 2.2 0 0 1 9 5 Z");width:10px;height:10px}
+.ni.play{background:radial-gradient(circle at 35% 35%,#fff 0 18%,transparent 19%),conic-gradient(var(--sky) 0 25%,var(--butter) 0 50%,var(--sky) 0 75%,var(--butter) 0);border-radius:50%}
+.ni.talk{width:auto;height:auto;font-weight:700;color:var(--ink-dark);font-size:12px;line-height:1}
+.bub.out{opacity:0}
+@keyframes pop{from{transform:translate(-50%,-70%) scale(.5);opacity:0}}
+@keyframes bob{50%{margin-top:-3px}}
+
+.hud{position:absolute;top:8px;inset-inline:8px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;align-items:center}
+.hud .sp{flex:1}
+.chip{pointer-events:auto;background:rgba(33,26,40,.86);border:2px solid var(--wood-edge);border-radius:8px;padding:2px 8px;font-size:12px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.chip b{font-family:var(--pixel);font-weight:400;font-size:13px;font-variant-numeric:tabular-nums}
+.ico{width:10px;height:10px;display:inline-block;image-rendering:pixelated}
+.ico.star{background:var(--butter);clip-path:polygon(50% 0,63% 37%,100% 40%,70% 62%,80% 100%,50% 78%,20% 100%,30% 62%,0 40%,37% 37%)}
+.ico.veg{background:var(--berry);border-radius:50% 50% 45% 45%;box-shadow:inset 0 3px 0 -1px var(--leaf)}
+.ico.pip{background:#b9a2f0;border-radius:3px}
+.ico.wood{background:#a87a42;border-radius:50%;box-shadow:inset 0 0 0 2px #7a4a2a,inset 0 0 0 3px #c89c63}
+button.chip{cursor:pointer}
+
+.toasts{position:absolute;bottom:8px;inset-inline:8px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+.toast{background:rgba(33,26,40,.92);border:2px solid var(--wood-edge);color:var(--ink);padding:3px 10px;border-radius:8px;font-size:13px;font-weight:500;transition:opacity .4s,transform .4s;max-width:100%}
+.toast.out{opacity:0;transform:translateY(6px)}
+
+.pmenu{position:absolute;transform:translate(-50%,-104%);background:var(--wood);border:2px solid var(--wood-edge);border-radius:10px;padding:8px;min-width:150px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:3}
+.pmenu h4{margin:0;font-size:14px;font-weight:600}
+.pmenu p{margin:0;font-size:12px;color:var(--ink-dim)}
+.btn{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:500;text-align:start;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.btn:hover:not(:disabled){border-color:var(--butter)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.main{background:var(--butter);color:var(--ink-dark);border-color:var(--butter);font-weight:600;justify-content:center}
+.btn small{font-family:var(--pixel);font-size:11px;opacity:.8}
+
+.panel{background:var(--wood);border:3px solid var(--wood-edge);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+@media (max-width:860px){.panel{min-height:420px}}
+.tabs{display:flex;gap:4px;padding:8px 8px 0;background:var(--wood-2);border-bottom:3px solid var(--wood-edge)}
+.tabs button{flex:1;background:transparent;border:0;border-radius:8px 8px 0 0;padding:8px 2px;cursor:pointer;color:var(--ink-dim);font-weight:600;font-size:13px;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--wood);color:var(--butter)}
+.tabs .count{font-family:var(--pixel);font-size:11px;font-weight:400;margin-inline-start:4px;opacity:.8}
+.tab{padding:12px;overflow:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+
+.pip-head{display:flex;gap:10px;align-items:center}
+.portrait{width:52px;height:52px;flex:none;border-radius:10px;background:#3f6e38;border:2px solid var(--wood-edge);image-rendering:pixelated}
+.pip-name{font-size:20px;font-weight:700;line-height:1.1;margin:0;text-wrap:balance}
+.pip-sub{font-size:12px;color:var(--ink-dim);margin-top:2px}
+.lv{font-family:var(--pixel);font-size:11px;background:var(--butter);color:var(--ink-dark);border-radius:5px;padding:0 5px;margin-inline-start:6px;vertical-align:middle}
+.icon-btn{margin-inline-start:auto;background:transparent;border:2px solid var(--wood-edge);border-radius:8px;padding:3px 8px;cursor:pointer;font-size:12px;color:var(--ink-dim)}
+.rename{display:flex;gap:6px}
+.rename input{flex:1;min-width:0;background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;padding:4px 8px}
+
+.bars{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:12px}
+.bars span{color:var(--ink-dim)}
+.bar{height:8px;background:var(--ground);border-radius:4px;overflow:hidden;border:1px solid var(--wood-edge)}
+.bar i{display:block;height:100%;width:0;border-radius:3px;transition:width .5s}
+.bars em{font-style:normal;font-family:var(--pixel);font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums;min-width:3ch;text-align:end}
+.hint{font-size:12px;color:var(--ember)}
+
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:12px;background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:999px;padding:1px 8px}
+.tag.trait{border-color:var(--butter);color:var(--butter)}
+.label{font-size:11px;letter-spacing:.06em;color:var(--ink-dim);margin:0 0 4px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.row .btn{flex:1;justify-content:center}
+
+.chat{display:flex;flex-direction:column;gap:6px;flex:1;min-height:140px}
+.log{flex:1;min-height:110px;max-height:300px;overflow:auto;background:var(--ground);border:2px solid var(--wood-edge);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:5px}
+.msg{max-width:85%;padding:4px 10px 5px;border-radius:10px;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.msg.u{align-self:flex-start;background:var(--wood-2);border:1px solid var(--wood-edge)}
+.msg.p{align-self:flex-end;background:var(--ink);color:var(--ink-dark)}
+.msg.p.q{background:var(--butter)}
+.msg.p .w{display:inline-block;margin-inline-start:6px;background:var(--butter);border-radius:6px;padding:0 6px;font-style:normal;font-weight:700}
+.msg.p .s{font-style:italic}
+.msg.typing{opacity:.7;font-style:italic}
+.empty{color:var(--ink-dim);font-size:13px;margin:auto;text-align:center;padding:10px}
+.send{display:flex;gap:6px}
+.send input{flex:1;min-width:0;background:var(--ground);border:2px solid var(--wood-edge);border-radius:10px;padding:7px 10px}
+.send .btn{flex:none}
+.voice{font-size:11px;color:var(--ink-dim)}
+
+.tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.task{display:flex;gap:8px;align-items:center;background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:10px;padding:6px 8px}
+.task input[type=checkbox]{width:18px;height:18px;accent-color:var(--leaf);flex:none}
+.task .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.task.done .t{text-decoration:line-through;color:var(--ink-dim)}
+.task .who{font-size:11px;color:var(--ink-dim);white-space:nowrap}
+.task .x{background:none;border:0;color:var(--ink-dim);cursor:pointer;font-size:16px;padding:0 4px}
+.tform{display:flex;flex-direction:column;gap:6px}
+.tform input,.tform select{background:var(--ground);border:2px solid var(--wood-edge);border-radius:10px;padding:7px 10px;min-width:0}
+.tform .row select{flex:1}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:10px;padding:6px 8px}
+.stat b{display:block;font-family:var(--pixel);font-weight:400;font-size:16px;font-variant-numeric:tabular-nums;color:var(--butter)}
+.stat span{font-size:11px;color:var(--ink-dim)}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.pcard{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:10px;padding:5px 8px;cursor:pointer;text-align:start;display:flex;gap:6px;align-items:center}
+.pcard[aria-current="true"]{border-color:var(--butter)}
+.dot{width:12px;height:12px;border-radius:4px;flex:none}
+.pcard small{display:block;font-size:10px;color:var(--ink-dim)}
+.lex{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lexi{background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:10px;padding:8px 10px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.lexi .lw{font-size:20px;font-weight:700;color:#cfe6ff;letter-spacing:.04em}
+.lexi .lm{font-size:11px;color:var(--ink-dim)}
+.lexi .meaning{background:var(--sky);color:var(--ink-dark);border-radius:999px;padding:1px 10px;font-weight:600;font-size:13px}
+.lexi .guess{grid-column:1/-1;display:flex;gap:6px}
+.lexi .guess select{flex:1;min-width:0;background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;padding:4px 8px}
+.lexi.no{animation:shake .4s linear 2}
+.lexi.dead{opacity:.5}
+.tag.lang{border-color:var(--sky);color:#cfe6ff}
+.alb-sec h3{margin:0 0 6px;font-size:14px;font-weight:600;display:flex;justify-content:space-between}
+.alb-sec h3 small{font-family:var(--pixel);font-size:11px;color:var(--ink-dim);font-weight:400}
+.alb{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px}
+.card{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:10px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;text-align:center}
+.card canvas{width:44px;height:44px;image-rendering:pixelated;border-radius:8px}
+.card b{font-size:12px;font-weight:600;line-height:1.15}
+.card small{font-size:10px;color:var(--ink-dim)}
+.card.locked{cursor:default}
+.card.locked canvas{filter:brightness(0) opacity(.45)}
+.card.locked b{color:var(--ink-dim)}
+.card.rare:not(.locked){border-color:var(--butter);box-shadow:0 0 0 1px var(--butter) inset}
+.albtop{font-size:13px;color:var(--ink-dim)}
+.albtop b{color:var(--butter);font-family:var(--pixel);font-weight:400}
+.tag.mut{border-color:var(--butter);background:var(--butter);color:var(--ink-dark);font-weight:600}
+.tribes{display:flex;flex-direction:column;gap:6px}
+.tribe{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;background:var(--wood-2);border:1px solid var(--wood-edge);border-radius:10px;padding:8px 10px;cursor:pointer;text-align:start}
+.tribe .flag{width:14px;height:20px;border-radius:2px;grid-row:span 2}
+.tribe b{font-size:15px}
+.tribe small{font-size:11px;color:var(--ink-dim);grid-column:2/4}
+.tribe em{font-style:normal;font-family:var(--pixel);font-size:11px;color:var(--butter)}
+.tag.tribe-tag{border-width:2px}
+.mapui{position:absolute;top:40px;left:8px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+#mini{width:clamp(96px,22%,150px);height:auto;aspect-ratio:640/336;image-rendering:pixelated;border:2px solid var(--wood-edge);border-radius:6px;background:#16221a;cursor:pointer;touch-action:none}
+.zoom{display:flex;gap:4px}
+.zoom button{width:30px;height:30px;justify-content:center;padding:0;font-size:16px;font-weight:700}
+.zlock{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;background:rgba(33,26,40,.9);border:2px solid var(--butter);color:var(--ink);border-radius:10px;padding:4px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.zlock small{font-family:var(--pixel);font-size:11px;color:var(--butter)}
+.mem{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:12px}
+.mem li{display:flex;justify-content:space-between;gap:8px;color:var(--ink)}
+.mem li.bad{color:var(--berry)}
+.mem li small{color:var(--ink-dim);white-space:nowrap}
+.focus{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.focus.on{border-color:var(--sky)}
+.focus h3{margin:0;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+.focus h3 small{font-size:11px;color:var(--ink-dim);font-weight:400}
+.clock{font-family:var(--pixel);font-size:34px;color:#cfe6ff;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.fbar{height:6px;background:var(--ground);border-radius:3px;overflow:hidden}.fbar i{display:block;height:100%;background:var(--sky);width:0}
+.focus select{background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;padding:5px 8px;min-width:0}
+.streak{display:flex;gap:10px;align-items:center;background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:12px;padding:8px 10px}
+.streak b{font-family:var(--pixel);font-size:24px;color:var(--ember);font-weight:400}
+.streak p{margin:0;font-size:12px;color:var(--ink-dim)}
+.streak.hot{border-color:var(--ember)}
+.quest{background:linear-gradient(0deg,var(--wood-2),var(--wood-2));border-bottom:3px solid var(--wood-edge);padding:8px 12px;display:flex;gap:10px;align-items:center}
+.quest .qn{font-family:var(--pixel);font-size:11px;color:var(--butter);white-space:nowrap}
+.quest p{margin:0;font-size:13px;flex:1;min-width:0}
+.quest button{background:none;border:0;color:var(--ink-dim);font-size:11px;cursor:pointer;text-decoration:underline;white-space:nowrap}
+.logbox{position:absolute;top:40px;right:8px;bottom:8px;width:min(300px,70%);background:rgba(33,26,40,.95);border:2px solid var(--wood-edge);border-radius:10px;display:flex;flex-direction:column;z-index:4}
+.logbox header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--wood-edge);font-weight:600}
+.logbox header button{background:none;border:0;color:var(--ink);font-size:18px;cursor:pointer}
+.logbox ol{list-style:none;margin:0;padding:6px 10px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.logbox li{display:flex;gap:8px;justify-content:space-between}
+.logbox li small{color:var(--ink-dim);font-family:var(--pixel);font-size:10px;white-space:nowrap}
+.logbox li.imp{color:var(--butter)}
+details.more{margin-top:8px;border-top:1px solid var(--wood-edge);padding-top:6px}
+details.more summary{cursor:pointer;font-size:13px;color:var(--ink-dim);list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ "}
+details.more[open] summary::before{content:"▾ "}
+.shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.shop .btn{flex-direction:column;align-items:flex-start;gap:2px}
+.shop .btn span{font-size:11px;color:var(--ink-dim);font-weight:400}
+.backup textarea{width:100%;min-height:70px;background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;color:var(--ink);font-family:ui-monospace,monospace;font-size:11px;padding:6px;direction:ltr}
+.hmore{display:none}
+@media (max-width:620px){
+  .hud{gap:4px;top:6px;inset-inline:6px}
+  .chip{padding:1px 6px;font-size:11px}
+  .hud .sp{display:none}
+  .hmore{display:flex}
+  .hud:not(.open) .sec{display:none}
+  .mapui{top:auto;bottom:6px;left:6px}
+  #mini{width:84px}
+  .zoom button{width:26px;height:26px}
+  .toasts{bottom:auto;top:34px}
+}
+.story{position:absolute;inset:0;background:rgba(5,8,12,.9);display:flex;align-items:center;justify-content:center;z-index:6;padding:16px;cursor:pointer}
+.sbox{max-width:540px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;cursor:default}
+.stitle{color:var(--butter);font-weight:700;margin:0;font-size:15px;letter-spacing:.01em}
+.slines p{margin:0 0 6px;font-size:clamp(13px,1.7vw,16px);line-height:1.5}
+.slines p.sys{color:#7dff9a;font-weight:500}
+.slines p.nar{color:var(--ink);font-style:italic}
+.slines p.dark{color:#ff8a8a;font-weight:500}
+.schoices{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.schoices .btn small{font-family:var(--display)}
+.sjournal li{display:flex;justify-content:space-between;gap:8px;color:var(--ink);font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.sjournal{list-style:none;margin:0;padding:0}
+.karma{height:8px;border-radius:4px;background:linear-gradient(90deg,#ff7a7a,#ffd166 50%,#86d47f);position:relative;margin:4px 0}
+.karma i{position:absolute;top:-3px;width:4px;height:14px;background:#fff;border-radius:2px}
+.shake{animation:shk .35s linear}
+@keyframes shk{20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-1px)}80%{transform:translate(2px,1px)}}
+.storychip{border-color:#7dff9a!important;color:#cfffd8}
+.choirbtn{border-color:var(--butter)!important}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.opt input{width:18px;height:18px;accent-color:var(--butter)}
+.danger{color:var(--berry)}
+@media (prefers-reduced-motion:reduce){.bub,.bub.q{animation:none}.bar i{transition:none}}
+</style>
+
+<div class="app" dir="rtl">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="512" height="336" aria-label="החווה: הקש על פיפ כדי לבחור אותו, על חלקה כדי לשתול או לקטוף"></canvas>
+    <div class="bubbles" id="bubbles"></div>
+    <div class="hud">
+      <span class="chip" title="ניצוצות"><span class="ico star"></span><b id="hSparks">0</b></span>
+      <span class="chip" title="ירקות בסל"><span class="ico veg"></span><b id="hBasket">0</b></span>
+      <span class="chip" title="עצים"><span class="ico wood"></span><b id="hWood">0</b></span>
+      <span class="chip" title="פיפים"><span class="ico pip"></span><b id="hPop">1</b></span>
+      <span class="sp"></span>
+      <button class="chip hmore" id="hMore" type="button" aria-expanded="false">⋯</button>
+      <span class="chip sec" id="hClock">יום</span>
+      <span class="chip" id="hWeather">בהיר</span>
+      <span class="chip" id="hStreak" hidden>רצף</span>
+      <span class="chip" id="hHoliday" hidden style="border-color:var(--butter)">חג</span>
+      <button class="chip" id="hFocus" type="button" hidden>ריכוז</button>
+      <button class="chip storychip" id="hStory" type="button" hidden>סיפור</button>
+      <button class="chip sec" id="hLog" type="button">יומן</button>
+      <button class="chip choirbtn sec" id="hChoir" type="button">♪ מקהלה</button>
+      <button class="chip sec" id="hSound" type="button" aria-pressed="true">צליל: פועל</button>
+    </div>
+    <div class="mapui">
+      <canvas id="mini" width="128" height="67" aria-label="מפת העולם: הקש כדי לקפוץ למקום"></canvas>
+      <div class="zoom"><button class="chip" id="zIn" type="button" aria-label="התקרב">+</button><button class="chip" id="zOut" type="button" aria-label="התרחק">−</button></div>
+    </div>
+    <div class="toasts" id="toasts"></div>
+    <div class="story" id="story" hidden><div class="sbox" id="sBox"><p class="stitle" id="sTitle"></p><div class="slines" id="sLines"></div><div class="schoices" id="sChoices"></div></div></div>
+    <div class="logbox" id="logBox" hidden><header>יומן החווה<button type="button" id="logClose" aria-label="לסגור">×</button></header><ol id="logList"></ol></div>
+    <div class="pmenu" id="pmenu" hidden></div>
+  </div>
+
+  <aside class="panel">
+    <div class="quest" id="questBar" hidden><span class="qn" id="questN"></span><p id="questText"></p><button type="button" id="questSkip">לדלג</button></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tb-pip" aria-selected="true" data-tab="pip">הפיפ</button>
+      <button role="tab" id="tb-tasks" aria-selected="false" data-tab="tasks">משימות<span class="count" id="taskCount"></span></button>
+      <button role="tab" id="tb-lang" aria-selected="false" data-tab="lang">שפה<span class="count" id="langCount"></span></button>
+      <button role="tab" id="tb-album" aria-selected="false" data-tab="album">אלבום<span class="count" id="albCount"></span></button>
+      <button role="tab" id="tb-farm" aria-selected="false" data-tab="farm">חווה</button>
+    </nav>
+
+    <section class="tab" id="tab-pip">
+      <div id="pipHead"></div>
+      <div class="chat">
+        <div class="log" id="chatLog" aria-live="polite"></div>
+        <form class="send" id="chatForm">
+          <input id="chatInput" autocomplete="off" placeholder="תגיד לו משהו…" maxlength="160">
+          <button class="btn main" id="chatSend" type="submit">שלח</button>
+        </form>
+        <div class="voice" id="voiceNote"></div>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-tasks" hidden>
+      <div class="streak" id="streakBox"></div>
+      <div class="focus" id="focusBox">
+        <h3>זמן ריכוז<small>הפיפים עובדים בשקט איתך</small></h3>
+        <div id="focusIdle">
+          <div class="row" style="margin-bottom:6px"><select id="focusTask" aria-label="על איזו משימה מתרכזים"></select></div>
+          <div class="row">
+            <button class="btn" type="button" data-min="15">15 דק'</button>
+            <button class="btn main" type="button" data-min="25">25 דק'</button>
+            <button class="btn" type="button" data-min="50">50 דק'</button>
+          </div>
+        </div>
+        <div id="focusRun" hidden>
+          <div class="clock" id="focusClock">25:00</div>
+          <div class="fbar"><i id="focusBar"></i></div>
+          <p class="label" id="focusOn" style="margin:0"></p>
+          <button class="btn" type="button" id="focusStop">לעצור</button>
+        </div>
+        <div id="focusDone" hidden></div>
+      </div>
+      <form class="tform" id="taskForm">
+        <p class="label">משימה אמיתית שלך, והפיפ יעודד אותך עד שתסיים</p>
+        <input id="taskText" autocomplete="off" placeholder="למשל: לסיים את תרגיל 3 באלגברה" maxlength="120">
+        <div class="row">
+          <select id="taskPip" aria-label="איזה פיפ ילווה את המשימה"></select>
+          <button class="btn main" type="submit">להוסיף</button>
+        </div>
+      </form>
+      <ul class="tasks" id="taskList"></ul>
+    </section>
+
+    <section class="tab" id="tab-lang" hidden>
+      <p class="label">הפיפים ממציאים מילים משלהן ומעבירים אותן אחד לשני. תקשיב מתי כל מילה נאמרת ותנחש מה היא אומרת. אפשר גם לכתוב להם מילה פיפית בצ'אט, והם יבינו</p>
+      <ul class="lex" id="lexList"></ul>
+    </section>
+
+    <section class="tab" id="tab-album" hidden>
+      <p class="albtop" id="albTop"></p>
+      <div id="albBody"></div>
+    </section>
+
+    <section class="tab" id="tab-farm" hidden>
+      <div class="stats" id="farmStats"></div>
+      <div>
+        <p class="label">חנות</p>
+        <div class="shop" id="shopBox"></div>
+      </div>
+      <div>
+        <p class="label">זרעים</p>
+        <div class="row" id="seedShop"></div>
+      </div>
+      <div>
+        <p class="label">שבטים</p>
+        <div class="tribes" id="tribeList"></div>
+      </div>
+      <div>
+        <p class="label">כל הפיפים</p>
+        <div class="plist" id="pipList"></div>
+      </div>
+      <div>
+        <p class="label">הגדרות</p>
+        <label class="opt" for="optSound">צלילים <input type="checkbox" id="optSound"></label>
+        <label class="opt" for="optStory">סיפור מהיר (בלי לחכות יום בין פרקים) <input type="checkbox" id="optStory"></label>
+        <div id="deskSettings" hidden>
+          <label class="opt" for="optBuddy">חברים על שולחן העבודה <input type="checkbox" id="optBuddy"></label>
+          <label class="opt" for="optAuto">להפעיל עם Windows <input type="checkbox" id="optAuto"></label>
+          <p class="label" style="margin-top:6px">מפתח Claude API (לא חובה). נשמר מוצפן רק על המחשב הזה</p>
+          <div class="row"><input id="optKey" type="password" autocomplete="off" placeholder="sk-ant-..." style="flex:1;min-width:0;background:var(--ground);border:2px solid var(--wood-edge);border-radius:8px;padding:5px 8px;direction:ltr"><button class="btn" type="button" id="optKeySave">שמור</button></div>
+          <p class="label" id="optKeyNote" style="margin-top:4px"></p>
+          <div class="row" style="margin-top:6px;align-items:center"><p class="label" id="optVersion" style="flex:1;margin:0"></p><button class="btn" type="button" id="optUpdate" hidden>להתקין עדכון</button></div>
+        </div>
+        <label class="opt" for="optSeason">עונות מהירות (עונה חדשה כל יום) <input type="checkbox" id="optSeason"></label>
+        <label class="opt" for="optAi">Claude נותן לפיפים קול בשיחה <input type="checkbox" id="optAi"></label>
+      </div>
+      <div class="backup">
+        <p class="label">גיבוי</p>
+        <div class="row"><button class="btn" type="button" id="bkCopy">להעתיק קוד גיבוי</button><button class="btn" type="button" id="bkOpen">לשחזר מגיבוי</button></div>
+        <div id="bkArea" hidden style="margin-top:6px"><textarea id="bkText" aria-label="קוד גיבוי"></textarea><div class="row" id="bkRow" style="margin-top:6px"></div></div>
+      </div>
+      <div id="resetBox">
+        <button class="btn" type="button" id="resetBtn"><span class="danger">להתחיל חווה חדשה</span></button>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<script>
+/*@@GAME@@*/
+</script>

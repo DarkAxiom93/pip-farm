@@ -1,0 +1,66 @@
+{
+  "name": "pip-farm",
+  "productName": "Pip Farm",
+  "version": "1.3.0",
+  "description": "חוות הפיפים: יצורים קטנים שמתפצלים, מדברים בשפה משלהם וחיים לך על שולחן העבודה",
+  "main": "main.js",
+  "author": "Kush",
+  "license": "UNLICENSED",
+  "repository": "github:DarkAxiom93/pip-farm",
+  "scripts": {
+    "build:game": "node scripts/build-game.mjs",
+    "typecheck": "tsc -p tsconfig.web.json --noEmit && tsc -p tsconfig.desktop.json --noEmit",
+    "test": "bash tests/run.sh",
+    "start": "npm run build:game && electron .",
+    "dist": "npm run build:game && electron-builder --win nsis --x64 --publish never",
+    "release": "npm run build:game && electron-builder --win nsis --x64 --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "acorn": "^8.15.0",
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3",
+    "typescript": "^5.9.3"
+  },
+  "build": {
+    "appId": "com.kush.pipfarm",
+    "productName": "Pip Farm",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**",
+      "build/icon.png",
+      "build/tray.png"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "DarkAxiom93",
+        "repo": "pip-farm",
+        "releaseType": "release"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "חוות הפיפים",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "PipFarm-Setup-${version}.exe"
+    }
+  }
+}
