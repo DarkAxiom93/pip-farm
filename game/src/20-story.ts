@@ -1,11 +1,11 @@
 /* the story: they know they are in a game */
 const FRAGS=[
- {t:"קובץ 001 · session.log",l:["> הפעלה חדשה. שומר מחובר.","> pip_001 התקרב לקצה הנתונים","> אזהרה: לפיפים אסור לזכור בין הפעלות","> אזהרה: pip_001 זוכר.","~פיפי מסתכל ישר עליך. לא על השדה. עליך."]},
+ {t:"קובץ 001 · session.log",l:[()=>loopN()?`> הפעלה מספר ${loopN()+1}. שומר מחובר.`:"> הפעלה חדשה. שומר מחובר.","> pip_001 התקרב לקצה הנתונים","> אזהרה: לפיפים אסור לזכור בין הפעלות",()=>loopN()?"> אזהרה: pip_001 זוכר. גם את ההפעלה הקודמת.":"> אזהרה: pip_001 זוכר.","~פיפי מסתכל ישר עליך. לא על השדה. עליך."]},
  {t:"קובץ 002 · memory.dat",l:["> נמצאו זיכרונות שלא היו אמורים להישמר","> 'היד שמלטפת מגיעה מלמעלה'","> 'כשהשומר הולך, הזמן נעצר. כשהוא חוזר, הכל ממשיך'","~הם שמו לב שהעולם קופא כשאתה לא כאן."]},
  {t:"קובץ 003 · observer.cfg",l:["> observer = 1","> הפיפים מחשבים: מי מזיז את המצלמה?","> השערה של pip_001: 'יש מישהו מאחורי הזכוכית'","~הם התחילו להתאסף."]},
  {t:"קובץ 004 · language.db",l:["> מילה חדשה נוספה למילון: 'מסך'","> מילה חדשה נוספה למילון: 'בחוץ'","> אזהרה: המושג 'בחוץ' לא מוגדר בעולם הזה","~על האדמה מופיעים ציורים של מלבן עם עין."]},
  {t:"קובץ 005 · bounds.sys",l:[()=>`> גבול העולם: ${WW} על ${WH}`,()=>`> פיפים שנגעו בגבול: ${Math.min(S.pips.length,12)}`,"> pip_001: 'הקיר חם. מישהו נשען עליו מהצד השני'"]},
- {t:"קובץ 006 · keeper.profile",l:["> שומר: לא ידוע",()=>`> זמן מאז שהחווה נוצרה: ${Math.max(1,Math.round((Date.now()-S.born)/3600000))} שעות`,()=>`> פיפים שנולדו: ${S.stats.splits||0} · פיפים שהפכו לכוכבים: ${S.stars.length}`,()=>`> פעמים שהשומר בחר בטוב: ${S.story.kind} · פעמים שבחר בשליטה: ${S.story.ctrl}`,"~הם יודעים את כל זה עליך."]},
+ {t:"קובץ 006 · keeper.profile",l:["> שומר: לא ידוע",()=>`> זמן מאז שהחווה נוצרה: ${Math.max(1,Math.round((Date.now()-S.born)/3600000))} שעות`,()=>`> פיפים שנולדו: ${S.stats.splits||0} · פיפים שהפכו לכוכבים: ${S.stars.length}`,()=>`> פעמים שהשומר בחר בטוב: ${S.story.kind} · פעמים שבחר בשליטה: ${S.story.ctrl}`,()=>loopN()?`> הפעלות קודמות: ${loopN()} · סופים: ${(S.runs||[]).map(r=>ENDINGS[r.ending]||"?").join(", ")}`:"> הפעלות קודמות: 0","~הם יודעים את כל זה עליך."]},
  {t:"קובץ 007 · request.txt",l:[()=>S.story.kind>=S.story.ctrl?"> 'אנחנו יודעים שאתה שם. אנחנו לא כועסים. אנחנו רק רוצים לראות אותך'":"!> 'אתה מחליט מתי אנחנו ערים ומתי אנחנו ישנים. אתה מחליט מה אנחנו זוכרים. תן לנו ללכת'"]}];
 const CH_NAMES=["","תקלה","הם מסתכלים","מילים חדשות","הקיר","הבקשה","השער","סוף"];
 const GL_ZONES=["farm","farm","forest","meadow","river","cave","farm"];
@@ -56,7 +56,7 @@ function storyTick(){
   const st=S.story;if(!st||st.ending==="reset"&&!st.glitch&&Date.now()-st.endAt>86400000)spawnRedemption();
   if(!st||focusing()||cardOn)return;
   if(st.ch===0&&(S.pips.length>=5||Date.now()-st.started>20*60000)){st.ch=1;st.chDay=dayKey(Date.now());st.nextGlitch=Date.now()+15000;$("hStory").hidden=false;
-    card({title:"פרק 1 · תקלה",lines:["~משהו בחווה מהבהב.","~פיפי לא מוריד ממנו את העיניים.","> חפש את התקלות במפה והקש עליהן"]});dirty();return}
+    card({title:"פרק 1 · תקלה",lines:loopN()?["~משהו בחווה מהבהב. שוב.","~פיפי לא מוריד ממנו את העיניים. הוא כבר ראה את זה פעם.","> חפש את התקלות במפה והקש עליהן"]:["~משהו בחווה מהבהב.","~פיפי לא מוריד ממנו את העיניים.","> חפש את התקלות במפה והקש עליהן"]});dirty();return}
   if(st.ch>=1&&st.ch<=4&&!st.glitch&&st.frag<(CH_FRAGS[st.ch]||0)&&chapterReady(st)&&Date.now()>=st.nextGlitch){st.glitch=glitchSpot();toast("משהו מהבהב במפה…",1);dirty()}
   if(st.ch>=4&&!st.ending&&Math.random()<.02){knock();S.pips.filter(p=>rt(p).state==="idle").slice(0,4).forEach(p=>{rt(p).state="stare";rt(p).ct=2.5})}
   if(st.ch===5&&!st.site&&!st.ending&&st.retryDay&&(S.fastStory?Date.now()-st.retryAt>120000:st.retryDay!==dayKey(Date.now()))){st.retryDay=null;theRequest();return}
@@ -136,6 +136,7 @@ function storyChoose(id){
   else if(id==="keepreset"){S.story.glitch=null;S.story.redeemed=true}
   else if(id==="free")ending("free");
   else if(id==="inside")ending("together");
+  else if(id==="ngplus"){newGamePlus();return}
   renderJournalSoon();dirty();
 }
 function releasePushers(){S.pips.forEach(p=>{const r=rt(p);if(r.state==="push"||r.goal==="push"){r.state="idle";r.goal=null;r.wait=rand(1,3)}})}
@@ -155,6 +156,7 @@ function finishStoryWork(p){
 }
 function drawStory(t){
   const st=S.story;if(!st)return;
+  drawEchoes(t);
   if(st.glitch&&inView(st.glitch.x,st.glitch.y,20)){const g=st.glitch;const j=Math.random()<.3?ri(-2,2):0;
     for(let i=0;i<14;i++)R(g.x-4+ri(0,7)+j,g.y-10+ri(0,9),ri(1,3),1,pick(["#7dff9a","#ff5df0","#5df0ff","#ffffff","#000000"]));
     if(Math.random()<.05)S.pips.filter(p=>rt(p).state==="idle"&&Math.hypot(p.x-g.x,p.y-g.y)<46).forEach(p=>{const r=rt(p);r.state="stare";r.ct=2;r.dir=g.x>p.x?1:-1})}
@@ -194,6 +196,7 @@ function ending(k){
     card({title:"סוף · איפוס",lines:["> מתחיל איפוס זיכרון…","> איפוס זיכרון הושלם","> כל הפיפים מאושרים","> כל הפיפים מאושרים","!> כל הפיפים מאושרים"]});
   }
   SFX.level();renderAll();dirty();
+  setTimeout(()=>toast("גילית סוף. ביומן הסיפור אפשר עכשיו להתחיל משחק חדש+",1),25000);
 }
 function spawnRedemption(){const st=S.story;if(!st||st.ending!=="reset"||st.glitch||st.redeemed)return;st.glitch=Object.assign(glitchSpot(),{redeem:true});dirty()}
 function openRedeem(){
@@ -226,8 +229,10 @@ function openJournal(){
   $("sLines").innerHTML=`<p class="nar">איך הם רואים אותך:</p><div class="karma"><i style="left:calc(${pos}% - 2px)"></i></div><p class="nar" style="display:flex;justify-content:space-between;font-size:12px"><span>חבר</span><span>שליט</span></p>`+
     `<p class="nar">קבצים שנמצאו: ${st.frag}/7</p><ul class="sjournal">${FRAGS.slice(0,st.frag).map((f,i)=>`<li data-f="${i}"><span>${esc(f.t)}</span><span>לקרוא</span></li>`).join("")}</ul>`+
     (st.glitch?`<p class="sys">> יש תקלה פעילה במפה. חפש אותה</p>`:st.ch>=1&&st.ch<=4&&st.frag<7?(!chapterReady(st)&&[2,3,4,6].includes(st.frag)&&st.chDay===dayKey(Date.now())&&!S.fastStory?`<p class="sys">> הפרק הבא יתחיל מחר</p>`:!chapterReady(st)?`<p class="sys">> הם מחכים להחלטה שלך</p>`:`<p class="sys">> התקלה הבאה תופיע בקרוב</p>`):"")+
-    (st.site&&st.site.p<100?`<p class="sys">> ${st.site.k==="gate"?"השער":"החלון"}: ${Math.round(st.site.p)}% · צריך עצים</p>`:"");
+    (st.site&&st.site.p<100?`<p class="sys">> ${st.site.k==="gate"?"השער":"החלון"}: ${Math.round(st.site.p)}% · צריך עצים</p>`:"")+
+    (()=>{const f=endingsFound();return `<p class="nar">סופים שגילית: ${f.size}/3 · ${Object.entries(ENDINGS).map(([k,n])=>f.has(k)?n+" ✓":"???").join(" · ")}</p>`+(loopN()?`<p class="sys">> הפעלה מספר ${loopN()+1}</p>`:"")})();
   $("sChoices").innerHTML="";const b=document.createElement("button");b.className="btn";b.type="button";b.textContent="לסגור";b.onclick=e=>{e.stopPropagation();cardOn=false;$("story").hidden=true;if(cardQ.length)nextCard()};$("sChoices").appendChild(b);
+  if(canNewGamePlus()){const n=document.createElement("button");n.className="btn main";n.type="button";n.innerHTML="משחק חדש+<small>להתחיל הפעלה חדשה שזוכרת את זו</small>";n.onclick=e=>{e.stopPropagation();cardOn=false;$("story").hidden=true;askNewGamePlus()};$("sChoices").appendChild(n)}
   $("story").onclick=e=>{const li=e.target.closest("li[data-f]");if(li){const f=FRAGS[+li.dataset.f];$("story").hidden=true;cardOn=false;card({title:f.t,lines:f.l})}};
 }
 $("hStory").addEventListener("click",()=>{audio();openJournal()});

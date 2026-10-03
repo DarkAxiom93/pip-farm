@@ -1,7 +1,7 @@
 /* ================= audio ================= */
 let AC=null,master=null;
 function audio(){
-  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.16;master.connect(AC.destination)}catch(e){AC=null}}
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.16;master.connect(AC.destination);musicInit()}catch(e){AC=null}}
   if(AC&&AC.state==="suspended")AC.resume().catch(()=>{});
 }
 function tone(f,dur,type,when,glide,vol){

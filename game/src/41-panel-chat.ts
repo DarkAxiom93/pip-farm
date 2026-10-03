@@ -24,7 +24,7 @@ function renderHead(){
     <span id="portraitSlot"></span>
     <div style="min-width:0">
       <p class="pip-name">${esc(p.name)}<span class="lv">LV ${lv}</span></p>
-      <div class="pip-sub">${isElder(p)?"זקן":stageOf(lv)} · ${ageText(p)} · דור ${p.gen}${p.founder?" · המייסד":""}${tribeOf(p)?` · שבט ${esc(tribeOf(p).name)}`:" · נווד"}${par?` · נולד מ${esc(par.name)}`:p.parent?" · ההורה כבר לא כאן":" · הפיפ הראשון"}</div>
+      <div class="pip-sub">${isElder(p)?"זקן":stageOf(lv)} · ${ageText(p)} · דור ${p.gen}${p.founder?" · המייסד":""}${p.echo?" · זוכר הפעלה קודמת":""}${tribeOf(p)?` · שבט ${esc(tribeOf(p).name)}`:" · נווד"}${par?` · נולד מ${esc(par.name)}`:p.parent?" · ההורה כבר לא כאן":" · הפיפ הראשון"}</div>
     </div>
     <button class="icon-btn" id="renameBtn" type="button">שם</button>
   </div>

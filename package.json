@@ -1,7 +1,7 @@
 {
   "name": "pip-farm",
   "productName": "Pip Farm",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "חוות הפיפים: יצורים קטנים שמתפצלים, מדברים בשפה משלהם וחיים לך על שולחן העבודה",
   "main": "main.js",
   "author": "Kush",
