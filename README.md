@@ -49,9 +49,6 @@ npm run dist        # בונה קובץ התקנה לתיקייה dist
 
 ## שחרור גרסה חדשה
 1. מעלים את `version` ב-`package.json`, למשל ל-`1.3.1`.
-2. עושים commit ומעלים tag תואם:
-   ```
-   git tag v1.3.1 && git push origin main --tags
-   ```
-3. GitHub Actions בונה את קובץ ההתקנה על Windows ומפרסם Release.
+2. עושים commit ו-push ל-`main`.
+3. GitHub Actions רואה גרסה שעוד לא שוחררה, בונה את קובץ ההתקנה על Windows ומפרסם Release.
 4. כל החוות המותקנות מתעדכנות לבד.
