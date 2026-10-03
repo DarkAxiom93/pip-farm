@@ -32,6 +32,15 @@ jobs:
       - if: steps.check.outputs.new == 'true'
         run: npm run typecheck
       - if: steps.check.outputs.new == 'true'
-        run: npm run release
+        shell: bash
+        run: set -o pipefail; npm run release 2>&1 | tee release.log
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # if the build fails, leave the end of the log as a comment on the commit so it is easy to read
+      - if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          { echo '```'; tail -n 60 release.log 2>/dev/null || echo "no log"; echo '```'; } > comment.md
+          gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" -F body=@comment.md
