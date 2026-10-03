@@ -167,10 +167,8 @@ function render(t){
   // cloud shadows
   if(S.weather.k==="cloudy"||rainy()){for(let i=0;i<4;i++){const x=((t*6+i*190)%(WW+160))-80,y=40+i*80;ctx.fillStyle="rgba(0,0,0,.08)";ctx.beginPath();ctx.ellipse(x,y,60,22,0,0,7);ctx.fill()}}
   // fog over locked zones
-  for(const z of ZONES){if(zoneOpen(z.id)||!inView(z.x+z.w/2,z.y+z.h/2,Math.max(z.w,z.h)))continue;
-    ctx.fillStyle="rgba(22,26,34,.7)";ctx.fillRect(z.x,z.y,z.w,z.h);
-    ctx.save();ctx.beginPath();ctx.rect(z.x,z.y,z.w,z.h);ctx.clip();const ox=(t*4)%96;
-    for(let x=z.x-96;x<z.x+z.w;x+=96)for(let y=z.y;y<z.y+z.h;y+=96)ctx.drawImage(fog,x+ox,y);ctx.restore()}
+  // the fog follows the same soft, wandering edge as the ground (zoneMask)
+  drawLockFog(t);
   // light and weather tint, in screen space
   ctx.setTransform(1,0,0,1,0,0);
   const d=new Date(),h=d.getHours()+d.getMinutes()/60;
@@ -204,4 +202,18 @@ function render(t){
   if(flash>0){ctx.fillStyle=`rgba(240,245,255,${flash*.55})`;ctx.fillRect(0,0,CW,CH)}
   if(S.weather.k==="rainbow"){const cols=["#ff5d73","#ffb347","#ffd166","#86d47f","#8fbfff","#c9a2ff"];ctx.globalAlpha=.32;cols.forEach((c,i)=>{ctx.strokeStyle=c;ctx.lineWidth=5;ctx.beginPath();ctx.arc(CW/2,CH*1.05,CH*.95-i*5,Math.PI,2*Math.PI);ctx.stroke()});ctx.globalAlpha=1}
   drawHideHud();
+}
+
+const fogTmp=document.createElement("canvas");fogTmp.width=WW;fogTmp.height=WH;
+function drawLockFog(t){
+  const m=lockedMask();if(!m)return;
+  // only the part of the world that is on screen
+  const x0=Math.max(0,Math.floor(cam.x)-2),y0=Math.max(0,Math.floor(cam.y)-2),w=Math.min(WW,Math.ceil(cam.x+CW/cam.z)+2)-x0,h=Math.min(WH,Math.ceil(cam.y+CH/cam.z)+2)-y0;
+  if(w<=0||h<=0)return;
+  const g=fogTmp.getContext("2d");
+  g.globalCompositeOperation="source-over";g.clearRect(x0,y0,w,h);
+  g.fillStyle="rgba(22,26,34,.7)";g.fillRect(x0,y0,w,h);
+  const ox=(t*4)%96;for(let x=Math.floor(x0/96)*96-96;x<x0+w;x+=96)for(let y=Math.floor(y0/96)*96;y<y0+h;y+=96)g.drawImage(fog,x+ox,y);
+  g.globalCompositeOperation="destination-in";g.drawImage(m,x0,y0,w,h,x0,y0,w,h);g.globalCompositeOperation="source-over";
+  ctx.drawImage(fogTmp,x0,y0,w,h,x0,y0,w,h);
 }
