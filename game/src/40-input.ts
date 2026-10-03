@@ -76,8 +76,9 @@ function tapAt(e){
     if(st){openStar(st);return}}
   const[x,y]=toWorld(e),m=2/cam.z*2;
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
+  if(hideTap(x,y))return;
   // a pip that is remembering something is tapped first, even in a crowd
-  const ord=S.pips.filter(p=>inView(p.x,p.y,20)).sort((a,b)=>(rt(b).recall?1:0)-(rt(a).recall?1:0)||b.y-a.y);
+  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall?1:0)-(rt(a).recall?1:0)||b.y-a.y);
   for(const p of ord){
     const bw=7+Math.floor(Math.min(level(p),10)*.4);
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}

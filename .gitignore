@@ -7,3 +7,4 @@ tests/t.html
 tests/*.png
 *.log
 __pycache__/
+/*.png

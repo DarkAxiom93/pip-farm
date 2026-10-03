@@ -21,7 +21,8 @@ const MOMENTS={
   late:{i:"keeper",x:()=>"הלילה שבו נשארת ער איתם"},
   wave:{i:"keeper",x:()=>"הפעם שנופפת להם מאחורי המסך"},
   gate:{i:"door",x:()=>"היום שבו השער נפתח"},
-  together:{i:"keeper",x:()=>"היום שבו נכנסת אליהם"}
+  together:{i:"keeper",x:()=>"היום שבו נכנסת אליהם"},
+  hide:{i:"sun",x:m=>`המחבואים הראשונים. מצאת את כולם ב-${m.v} שניות`}
 };
 // add a moment. who: one pip, a list of pips, or null for whoever is around (up to 12)
 function moment(k,who,v?,once=true){

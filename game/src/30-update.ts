@@ -8,7 +8,7 @@ function update(dt){
   socialT-=dt;if(socialT<=0){socialT=rand(2,4);social()}
   updateChoir(dt);updateArgs(dt);updateWeather(dt);updateFocus(dt);seasonTick(dt);spawnWild(dt);
   storyT-=dt;if(storyT<=0){storyT=2;try{storyTick()}catch(e){console.error(e)}}
-  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);recallTick(dt);
+  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);recallTick(dt);hideTick(dt);
   if(camGoal){const k=Math.min(1,dt*5);cam.x+=(camGoal.x-cam.x)*k;cam.y+=(camGoal.y-cam.y)*k;clampCam();if(Math.hypot(camGoal.x-cam.x,camGoal.y-cam.y)<.5)camGoal=null}
   tribeT-=dt;if(tribeT<=0){tribeT=6;updateTribes();updateLoyalty()}
   choirT-=dt;if(choirT<=0){choirT=rand(150,300);if(!night&&!focusing()&&S.pips.length>=4)startChoir(false)}
@@ -59,6 +59,7 @@ function updPip(p,dt){
         else if(r.goal==="build"){r.state="build";r.workT=r.workMax=3}
         else if(r.goal==="form"){r.state="form";r.ct=60;r.dir=1}
         else if(r.goal==="push"){r.state="push";r.ct=rand(10,16);r.dir=1}
+        else if(r.goal==="hide"){r.state="hidden";r.goal=null;clearBubble(p.id)}
         else if(r.goal==="story"){r.state="sbuild3";r.workT=r.workMax=3}
         else if(r.goal==="gate"){r.state="act";r.act="hop";r.ct=1;r.goal=null;p.x+=rand(-6,6);burst(p.x,p.y-6,"spark",6)}
         else if(r.goal==="site"){r.state="construct";r.workT=r.workMax=r.site==="craft"?5:3}
@@ -90,6 +91,7 @@ function updPip(p,dt){
     case "held":case "cuddle":break;
     case "form":r.ct-=dt;if(r.ct<=0){r.state="idle";r.goal=null}break;
     case "push":r.ct-=dt;r.dir=1;if(Math.random()<dt*2)burst(p.x+4,p.y-5,"dust",1);if(r.ct<=0){r.state="idle";r.goal=null;r.wait=rand(1,3)}break;
+    case "hidden":if(!hide){r.state="idle";r.wait=1;r.spot=null}break;
     case "stare":r.ct-=dt;if(r.ct<=0){r.state="idle";r.wait=rand(1,3)}break;
     case "sbuild3":r.workT-=dt;if(Math.random()<dt*4)burst(p.x+4,p.y-3,"dust",1);if(r.workT<=0)finishStoryWork(p);break;
     case "build":r.workT-=dt;if(Math.random()<dt*4)burst(p.x+r.dir*5,p.y-3,"dust",1);if(r.workT<=0)finishBuild(p);break;
@@ -106,7 +108,7 @@ function updPip(p,dt){
   if(r.need){
     if(r.state==="sleep"||r.state==="choir"||r.goal==="choir")dropNeed(p);
     else if(!focusing()){r.need.left-=dt;if(r.need.left<=0){dropNeed(p);p.mood=Math.max(0,p.mood-10);bond(p,-3,"ignored");say(p,pick(SOUNDS.sad),1.6,"snd","sad")}}
-  }else if(awake&&!night&&!focusing()&&r.state!=="choir"&&r.goal!=="choir"&&!p.question){
+  }else if(awake&&!night&&!focusing()&&r.state!=="hidden"&&r.goal!=="hide"&&r.state!=="choir"&&r.goal!=="choir"&&!p.question){
     r.nextNeed-=dt;
     if(r.nextNeed<=0){r.nextNeed=rand(55,140);if(needCount()<2+Math.floor(S.pips.length/6))giveNeed(p)}
   }

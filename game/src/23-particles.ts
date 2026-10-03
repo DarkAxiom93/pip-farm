@@ -3,6 +3,7 @@ const parts=[];
 function burst(x,y,kind,n){for(let i=0;i<n;i++)parts.push({x,y,vx:rand(-20,20),vy:rand(-34,-8),life:rand(.6,1.2),kind,c:pick(["#ffd166","#ff7aa2","#8fbfff","#86d47f","#ffffff"])})}
 const bubbleEls=new Map();
 function say(p,text,dur?,cls?,mood?){
+  if(RT.get(p.id)?.state==="hidden")return; // a hiding pip keeps quiet
   const box=$("bubbles");let b=bubbleEls.get(p.id);
   if(b&&b.classList.contains("q")&&cls!=="q")return;
   if(b&&b.classList.contains("memo")&&cls!=="memo"&&cls!=="q"&&performance.now()<b._until)return; // let a memory finish

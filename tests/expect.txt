@@ -42,3 +42,10 @@ moments_test|RESET forgot 0
 moments_test|RESTORE back True
 moments_test|NG kept True old True founder True
 moments_test|ERR []
+hide_test|START hide hiders 5 more spots than pips True
+hide_test|SEEK seek all hidden True
+hide_test|EMPTY bush 0 marked True
+hide_test|WON over True best set True moment True none hidden True sparks up True
+hide_test|TIMEOUT over True hides 2 none hidden True
+hide_test|NIGHT blocked True
+hide_test|ERR []

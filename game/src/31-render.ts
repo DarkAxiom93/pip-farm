@@ -159,8 +159,8 @@ function render(t){
   drawStatue(t);
   for(const tr of S.tribes)drawCamp(tr,t);
   drawTrees(t);
-  drawStory(t);
-  const ord=S.pips.filter(p=>inView(p.x,p.y,24)).sort((a,b)=>a.y-b.y);
+  drawStory(t);drawHide(t);
+  const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
   drawVisitor(t);
   drawParticles();
@@ -203,4 +203,5 @@ function render(t){
   drawSeasonSky();
   if(flash>0){ctx.fillStyle=`rgba(240,245,255,${flash*.55})`;ctx.fillRect(0,0,CW,CH)}
   if(S.weather.k==="rainbow"){const cols=["#ff5d73","#ffb347","#ffd166","#86d47f","#8fbfff","#c9a2ff"];ctx.globalAlpha=.32;cols.forEach((c,i)=>{ctx.strokeStyle=c;ctx.lineWidth=5;ctx.beginPath();ctx.arc(CW/2,CH*1.05,CH*.95-i*5,Math.PI,2*Math.PI);ctx.stroke()});ctx.globalAlpha=1}
+  drawHideHud();
 }

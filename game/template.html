@@ -182,6 +182,7 @@ button.chip{cursor:pointer}
 .mem li small{color:var(--ink-dim);white-space:nowrap}
 .focus{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
 .focus.on{border-color:var(--sky)}
+.chip.on{background:var(--butter);color:var(--ink-dark)}
 .focus h3{margin:0;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
 .focus h3 small{font-size:11px;color:var(--ink-dim);font-weight:400}
 .clock{font-family:var(--pixel);font-size:34px;color:#cfe6ff;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
@@ -264,6 +265,7 @@ details.more[open] summary::before{content:"▾ "}
       <button class="chip" id="hFocus" type="button" hidden>ריכוז</button>
       <button class="chip storychip" id="hStory" type="button" hidden>סיפור</button>
       <button class="chip sec" id="hLog" type="button">יומן</button>
+      <button class="chip choirbtn sec" id="hHide" type="button">מחבואים</button>
       <button class="chip choirbtn sec" id="hChoir" type="button">♪ מקהלה</button>
       <button class="chip sec" id="hSound" type="button" aria-pressed="true">צליל: פועל</button>
     </div>
