@@ -36,6 +36,7 @@ const ACH=[
   {id:"colall",n:"מוזיאון",d:"ספר אוסף מלא",r:120,v:()=>Object.keys(S.col||{}).length,g:()=>SPECIES.length},
   {id:"dig20",n:"ארכיאולוג",d:"לחפור 20 פעמים",r:20,v:()=>S.stats.digs||0,g:20},
   {id:"decor5",n:"מעצב",d:"לשים 5 קישוטים בחווה",r:20,v:()=>(S.decor||[]).length,g:5},
+  {id:"fire5",n:"סיפורים ליד האש",d:"5 ערבים ליד המדורה",r:20,v:()=>S.stats.fires||0,g:5},
   {id:"daily10",n:"קבוע",d:"לסיים את כל מטרות היום 10 פעמים",r:40,v:()=>S.stats.dailyDone||0,g:10}
 ];
 const achGoal=a=>typeof a.g==="function"?a.g():a.g;
@@ -77,6 +78,7 @@ const DAILY={
   focus:{n:"זמן ריכוז אחד עד הסוף",g:1},
   decode:{n:"לפענח מילה פיפית",g:1,ok:()=>Object.values(S.lex||{}).some((w:any)=>!w.ok)},
   flies:{n:"לתפוס גחליליות בלילה",g:5},
+  campfire:{n:"לשבת עם הפיפים ליד המדורה בערב",g:1},
   collect:{n:"לתפוס חרקים או דגים",g:4},
   dig:{n:"לחפור בנקודה נוצצת",g:1,ok:()=>(S.digs||[]).length>0},
   flowers:{n:"לנגן את שיר הפרחים (8 פרחים ברצף)",g:1},

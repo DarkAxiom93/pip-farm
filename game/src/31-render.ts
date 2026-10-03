@@ -159,9 +159,10 @@ function render(t){
   drawStatue(t);
   for(const tr of S.tribes)drawCamp(tr,t);
   drawTrees(t);
-  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);
+  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);drawFire(t);
   const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
+  drawFireGlow(t);
   drawVisitor(t);
   drawParticles();
   // cloud shadows

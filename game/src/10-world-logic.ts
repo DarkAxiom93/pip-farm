@@ -39,7 +39,7 @@ function assignJobs(){
   for(const j of jobs){
     if(j.pip)continue;
     const busy=new Set(jobs.filter(x=>x.pip).map(x=>x.pip));
-    const free=S.pips.filter(p=>{const r=rt(p);return !busy.has(p.id)&&["idle","walk","sleep","chat"].includes(r.state)&&!r.job});
+    const free=S.pips.filter(p=>{const r=rt(p);return !busy.has(p.id)&&["idle","walk","sleep","chat"].includes(r.state)&&!r.job&&(r.state!=="walk"||!r.goal||r.goal==="wander")}); // don't pull a pip off its way to the fire, a hiding spot or a choir
     if(!free.length)continue;
     const pl=PLOTS[j.plot];
     let p=free.find(q=>q.id===j.prefer);

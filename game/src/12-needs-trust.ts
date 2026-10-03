@@ -24,7 +24,7 @@ function fulfill(p){
 function playWith(p){const r=rt(p);r.state="act";r.act="dance";r.ct=2;burst(p.x,p.y-8,"confetti",10);SFX.mood(p.pitch,"excited",.4)}
 
 /* trust, memory, absence, statue */
-const MEM={dream:["הצצת לחלום שלו",1],hide:["שיחקתם מחבואים",1],shared:["נזכרתם ביחד ברגע משותף",1],pet:["ליטפת אותו",1],fed:["האכלת אותו",1],need:["נתת לו מה שביקש",1],talk:["דיברת אליו יפה",1],calm:["הפרדת אותו מריב",1],task:["סיימתם משימה ביחד",1],hurt:["פגעת בו",0],ignored:["התעלמת ממנו",0],poke:["הצקת לו",0],missed:["היית רחוק הרבה זמן",0],born:["נולד מהורה ש",2],lost:["ההורה שלו הפך לכוכב",2],thanked:["הודית לו על ציור",1]};
+const MEM={fire:["ישבתם ביחד ליד המדורה",1],dream:["הצצת לחלום שלו",1],hide:["שיחקתם מחבואים",1],shared:["נזכרתם ביחד ברגע משותף",1],pet:["ליטפת אותו",1],fed:["האכלת אותו",1],need:["נתת לו מה שביקש",1],talk:["דיברת אליו יפה",1],calm:["הפרדת אותו מריב",1],task:["סיימתם משימה ביחד",1],hurt:["פגעת בו",0],ignored:["התעלמת ממנו",0],poke:["הצקת לו",0],missed:["היית רחוק הרבה זמן",0],born:["נולד מהורה ש",2],lost:["ההורה שלו הפך לכוכב",2],thanked:["הודית לו על ציור",1]};
 function bond(p,d,k){
   p.trust=clamp((p.trust??30)+d,-100,100);
   if(k){p.mem=p.mem||[];const last=p.mem[p.mem.length-1];if(last&&last.k===k&&Date.now()-last.t<60000)last.t=Date.now();else{p.mem.push({k,t:Date.now()});if(p.mem.length>6)p.mem.shift()}}

@@ -11,6 +11,7 @@ function hideBlocked(){
   if(focusing())return "בזמן ריכוז לא משחקים";
   if(choir)return "הם באמצע מקהלה";
   if(cardOn)return "קודם לסגור את הכרטיס";
+  if(fire)return "הם יושבים ליד המדורה";
   if(hideCandidates().length<2)return "צריך לפחות 2 פיפים ערים ופנויים";
   return null;
 }
@@ -24,7 +25,7 @@ function startHide(){
   const far=(x,y)=>spots.every(s=>Math.hypot(s.x-x,s.y-y)>22);
   for(let i=0;i<80&&spots.length<hiders.length+3;i++){
     const x=cx+rand(-CW/cam.z/2+14,CW/cam.z/2-14),y=cy+rand(-CH/cam.z/2+26,CH/cam.z/2-10);
-    if(!walkable(x,y)||!far(x,y)||PLOTS.some(g=>x>g.x-6&&x<g.x+PW+6&&y>g.y-8&&y<g.y+PH+8))continue;
+    if(!walkable(x,y)||!far(x,y)||Math.hypot(x-FIRE.x,y-FIRE.y)<16||PLOTS.some(g=>x>g.x-6&&x<g.x+PW+6&&y>g.y-8&&y<g.y+PH+8))continue;
     spots.push({x:Math.round(x),y:Math.round(y),k:"bush",pip:null,found:false});
   }
   TREES.forEach((tr,i)=>{if(zoneOpen(tr.z)&&treeUp(i)&&inView(tr.x,tr.y,-10)&&far(tr.x,tr.y))spots.push({x:tr.x,y:tr.y,k:"tree",tree:i,pip:null,found:false})});

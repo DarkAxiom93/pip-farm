@@ -17,7 +17,7 @@ function decorOk(x,y){
   if(!walkable(x,y))return false;
   if(PLOTS.some(g=>(!g.z||zoneOpen(g.z))&&x>g.x-6&&x<g.x+PW+6&&y>g.y-6&&y<g.y+PH+8))return false;
   if(Object.values(BUILD).some(B=>Math.abs(x-B.x)<14&&y<B.y+10&&y>B.y-20))return false;
-  if(Math.hypot(x-BURROW.x,y-BURROW.y)<22)return false;
+  if(Math.hypot(x-BURROW.x,y-BURROW.y)<22||Math.hypot(x-FIRE.x,y-FIRE.y)<16)return false;
   return !(S.decor||[]).some(d=>d.id!==(placing&&placing.move)&&Math.hypot(d.x-x,d.y-y)<9);
 }
 function startPlacing(k){

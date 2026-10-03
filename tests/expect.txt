@@ -82,3 +82,9 @@ decor_test|FREE from storage True
 decor_test|PIP swings True
 decor_test|SAVED decor
 decor_test|ERR []
+campfire_test|NOON no fire True
+campfire_test|EVENING lit gather
+campfire_test|GATHER sitting True
+campfire_test|STORY told 1 moment True
+campfire_test|WOOD thrown 1 logs True
+campfire_test|ERR []

@@ -145,7 +145,7 @@ function digTick(dt){
   digT-=dt;if(digT>0)return;digT=rand(180,360);
   S.digs=S.digs||[];if(S.digs.length>=3)return;
   for(let i=0;i<30;i++){const z=pick(ZONES.filter(q=>zoneOpen(q.id))),x=rand(z.x+10,z.x+z.w-10),y=rand(z.y+20,z.y+z.h-8);
-    if(!walkable(x,y)||PLOTS.some(g=>x>g.x-6&&x<g.x+PW+6&&y>g.y-8&&y<g.y+PH+8)||Math.hypot(x-BURROW.x,y-BURROW.y)<20)continue;
+    if(!walkable(x,y)||PLOTS.some(g=>x>g.x-6&&x<g.x+PW+6&&y>g.y-8&&y<g.y+PH+8)||Math.hypot(x-BURROW.x,y-BURROW.y)<20||Math.hypot(x-FIRE.x,y-FIRE.y)<16)continue;
     S.digs.push({x:Math.round(x),y:Math.round(y),z:z.id});dirty();break}
 }
 function drawDigs(t){for(const d of S.digs||[]){if(!inView(d.x,d.y,8))continue;R(d.x-2,d.y-1,5,2,"#6a4a2a");if(Math.sin(t*5+d.x)>.3)R(d.x-1+Math.round(Math.sin(t*3+d.y)*2),d.y-4,1,1,"#fff7b0");if(Math.sin(t*4+d.y)>.6)R(d.x+2,d.y-3,1,1,"#ffffff")}}

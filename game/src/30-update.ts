@@ -8,7 +8,7 @@ function update(dt){
   socialT-=dt;if(socialT<=0){socialT=rand(2,4);social()}
   updateChoir(dt);updateArgs(dt);updateWeather(dt);updateFocus(dt);seasonTick(dt);spawnWild(dt);
   storyT-=dt;if(storyT<=0){storyT=2;try{storyTick()}catch(e){console.error(e)}}
-  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);
+  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);
   if(camGoal){const k=Math.min(1,dt*5);cam.x+=(camGoal.x-cam.x)*k;cam.y+=(camGoal.y-cam.y)*k;clampCam();if(Math.hypot(camGoal.x-cam.x,camGoal.y-cam.y)<.5)camGoal=null}
   tribeT-=dt;if(tribeT<=0){tribeT=6;updateTribes();updateLoyalty()}
   choirT-=dt;if(choirT<=0){choirT=rand(150,300);if(!night&&!focusing()&&S.pips.length>=4)startChoir(false)}
@@ -61,6 +61,7 @@ function updPip(p,dt){
         else if(r.goal==="form"){r.state="form";r.ct=60;r.dir=1}
         else if(r.goal==="push"){r.state="push";r.ct=rand(10,16);r.dir=1}
         else if(r.goal==="decor"){useDecor(p)}
+        else if(r.goal==="fire"){fireArrive(p)}
         else if(r.goal==="hide"){r.state="hidden";r.goal=null;clearBubble(p.id)}
         else if(r.goal==="story"){r.state="sbuild3";r.workT=r.workMax=3}
         else if(r.goal==="gate"){r.state="act";r.act="hop";r.ct=1;r.goal=null;p.x+=rand(-6,6);burst(p.x,p.y-6,"spark",6)}
