@@ -18,6 +18,16 @@ ngplus_test|NG founder echo True trust 60 lang ['food']
 ngplus_test|NG kept lex ['בלופ'] album True tasks 1
 ngplus_test|NG story ch 0 ending None wood 0
 ngplus_test|NG reload loop 1 pips 1 stored loop 1
-ngplus_test|MUSIC steps>0 True mode day
+ngplus_test|MUSIC steps>0 True mode
 ngplus_test|MUSIC reset mode sad
 ngplus_test|ERR []
+outside_test|LATE note set True letters ['sleep']
+outside_test|LATE once per night 1
+outside_test|LETTER wall once 1
+outside_test|JOURNAL letters 2
+outside_test|JOURNAL open letter מכתב · הקיר
+outside_test|TITLE glitched True back to normal חוות הפיפים
+outside_test|BACK greeted True
+outside_test|ENDING letter True
+outside_test|SAVED letters ['sleep', 'together', 'wall']
+outside_test|ERR []

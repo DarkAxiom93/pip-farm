@@ -56,7 +56,7 @@ function storyTick(){
   const st=S.story;if(!st||st.ending==="reset"&&!st.glitch&&Date.now()-st.endAt>86400000)spawnRedemption();
   if(!st||focusing()||cardOn)return;
   if(st.ch===0&&(S.pips.length>=5||Date.now()-st.started>20*60000)){st.ch=1;st.chDay=dayKey(Date.now());st.nextGlitch=Date.now()+15000;$("hStory").hidden=false;
-    card({title:"פרק 1 · תקלה",lines:loopN()?["~משהו בחווה מהבהב. שוב.","~פיפי לא מוריד ממנו את העיניים. הוא כבר ראה את זה פעם.","> חפש את התקלות במפה והקש עליהן"]:["~משהו בחווה מהבהב.","~פיפי לא מוריד ממנו את העיניים.","> חפש את התקלות במפה והקש עליהן"]});dirty();return}
+    card({title:"פרק 1 · תקלה",lines:loopN()?["~משהו בחווה מהבהב. שוב.","~פיפי לא מוריד ממנו את העיניים. הוא כבר ראה את זה פעם.","> חפש את התקלות במפה והקש עליהן"]:["~משהו בחווה מהבהב.","~פיפי לא מוריד ממנו את העיניים.","> חפש את התקלות במפה והקש עליהן"]});setTimeout(()=>letter("hello"),25000);dirty();return}
   if(st.ch>=1&&st.ch<=4&&!st.glitch&&st.frag<(CH_FRAGS[st.ch]||0)&&chapterReady(st)&&Date.now()>=st.nextGlitch){st.glitch=glitchSpot();toast("משהו מהבהב במפה…",1);dirty()}
   if(st.ch>=4&&!st.ending&&Math.random()<.02){knock();S.pips.filter(p=>rt(p).state==="idle").slice(0,4).forEach(p=>{rt(p).state="stare";rt(p).ct=2.5})}
   if(st.ch===5&&!st.site&&!st.ending&&st.retryDay&&(S.fastStory?Date.now()-st.retryAt>120000:st.retryDay!==dayKey(Date.now()))){st.retryDay=null;theRequest();return}
@@ -105,7 +105,7 @@ function theWall(){
   S.pips.filter(p=>["idle","walk","chat"].includes(rt(p).state)&&!rt(p).job).slice(0,12).forEach((p,i)=>{const r=rt(p);r.goal="push";r.state="walk";setT(p,ex-3,clamp(40+i*20+rand(-6,6),24,WH-10))});
   setTimeout(knock,3500);setTimeout(knock,5200);
   setTimeout(()=>card({title:"פרק 4 · הקיר",lines:["~הם הלכו לקצה של העולם.","~הם לוחצים עליו. דופקים עליו.","~מבפנים."],
-    choices:[{t:"לבנות להם חלון בקצה העולם",id:"window",main:true,note:"30 עצים. הפיפים יבנו אותו כשיהיו עצים"},{t:"לבנות גדר לאורך הקצה",id:"fence",note:"שיפסיקו להתקרב"}]}),7000);
+    after:()=>setTimeout(()=>letter("wall"),20000),choices:[{t:"לבנות להם חלון בקצה העולם",id:"window",main:true,note:"30 עצים. הפיפים יבנו אותו כשיהיו עצים"},{t:"לבנות גדר לאורך הקצה",id:"fence",note:"שיפסיקו להתקרב"}]}),7000);
 }
 // chapter 5: the request
 function theRequest(){
@@ -124,9 +124,9 @@ function storyChoose(id){
   const st=S.story;st.choices.push(id);
   if(id==="wave"){st.kind++;S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+3,-100,100);const r=rt(p);if(r.goal==="form"||r.state==="form"){r.state="celebrate";r.ct=1.5;r.goal=null}});SFX.level();toast("הם קופצים משמחה. הם יודעים שאתה שם",1)}
   else if(id==="ignore"){st.ctrl++;S.pips.forEach(p=>{p.mood=Math.max(0,p.mood-5);const r=rt(p);if(r.state==="form"||r.goal==="form"){r.state="idle";r.goal=null;r.wait=rand(1,4)}});toast("הם מתפזרים לאט. בשקט")}
-  else if(id==="game"){st.kind++;storyInit();const w=newWord();S.lex[w]={c:"game",ok:true,born:Date.now(),heard:1};S.pips.forEach(p=>{p.lang.game=w});toast(`עכשיו יש להם מילה: "${w}" זה משחק`,1)}
+  else if(id==="game"){st.kind++;storyInit();const w=newWord();S.lex[w]={c:"game",ok:true,born:Date.now(),heard:1};S.pips.forEach(p=>{p.lang.game=w});toast(`עכשיו יש להם מילה: "${w}" זה משחק`,1);setTimeout(()=>letter("game"),20000)}
   else if(id==="erase"){st.ctrl+=2;S.pips.forEach(p=>{delete p.lang.screen;delete p.lang.outside;p.trust=clamp((p.trust??30)-5,-100,100)});for(const w in S.lex)if(["screen","outside"].includes(S.lex[w].c))delete S.lex[w];
-    setTimeout(()=>{const a=pick(S.pips);if(a)S.drawings.push({x:Math.round(a.x),y:Math.round(a.y+10),k:"screen",by:a.id,name:a.name,t:Date.now(),away:0});toast("המילים נמחקו. אבל מישהו שוב צייר מסך על האדמה",1)},20000)}
+    setTimeout(()=>{const a=pick(S.pips);if(a)S.drawings.push({x:Math.round(a.x),y:Math.round(a.y+10),k:"screen",by:a.id,name:a.name,t:Date.now(),away:0});toast("המילים נמחקו. אבל מישהו שוב צייר מסך על האדמה",1);setTimeout(()=>letter("erase"),15000)},20000)}
   else if(id==="window"){st.kind+=2;st.site={k:"window",p:0,x:edgeX()-6,y:edgeY()};releasePushers()}
   else if(id==="fence"){st.ctrl+=2;st.fence=edgeX();S.pips.forEach(p=>{p.trust=clamp((p.trust??30)-5,-100,100)});releasePushers();toast("גדר עומדת לאורך הקצה. הם מסתכלים עליה")}
   else if(id==="gate"){st.ch=6;const x=st.site?st.site.x:edgeX()-6,y=st.site?st.site.y:edgeY();st.site={k:"gate",p:0,x,y,win:st.site&&st.site.k==="window"&&st.site.p>=100}}
@@ -196,7 +196,8 @@ function ending(k){
     card({title:"סוף · איפוס",lines:["> מתחיל איפוס זיכרון…","> איפוס זיכרון הושלם","> כל הפיפים מאושרים","> כל הפיפים מאושרים","!> כל הפיפים מאושרים"]});
   }
   SFX.level();renderAll();dirty();
-  setTimeout(()=>toast("גילית סוף. ביומן הסיפור אפשר עכשיו להתחיל משחק חדש+",1),25000);
+  setTimeout(()=>letter(k),k==="free"?32000:15000);
+  setTimeout(()=>toast("גילית סוף. ביומן הסיפור אפשר עכשיו להתחיל משחק חדש+",1),45000);
 }
 function spawnRedemption(){const st=S.story;if(!st||st.ending!=="reset"||st.glitch||st.redeemed)return;st.glitch=Object.assign(glitchSpot(),{redeem:true});dirty()}
 function openRedeem(){
@@ -230,10 +231,10 @@ function openJournal(){
     `<p class="nar">קבצים שנמצאו: ${st.frag}/7</p><ul class="sjournal">${FRAGS.slice(0,st.frag).map((f,i)=>`<li data-f="${i}"><span>${esc(f.t)}</span><span>לקרוא</span></li>`).join("")}</ul>`+
     (st.glitch?`<p class="sys">> יש תקלה פעילה במפה. חפש אותה</p>`:st.ch>=1&&st.ch<=4&&st.frag<7?(!chapterReady(st)&&[2,3,4,6].includes(st.frag)&&st.chDay===dayKey(Date.now())&&!S.fastStory?`<p class="sys">> הפרק הבא יתחיל מחר</p>`:!chapterReady(st)?`<p class="sys">> הם מחכים להחלטה שלך</p>`:`<p class="sys">> התקלה הבאה תופיע בקרוב</p>`):"")+
     (st.site&&st.site.p<100?`<p class="sys">> ${st.site.k==="gate"?"השער":"החלון"}: ${Math.round(st.site.p)}% · צריך עצים</p>`:"")+
-    (()=>{const f=endingsFound();return `<p class="nar">סופים שגילית: ${f.size}/3 · ${Object.entries(ENDINGS).map(([k,n])=>f.has(k)?n+" ✓":"???").join(" · ")}</p>`+(loopN()?`<p class="sys">> הפעלה מספר ${loopN()+1}</p>`:"")})();
+    (()=>{const f=endingsFound();return (S.letters&&Object.keys(S.letters).length?`<p class="nar">מכתבים מ-pip_001:</p><ul class="sjournal">${Object.entries(S.letters).sort((a:any,b:any)=>a[1].t-b[1].t).map(([id,x]:any)=>`<li data-l="${id}"><span>${esc(x.title)}</span><span>לקרוא</span></li>`).join("")}</ul>`:"")+`<p class="nar">סופים שגילית: ${f.size}/3 · ${Object.entries(ENDINGS).map(([k,n])=>f.has(k)?n+" ✓":"???").join(" · ")}</p>`+(loopN()?`<p class="sys">> הפעלה מספר ${loopN()+1}</p>`:"")})();
   $("sChoices").innerHTML="";const b=document.createElement("button");b.className="btn";b.type="button";b.textContent="לסגור";b.onclick=e=>{e.stopPropagation();cardOn=false;$("story").hidden=true;if(cardQ.length)nextCard()};$("sChoices").appendChild(b);
   if(canNewGamePlus()){const n=document.createElement("button");n.className="btn main";n.type="button";n.innerHTML="משחק חדש+<small>להתחיל הפעלה חדשה שזוכרת את זו</small>";n.onclick=e=>{e.stopPropagation();cardOn=false;$("story").hidden=true;askNewGamePlus()};$("sChoices").appendChild(n)}
-  $("story").onclick=e=>{const li=e.target.closest("li[data-f]");if(li){const f=FRAGS[+li.dataset.f];$("story").hidden=true;cardOn=false;card({title:f.t,lines:f.l})}};
+  $("story").onclick=e=>{const ll=e.target.closest("li[data-l]");if(ll){$("story").hidden=true;cardOn=false;openLetter(ll.dataset.l);return}const li=e.target.closest("li[data-f]");if(li){const f=FRAGS[+li.dataset.f];$("story").hidden=true;cardOn=false;card({title:f.t,lines:f.l})}};
 }
 $("hStory").addEventListener("click",()=>{audio();openJournal()});
 

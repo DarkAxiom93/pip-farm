@@ -1,5 +1,5 @@
 // Pip Farm desktop shell: the farm window, the desktop buddies strip, tray, saves and notifications.
-const { app, BrowserWindow, Tray, Menu, ipcMain, Notification, nativeImage, screen, safeStorage } = require("electron");
+const { app, BrowserWindow, Tray, Menu, ipcMain, Notification, nativeImage, screen, safeStorage, powerMonitor } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
@@ -146,17 +146,31 @@ function setupUpdates() {
 }
 let installUpdate = () => {};
 
+// ---------- the keeper at the computer ----------
+// Every 30 s look at how long the computer has been idle. When someone comes back after 10+ minutes,
+// tell the farm so the pips can greet them.
+function watchPresence() {
+  let away = 0;
+  setInterval(() => {
+    let idle = 0;
+    try { idle = powerMonitor.getSystemIdleTime(); } catch { return; }
+    if (idle >= 600) away = Math.max(away, idle);
+    else if (away && idle < 30) { if (farmWin) farmWin.webContents.send("presence", away / 60); away = 0; }
+  }, 30000);
+}
+
 // ---------- IPC from the pages ----------
 ipcMain.handle("app:info", () => ({ version: app.getVersion(), updateReady }));
 ipcMain.on("update:install", () => installUpdate());
 ipcMain.handle("save:load", () => readSave());
 ipcMain.on("save:write", (_e, json) => { try { writeSave(json); } catch (err) { console.error("save failed", err); } });
-ipcMain.handle("settings:get", () => { const s = readSettings(); return { buddy: !!s.buddy, autostart: !!s.autostart, hasKey: !!getApiKey() }; });
+ipcMain.handle("settings:get", () => { const s = readSettings(); return { buddy: !!s.buddy, autostart: !!s.autostart, letters: s.letters !== false, hasKey: !!getApiKey() }; });
 ipcMain.handle("settings:set", (_e, patch) => {
   if ("apiKey" in patch) setApiKey(String(patch.apiKey || "").trim());
   const s = readSettings();
   if ("buddy" in patch) s.buddy = !!patch.buddy;
   if ("autostart" in patch) s.autostart = !!patch.autostart;
+  if ("letters" in patch) s.letters = !!patch.letters;
   writeSettings(s); applyBuddy(); applyAutostart();
   return true;
 });
@@ -165,6 +179,19 @@ ipcMain.on("notify", (_e, { title, body }) => {
   const n = new Notification({ title: String(title).slice(0, 80), body: String(body).slice(0, 200), icon: iconPath(), silent: false });
   n.on("click", showFarm);
   n.show();
+});
+// letters from the pips: a .txt on the desktop. The name comes from a fixed id and a short title,
+// existing files are never overwritten, and only plain text is written.
+ipcMain.on("letter:write", (_e, { id, title, text }) => {
+  try {
+    if (readSettings().letters === false) return;
+    if (!/^[a-z0-9-]{1,30}$/.test(String(id))) return;
+    const clean = String(title).replace(/[\\/:*?"<>|\r\n\t]/g, "").slice(0, 40).trim() || "מכתב";
+    const file = path.join(app.getPath("desktop"), `מכתב מהפיפים - ${clean}.txt`);
+    if (fs.existsSync(file)) return;
+    const body = "\ufeff" + String(text).slice(0, 4000).replace(/\r?\n/g, "\r\n") + "\r\n";
+    fs.writeFileSync(file, body, { encoding: "utf8", flag: "wx" });
+  } catch (err) { console.error("letter failed", err && err.message); }
 });
 ipcMain.on("snapshot", (_e, snap) => { lastSnapshot = snap; if (buddyWin) buddyWin.webContents.send("snapshot", snap); });
 ipcMain.on("buddy:mouse", (_e, over) => { if (buddyWin) buddyWin.setIgnoreMouseEvents(!over, { forward: true }); });
@@ -194,6 +221,7 @@ app.whenReady().then(() => {
   applyBuddy();
   applyAutostart();
   setupUpdates();
+  watchPresence();
   // developer self-check: PIPFARM_SMOKE=<folder> saves screenshots of both windows and quits
   if (process.env.PIPFARM_SMOKE) {
     const out = process.env.PIPFARM_SMOKE;
@@ -203,6 +231,8 @@ app.whenReady().then(() => {
         fs.writeFileSync(path.join(out, "smoke-farm.png"), (await farmWin.webContents.capturePage()).toPNG());
         if (buddyWin) fs.writeFileSync(path.join(out, "smoke-buddy.png"), (await buddyWin.webContents.capturePage()).toPNG());
         fs.writeFileSync(path.join(out, "smoke-save.txt"), String((readSave() || "").length));
+        await farmWin.webContents.executeJavaScript('pipDesktop.writeLetter("hello","שלום","שורה אחת\\nשורה שתיים");pipDesktop.writeLetter("bad/../x","רע","לא אמור להיכתב")');
+        await new Promise(r => setTimeout(r, 500));
         fs.writeFileSync(path.join(out, "smoke-info.txt"), await farmWin.webContents.executeJavaScript('document.getElementById("optVersion").textContent+" | desk settings shown: "+!document.getElementById("deskSettings").hidden'));
       } catch (e) { fs.writeFileSync(path.join(out, "smoke-error.txt"), String(e && e.stack || e)); }
       quitting = true; app.quit();

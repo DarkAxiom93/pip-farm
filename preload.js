@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld("pipDesktop", {
   appInfo: () => ipcRenderer.invoke("app:info"),
   onUpdate: fn => ipcRenderer.on("update", (_e, info) => fn(info)),
   installUpdate: () => ipcRenderer.send("update:install"),
+  writeLetter: (id, title, text) => ipcRenderer.send("letter:write", { id: String(id), title: String(title), text: String(text) }),
+  onPresence: fn => ipcRenderer.on("presence", (_e, minutes) => fn(Number(minutes) || 0)),
   // used by the desktop buddies strip
   onSnapshot: fn => ipcRenderer.on("snapshot", (_e, snap) => fn(snap)),
   buddyMouse: over => ipcRenderer.send("buddy:mouse", !!over),

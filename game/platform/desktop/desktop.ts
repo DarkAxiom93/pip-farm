@@ -1,6 +1,14 @@
 /* platform: the Windows app. Saves go to a file, Claude goes through the user's API key,
    and pips show up on the desktop strip and in Windows notifications. */
-let lastNotify=0;
+let lastNotify=0,deskLetters=true;
+// letters become real .txt files on the keeper's desktop (can be turned off in the farm tab)
+function platformLetter(id:string,title:string,text:string):boolean{
+  if(!deskLetters)return false;
+  try{pipDesktop.writeLetter(id,title,text)}catch(_){return false}
+  notify("מכתב מהפיפים",`pip_001 השאיר משהו על שולחן העבודה: "${title}"`,true);
+  return true;
+}
+pipDesktop.onPresence(m=>keeperBack(m));
 function platformSave(d){try{pipDesktop.save(JSON.stringify(d))}catch(e){}}
 function notify(title:string,body:string,force?:boolean){
   if(!force&&document.hasFocus())return;
@@ -32,11 +40,13 @@ function platformBoot(local):boolean{
       const st=await pipDesktop.getSettings();
       sample=st.hasKey?Object.assign(async(input)=>({text:await pipDesktop.ask(String(input))}),{json:async(input)=>{const t=await pipDesktop.ask(String(input)+"\n\nהחזר אובייקט JSON אחד בלבד, בלי שום טקסט נוסף.");const m=String(t).match(/\{[\s\S]*\}/);if(!m)throw{code:"bad"};return JSON.parse(m[0])}}):null;
       aiDenied=false;voiceNote();
+      deskLetters=st.letters!==false;$("optLetters").checked=deskLetters;
       $("optBuddy").checked=!!st.buddy;$("optAuto").checked=!!st.autostart;$("optKeyNote").textContent=st.hasKey?"יש מפתח שמור. Claude פעיל":"אין מפתח. הפיפים מבינים לפי מילות מפתח";
     };
     $("deskSettings").hidden=false;await setupAI();
     $("optBuddy").onchange=e=>pipDesktop.setSettings({buddy:e.target.checked});
     $("optAuto").onchange=e=>pipDesktop.setSettings({autostart:e.target.checked});
+    $("optLetters").onchange=e=>{deskLetters=e.target.checked;pipDesktop.setSettings({letters:e.target.checked})};
     $("optKeySave").onclick=async()=>{const v=$("optKey").value.trim();await pipDesktop.setSettings({apiKey:v});$("optKey").value="";await setupAI();toast(v?"המפתח נשמר":"המפתח נמחק",1)};
     // version and updates
     const showUpdate=v=>{$("optVersion").textContent=`גרסה מוכנה להתקנה: ${v}`;$("optUpdate").hidden=false};

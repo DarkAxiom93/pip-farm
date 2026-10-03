@@ -3,3 +3,4 @@ function platformSave(d){}
 function notify(title:string,body:string,force?:boolean){}
 function platformVoiceNote(n:HTMLElement):boolean{return false}
 function platformBoot(local):boolean{return false}
+function platformLetter(id:string,title:string,text:string):boolean{return false}
