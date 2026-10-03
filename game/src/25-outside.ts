@@ -37,14 +37,14 @@ function outsideTick(dt){
     S.lateNote=today;
     S.pips.filter(p=>rt(p).state==="sleep"||rt(p).state==="idle").slice(0,3).forEach(p=>say(p,pick(["zzz","לישון","…"]),3,null,"sleepy"));
     toast(`השעה ${clock()}. הפיפים חושבים שגם אתה צריך לישון`,1);
-    if(S.story&&S.story.ch>=1)letter("sleep");dirty();
+    if(S.story&&S.story.ch>=1)letter("sleep");moment("late",null);dirty();
   }
 }
 // the window title glitches from chapter 4 until the end
 const TITLE=document.title;
 function titleTick(dt){
   titleT-=dt;if(titleT>0)return;titleT=rand(900,2400);
-  const st=S.story;if(!st||st.ch<4||st.ending||!document.hasFocus())return;
+  const st=S.story;if(!st||st.ch<4||st.ending||focusing()||!document.hasFocus())return;
   const zalgo=s=>[...s].map(c=>c===" "?c:c+"̷").join(""),lines=[zalgo(TITLE),"אנחנו רואים אותך",zalgo("pip_001"),TITLE];
   lines.forEach((t,i)=>setTimeout(()=>{document.title=t},i*900));
 }

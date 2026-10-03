@@ -41,6 +41,7 @@ function renderHead(){
   <div style="margin-top:8px"><p class="label">אופי</p><div class="chips">${tr.length?tr.map(k=>`<span class="tag trait">${TRAIT_NAME[k]}</span>`).join(""):`<span class="tag">עוד לא ברור. תעבדו, תדברו, תלטפו</span>`}</div></div>
   <div style="margin-top:8px"><p class="label">אסף ${p.vocab.length} מילים (קופצות לפעמים כשהוא מרגש)</p><div class="chips">${p.vocab.length?p.vocab.slice(-14).reverse().map(w=>`<span class="tag">${esc(w)}</span>`).join(""):`<span class="tag">כל מילה שתכתוב לו הוא לומד</span>`}</div></div>
   <div style="margin-top:8px"><p class="label">זוכר</p><ul class="mem" id="memList">${memHtml(p)}</ul></div>
+  <div style="margin-top:8px"><p class="label">רגעים משותפים</p><ul class="mem" id="momList">${momentsHtml(momentsOf(p),4)}</ul></div>
   <div style="margin-top:8px"><p class="label">גנים</p><div class="chips">${p.mut?`<span class="tag mut">✦ ${traitLabel("mut:"+p.mut)}</span>`:""}${traitKeys(p).filter(k=>!k.startsWith("mut")&&!/:0$/.test(k)||k==="head:0").map(k=>`<span class="tag">${traitLabel(k)}</span>`).join("")}</div></div>
   <div style="margin-top:8px"><p class="label">מדבר בשפת הפיפים</p><div class="chips">${Object.keys(p.lang).length?Object.entries(p.lang).map(([c,w]:[string,string])=>`<span class="tag lang">${esc(w)}${S.lex[w]&&S.lex[w].ok?" · "+CONCEPTS[c]:""}</span>`).join(""):`<span class="tag">עוד לא המציא מילים</span>`}</div></div>
   </details>

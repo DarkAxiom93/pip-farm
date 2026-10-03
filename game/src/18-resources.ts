@@ -80,7 +80,7 @@ function finishConstruct(p){
   }
   const b=S.builds[k];if(!b||b.done)return;
   b.p+=dom(p)==="work"?15:10;award(p,4,null);burst(p.x,p.y-4,"dust",6);
-  if(b.p>=100){b.p=100;b.done=true;SFX.level();burst(BUILD[k].x,BUILD[k].y-10,"confetti",26);toast(`הפיפים סיימו לבנות ${BUILD[k].n}! ${BUILD[k].d}`,1);quest("build")}
+  if(b.p>=100){b.p=100;b.done=true;moment("build",null,BUILD[k].n,false);SFX.level();burst(BUILD[k].x,BUILD[k].y-10,"confetti",26);toast(`הפיפים סיימו לבנות ${BUILD[k].n}! ${BUILD[k].d}`,1);quest("build")}
   dirty();
 }
 function drawBuildings(t){

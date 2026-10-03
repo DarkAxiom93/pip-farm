@@ -76,7 +76,8 @@ function tapAt(e){
     if(st){openStar(st);return}}
   const[x,y]=toWorld(e),m=2/cam.z*2;
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
-  const ord=S.pips.filter(p=>inView(p.x,p.y,20)).sort((a,b)=>b.y-a.y);
+  // a pip that is remembering something is tapped first, even in a crowd
+  const ord=S.pips.filter(p=>inView(p.x,p.y,20)).sort((a,b)=>(rt(b).recall?1:0)-(rt(a).recall?1:0)||b.y-a.y);
   for(const p of ord){
     const bw=7+Math.floor(Math.min(level(p),10)*.4);
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}
@@ -135,6 +136,7 @@ function tapPip(p){
   r.taps=(r.taps||[]).filter(x=>now-x<2500);r.taps.push(now);
   if(r.taps.length>=6){r.taps=[];bond(p,-4,"poke");r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,"!!",1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
   if((p.trust??30)<-20&&Math.random()<.5&&r.state!=="sleep"){r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,pick(["!?","איק!"]),1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
+  if(shareRecall(p)){if(sel!==p.id)select(p.id);return}
   if(r.state==="argue"){calm(p);if(sel!==p.id)select(p.id);return}
   if(r.state==="choir"){SFX.happy(p.pitch*2);burst(p.x,p.y-12,"heart",1);if(sel!==p.id)select(p.id);return}
   if(r.need){
@@ -155,7 +157,7 @@ function pet(p){
   const r=rt(p);
   burst(p.x,p.y-10,"heart",1);parts[parts.length-1].vx=0;parts[parts.length-1].vy=-14;
   SFX.purr(p.pitch);p.mood=Math.min(100,p.mood+5);quest("pet");
-  if(r.petCd<=0){award(p,3,"pet");r.petCd=2;langSpeak(p,"love",.3);bond(p,2,"pet")}
+  if(r.petCd<=0){award(p,3,"pet");r.petCd=2;langSpeak(p,"love",.3);bond(p,2,"pet");moment("pet",p);if(stormy()&&!S.weather.calmed){S.weather.calmed=1;moment("storm",p,null,false)}}
   if(r.state==="sleep"){say(p,"זזז…",1.5,"snd","sleepy")}
   else if(r.state==="idle"){r.state="celebrate";r.ct=.6}
   refresh();

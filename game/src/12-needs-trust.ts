@@ -24,7 +24,7 @@ function fulfill(p){
 function playWith(p){const r=rt(p);r.state="act";r.act="dance";r.ct=2;burst(p.x,p.y-8,"confetti",10);SFX.mood(p.pitch,"excited",.4)}
 
 /* trust, memory, absence, statue */
-const MEM={pet:["ליטפת אותו",1],fed:["האכלת אותו",1],need:["נתת לו מה שביקש",1],talk:["דיברת אליו יפה",1],calm:["הפרדת אותו מריב",1],task:["סיימתם משימה ביחד",1],hurt:["פגעת בו",0],ignored:["התעלמת ממנו",0],poke:["הצקת לו",0],missed:["היית רחוק הרבה זמן",0],born:["נולד מהורה ש",2],lost:["ההורה שלו הפך לכוכב",2],thanked:["הודית לו על ציור",1]};
+const MEM={shared:["נזכרתם ביחד ברגע משותף",1],pet:["ליטפת אותו",1],fed:["האכלת אותו",1],need:["נתת לו מה שביקש",1],talk:["דיברת אליו יפה",1],calm:["הפרדת אותו מריב",1],task:["סיימתם משימה ביחד",1],hurt:["פגעת בו",0],ignored:["התעלמת ממנו",0],poke:["הצקת לו",0],missed:["היית רחוק הרבה זמן",0],born:["נולד מהורה ש",2],lost:["ההורה שלו הפך לכוכב",2],thanked:["הודית לו על ציור",1]};
 function bond(p,d,k){
   p.trust=clamp((p.trust??30)+d,-100,100);
   if(k){p.mem=p.mem||[];const last=p.mem[p.mem.length-1];if(last&&last.k===k&&Date.now()-last.t<60000)last.t=Date.now();else{p.mem.push({k,t:Date.now()});if(p.mem.length>6)p.mem.shift()}}
@@ -33,7 +33,7 @@ function bond(p,d,k){
 function trustWord(t){return t>=60?"אוהב אותך":t>=25?"סומך עליך":t>=-10?"מהסס":"חושש ממך"}
 function avgTrust(list?){list=list||S.pips;return list.length?list.reduce((a,p)=>a+(p.trust??30),0)/list.length:0}
 function ago(t){const m=Math.round((Date.now()-t)/60000);if(m<1)return"עכשיו";if(m<60)return`לפני ${m} דק'`;const h=Math.round(m/60);if(h<24)return`לפני ${h} שע'`;return`לפני ${Math.round(h/24)} ימים`}
-let memT=null;function renderMemSoon(){clearTimeout(memT);memT=setTimeout(()=>{const p=sel&&byId(sel);const el=$("memList");if(p&&el)el.innerHTML=memHtml(p)},300)}
+let memT=null;function renderMemSoon(){clearTimeout(memT);memT=setTimeout(()=>{const p=sel&&byId(sel);const el=$("memList");if(p&&el)el.innerHTML=memHtml(p);const ml=$("momList");if(p&&ml)ml.innerHTML=momentsHtml(momentsOf(p),4)},300)}
 function memHtml(p){
   const list=(p.mem||[]).slice().reverse().slice(0,4);
   if(!list.length)return`<li><span>עוד לא קרה ביניכם משהו מיוחד</span></li>`;

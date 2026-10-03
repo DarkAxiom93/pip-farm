@@ -58,7 +58,7 @@ function openVisitor(){
   m.innerHTML=`<h4>${esc(v.name)}, אורח מרחוק</h4><p>יצור מעולם אחר עצר בחווה. הפיפים סקרנים מאוד</p>`+(v.done?`<p>הוא כבר קיבל ממך מתנה</p>`:`<button class="btn main" data-visit="1" ${S.basket<3?"disabled":""}>לתת לו 3 ירקות מהסל</button>${S.basket<3?"<p>צריך לפחות 3 ירקות בסל</p>":""}`);
 }
 function visitGift(){
-  const v=S.visitor;if(!v||v.done||S.basket<3)return;S.basket-=3;v.done=true;
+  const v=S.visitor;if(!v||v.done||S.basket<3)return;S.basket-=3;v.done=true;moment("visitor",null,v.name,false);
   const stayP=.25+(avgTrust()>50?.15:0),roll=Math.random();
   if(roll<stayP&&S.pips.length<cap()){
     const p=newPip(null);Object.assign(p,{name:v.name,hue:v.hue,exotic:true,x:v.x,y:v.y,trust:60,mood:90,gen:1,sprout:5,g:rollGenes()});

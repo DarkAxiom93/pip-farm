@@ -64,7 +64,7 @@ function finishJob(p){
   if(j.type==="plant"&&!pl.crop){pl.crop={type:j.seed,planted:Date.now(),water:!!(S.builds.well&&S.builds.well.done)};SFX.plop();quest("plant");burst(g.x+24,g.y+15,"dust",8);award(p,10,j.auto?null:"work")}
   else if(j.type==="water"&&pl.crop&&!pl.crop.water){pl.crop.water=true;SFX.water();burst(g.x+24,g.y+15,"drop",12);award(p,6,j.auto?null:"work");langSpeak(p,"water",.3)}
   else if(j.type==="harvest"&&pl.crop&&cropFrac(pl.crop)>=1){
-    const c=CROPS[pl.crop.type];pl.crop=null;S.sparks+=c.spark;addFood(c.yld+(curSeason==="autumn"?1:0));S.stats.harvests++;quest("harvest");
+    const c=CROPS[pl.crop.type];pl.crop=null;S.sparks+=c.spark;addFood(c.yld+(curSeason==="autumn"?1:0));S.stats.harvests++;quest("harvest");if([1,25,100,500].includes(S.stats.harvests))moment("harvest",null,S.stats.harvests,false);
     SFX.coin();burst(g.x+24,g.y+12,"spark",14);award(p,22,j.auto?null:"work");
     if(c.star){S.pips.forEach(q=>q.mood=Math.min(100,q.mood+20));toast("פרח כוכב! כל הפיפים שמחים")}
     if(!j.auto)toast(`${p.name} קטף ${c.name}: ‎+${c.spark} ניצוצות, ‎+${c.yld} לסל`);
@@ -89,7 +89,7 @@ function doSplit(p){
   c.x=clamp(p.x+7,6,WW-6);p.x=clamp(p.x-4,6,WW-6);
   p.growth=0;c.growth=0;p.food=Math.max(0,p.food-18);c.food=p.food;
   if(c.mut==="tiny")c.pitch=Math.min(1300,c.pitch*1.25);
-  S.pips.push(c);S.stats.splits++;quest("split");if(S.meteorBoost>0)S.meteorBoost--;
+  S.pips.push(c);S.stats.splits++;if(S.stats.splits===1)moment("split",[p,c],c.name);else if([10,50,100].includes(S.stats.splits))moment("split10",null,S.stats.splits,false);quest("split");if(S.meteorBoost>0)S.meteorBoost--;
   setTimeout(()=>{if(byId(c.id))discover(c,true)},1400);
   rt(p).state="celebrate";rt(p).ct=1.3;const rc=rt(c);rc.state="celebrate";rc.ct=1.3;
   SFX.split(p.pitch);burst(p.x+2,p.y-8,"confetti",26);

@@ -5,7 +5,7 @@ function ageText(p){const d=ageOf(p)/86400000;return d<1?`בן ${Math.max(1,Math
 function starPos(st){let h=0;for(const c of st.id)h=(h*31+c.charCodeAt(0))>>>0;return{fx:.04+((h%1000)/1000)*.92,fy:.04+(((h>>10)%1000)/1000)*.3}}
 function becomeStar(p,quiet?){
   const st={id:p.id,name:p.name,hue:p.hue,gen:p.gen,days:+(ageOf(p)/86400000).toFixed(1),died:Date.now(),trust:Math.round(p.trust??30),words:Object.keys(p.lang||{}).length,mut:p.mut||null};
-  S.stars.push(st);
+  S.stars.push(st);if(!quiet&&(p.trust??30)>=25)moment("farewell",S.pips.filter(q=>q.id!==p.id).slice(0,12),p.name,false);
   if((p.trust??30)>60){S.sparks+=10}
   S.pips.forEach(q=>{if(q.parent===p.id)bond(q,0,"lost")});
   {const r=RT.get(p.id);if(r){if(r.job){const j=r.job;if(jobs.includes(j))jobs.splice(jobs.indexOf(j),1);if(S.plots[j.plot])S.plots[j.plot].pending=false}if(r.node!=null)claims.delete(r.node)}}

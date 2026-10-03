@@ -50,6 +50,9 @@ function renderAlbum(){
   const have=Object.keys(S.album).length;
   $("albTop").innerHTML=`גילית <b>${have}/${albumTotal()}</b>. כל פיפ שנולד יורש את רוב הגנים מההורה, ולפעמים משהו משתנה. פיפ מאושר במיוחד (מצב רוח מעל 90) כשהוא מתפצל מוליד מוטציה פי 2 יותר`;
   const body=$("albBody");body.innerHTML="";
+  if(S.moments&&S.moments.length){const sec=document.createElement("div");sec.className="alb-sec";
+    sec.innerHTML=`<h3>ספר הרגעים<small>${S.moments.length}</small></h3><ul class="mem">${momentsHtml(S.moments,20)}</ul><p class="albtop">רגעים גדולים שעברתם ביחד. מדי פעם פיפ שהיה שם נזכר באחד מהם. כשזה קורה, הקש עליו כדי להיזכר איתו</p>`;
+    body.appendChild(sec)}
   if(S.stars.length){const sec=document.createElement("div");sec.className="alb-sec";
     sec.innerHTML=`<h3>שמי הזיכרון<small>${S.stars.length}</small></h3><ul class="mem">${S.stars.slice().reverse().slice(0,20).map(st=>`<li><span>✦ ${esc(st.name)} · דור ${st.gen} · חי ${st.days} ימים</span><small>${ago(st.died)}</small></li>`).join("")}</ul><p class="albtop" style="margin-top:4px">בלילה הם זורחים בשמיים. הקש על כוכב כדי לראות של מי הוא</p>`;
     body.appendChild(sec)}
@@ -91,7 +94,7 @@ $("lexList").addEventListener("click",e=>{
   const b=e.target.closest(".guess button");if(!b)return;audio();
   const li=b.closest(".lexi"),w=li.dataset.w,sel_=li.querySelector("select").value,e2=S.lex[w];if(!sel_||!e2)return;
   if(guessCd[w]&&Date.now()<guessCd[w]){toast("הם עוד מסתכלים עליך מוזר. חכה רגע");return}
-  if(sel_===e2.c){e2.ok=true;quest("decode");S.sparks+=8;S.stats.decoded++;SFX.level();toast(`פיענחת! "${w}" זה ${CONCEPTS[e2.c]}. ‎+8 ניצוצות`);
+  if(sel_===e2.c){e2.ok=true;quest("decode");S.sparks+=8;S.stats.decoded++;if(S.stats.decoded===1)moment("word",null,w);SFX.level();toast(`פיענחת! "${w}" זה ${CONCEPTS[e2.c]}. ‎+8 ניצוצות`);
     S.pips.filter(p=>Object.values(p.lang).includes(w)).slice(0,6).forEach((p,i)=>setTimeout(()=>{if(byId(p.id)){say(p,w+"!",1.8,"lang","excited");const r=rt(p);if(r.state==="idle"){r.state="celebrate";r.ct=.8}}},i*180));
     renderLang();if(sel)renderHead();dirty()}
   else{guessCd[w]=Date.now()+20000;li.classList.remove("no");void li.offsetWidth;li.classList.add("no");SFX.mood(440,"curious",.3);toast("לא. הם מטים את הראש בבלבול")}

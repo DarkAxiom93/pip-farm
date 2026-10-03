@@ -29,6 +29,8 @@ function newGamePlus(){
   Object.assign(S,{loop:sum.loop+1,runs:[...(old.runs||[]),sum].slice(-12),album:old.album,letters:old.letters,lex,tasks:old.tasks,streak:old.streak,stats:Object.assign({},S.stats,{tasksDone:old.stats.tasksDone||0}),
     hol:old.hol,sound:old.sound,music:old.music,ai:old.ai,fastStory:old.fastStory,fastSeasons:old.fastSeasons,seeds:old.seeds,quest:99,sparks:5+15*Math.min(sum.loop+1,4)});
   const f=S.pips[0];f.echo=true;
+  const oldF=old.pips.find(p=>p.founder);
+  S.moments=(old.moments||[]).filter(m=>!m.old&&oldF&&m.who.includes(oldF.id)).slice(-10).map(m=>Object.assign({},m,{who:[f.id],old:true,last:0,anniv:null}));
   f.trust=sum.ending==="reset"?5:sum.kind>=sum.ctrl?60:35;
   for(const w in lex)f.lang[lex[w].c]=w;
   f.mem=[{k:"loop",t:Date.now(),v:f.trust}];

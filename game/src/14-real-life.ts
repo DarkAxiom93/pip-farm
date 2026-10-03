@@ -7,6 +7,7 @@ function streakTick(){
   st.days=st.last===yest?st.days+1:1;st.last=today;st.best=Math.max(st.best||0,st.days);
   const bonus=Math.min(50,5*st.days);S.sparks+=bonus;
   SFX.level();toast(st.days===1?`רצף התחיל! ‎+${bonus} ניצוצות`:`רצף של ${st.days} ימים! ‎+${bonus} ניצוצות`);
+  if([3,7,30,100].includes(st.days))moment("streak",null,st.days,false);
   if(st.days===3)setTimeout(()=>toast("רצף 3: מזג האוויר בחווה נהיה נעים יותר"),2500);
   if(st.days===7)setTimeout(()=>toast("רצף 7: הירקות גדלים מהר יותר ב-20%"),2500);
   renderStreak();dirty();return true;
@@ -40,7 +41,7 @@ function finishFocus(){
   const reward=Math.round(f.len/5*2);S.sparks+=reward;S.stats.focusMin+=f.len;S.stats.focusRuns++;
   S.pips.forEach(p=>{p.xp+=5;p.growth+=5;p.mood=Math.min(100,p.mood+8);p.trust=clamp((p.trust??30)+2,-100,100);const r=rt(p);if(r.state==="idle"||r.state==="walk"){r.state="celebrate";r.ct=1.5}});
   SFX.level();burst(cam.x+CW/cam.z/2,cam.y+CH/cam.z/2,"confetti",40);
-  toast(`סיימת ${f.len} דקות ריכוז! ‎+${reward} ניצוצות`);notify("זמן הריכוז נגמר",`סיימת ${f.len} דקות. הפיפים חוגגים איתך`,true);
+  toast(`סיימת ${f.len} דקות ריכוז! ‎+${reward} ניצוצות`);if(f.len>=25)moment("focus",null,f.len,false);notify("זמן הריכוז נגמר",`סיימת ${f.len} דקות. הפיפים חוגגים איתך`,true);
   setTimeout(()=>startChoir(false),1500);
   const t=f.task&&S.tasks.find(x=>x.id===f.task&&!x.done);
   const box=$("focusDone");box.hidden=false;

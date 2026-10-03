@@ -103,7 +103,7 @@ function updateArgs(dt){
 function calm(p){
   const g=args.find(x=>x.a===p.id||x.b===p.id);if(!g)return false;
   args.splice(args.indexOf(g),1);
-  [byId(g.a),byId(g.b)].filter(Boolean).forEach(q=>{const r=rt(q);r.state="act";r.act="nuzzle";r.ct=1.6;q.mood=Math.min(100,q.mood+10);award(q,6,"pet");bond(q,4,"calm");burst(q.x,q.y-10,"heart",1)});
+  [byId(g.a),byId(g.b)].filter(Boolean).forEach(q=>{const r=rt(q);r.state="act";r.act="nuzzle";r.ct=1.6;q.mood=Math.min(100,q.mood+10);award(q,6,"pet");bond(q,4,"calm");moment("calm",q);burst(q.x,q.y-10,"heart",1)});
   S.stats.calmed++;SFX.purr(p.pitch);toast("הרגעת את הוויכוח. הם התחבקו");dirty();return true;
 }
 
@@ -176,7 +176,7 @@ function updateChoir(dt){
       if(live.length&&AC&&S.sound){const f=[0,4,7,12];live.forEach((p,i)=>voice(p,hz(f[i%4]+(i>3?12:0)),1.4,.3/Math.sqrt(live.length)))}
       live.forEach(p=>{const r=rt(p);r.state="celebrate";r.ct=1.3;r.goal=null;p.mood=Math.min(100,p.mood+10);award(p,3,"talk")});
       const lead=pick(live);if(lead)setTimeout(()=>{if(byId(lead.id))langSpeak(lead,"friend",.7)||chatter(lead,"excited")},600);
-      S.stats.choirs++;burst(choir.cx,choir.cy-10,"confetti",20);choir=null;choirT=rand(160,300);dirty();
+      if(S.stats.choirs===0)moment("choir",choir.mem.map(byId));S.stats.choirs++;burst(choir.cx,choir.cy-10,"confetti",20);choir=null;choirT=rand(160,300);dirty();
     }
   }
 }

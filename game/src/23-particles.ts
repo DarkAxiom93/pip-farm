@@ -5,6 +5,7 @@ const bubbleEls=new Map();
 function say(p,text,dur?,cls?,mood?){
   const box=$("bubbles");let b=bubbleEls.get(p.id);
   if(b&&b.classList.contains("q")&&cls!=="q")return;
+  if(b&&b.classList.contains("memo")&&cls!=="memo"&&cls!=="q"&&performance.now()<b._until)return; // let a memory finish
   if(!b){if(bubbleEls.size>=7&&cls!=="q")return;b=document.createElement("div");box.appendChild(b);bubbleEls.set(p.id,b)}
   b.className="bub"+(cls?" "+cls:"");b.textContent=text;b._until=cls==="q"?Infinity:performance.now()+(dur||2.4)*1000;
   rt(p).talk=Math.min(1.2,.2+text.length*.05);

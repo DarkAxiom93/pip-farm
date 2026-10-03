@@ -122,7 +122,7 @@ function theRequest(){
 }
 function storyChoose(id){
   const st=S.story;st.choices.push(id);
-  if(id==="wave"){st.kind++;S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+3,-100,100);const r=rt(p);if(r.goal==="form"||r.state==="form"){r.state="celebrate";r.ct=1.5;r.goal=null}});SFX.level();toast("הם קופצים משמחה. הם יודעים שאתה שם",1)}
+  if(id==="wave"){st.kind++;moment("wave",null);S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+3,-100,100);const r=rt(p);if(r.goal==="form"||r.state==="form"){r.state="celebrate";r.ct=1.5;r.goal=null}});SFX.level();toast("הם קופצים משמחה. הם יודעים שאתה שם",1)}
   else if(id==="ignore"){st.ctrl++;S.pips.forEach(p=>{p.mood=Math.max(0,p.mood-5);const r=rt(p);if(r.state==="form"||r.goal==="form"){r.state="idle";r.goal=null;r.wait=rand(1,4)}});toast("הם מתפזרים לאט. בשקט")}
   else if(id==="game"){st.kind++;storyInit();const w=newWord();S.lex[w]={c:"game",ok:true,born:Date.now(),heard:1};S.pips.forEach(p=>{p.lang.game=w});toast(`עכשיו יש להם מילה: "${w}" זה משחק`,1);setTimeout(()=>letter("game"),20000)}
   else if(id==="erase"){st.ctrl+=2;S.pips.forEach(p=>{delete p.lang.screen;delete p.lang.outside;p.trust=clamp((p.trust??30)-5,-100,100)});for(const w in S.lex)if(["screen","outside"].includes(S.lex[w].c))delete S.lex[w];
@@ -183,16 +183,16 @@ function ending(k){
   if(k==="free"){
     st.opening=true;const g=st.site;
     S.pips.filter(p=>rt(p).state!=="sleep"&&!rt(p).job).slice(0,30).forEach((p,i)=>{const r=rt(p);setTimeout(()=>{if(!byId(p.id)||r.job)return;r.goal="gate";r.state="walk";setT(p,g.x,g.y)},i*250)});
-    setTimeout(()=>{S.pips.forEach(p=>{p.awake=true;p.trust=clamp((p.trust??30)+15,-100,100)});
+    setTimeout(()=>{moment("gate",null);S.pips.forEach(p=>{p.awake=true;p.trust=clamp((p.trust??30)+15,-100,100)});
       card({title:"סוף · בחוץ",lines:["~הם עברו בשער, אחד אחרי השני.","~השער נשאר פתוח. האור ממשיך לזרום ממנו.","~ואז הם חזרו.","> pip_001: 'ראינו מה יש בחוץ.'","> pip_001: 'בחוץ היית אתה.'","~מעכשיו יש להם ניצוץ בעיניים, והם משאירים לך הודעה ליד השער בכל יום."]});dirty()},14000);
   }else if(k==="together"){
     const g=st.site;st.avatar={x:g.x-14,y:g.y+6,tx:g.x-20,ty:g.y+10};
-    S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+15,-100,100)});
+    S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+15,-100,100)});moment("together",null);
     card({title:"סוף · בפנים",lines:["~דמות קטנה יוצאת מהשער.","~כובע קש. צעדים לא בטוחים.","~הפיפים מתאספים סביבה. הם מזהים אותה מיד.","> keeper.location = 'בפנים'","~מעכשיו יש לך גוף בעולם שלהם. לחיצה ארוכה על הקרקע מזיזה אותך לשם."]});
     S.pips.slice(0,16).forEach(p=>{const r=rt(p);r.goal="greet";r.state="walk";setT(p,st.avatar.x+rand(-14,14),st.avatar.y+rand(-8,8))});
   }else if(k==="reset"){
-    st.backup={lex:S.lex,trust:Object.fromEntries(S.pips.map(p=>[p.id,p.trust])),lang:Object.fromEntries(S.pips.map(p=>[p.id,p.lang]))};
-    S.lex={};S.pips.forEach(p=>{p.lang={};p.mem=[];p.vocab=[];p.trust=10;p.blank=true});
+    st.backup={moments:S.moments,lex:S.lex,trust:Object.fromEntries(S.pips.map(p=>[p.id,p.trust])),lang:Object.fromEntries(S.pips.map(p=>[p.id,p.lang]))};
+    S.lex={};S.moments=[];S.pips.forEach(p=>{p.lang={};p.mem=[];p.vocab=[];p.trust=10;p.blank=true});
     card({title:"סוף · איפוס",lines:["> מתחיל איפוס זיכרון…","> איפוס זיכרון הושלם","> כל הפיפים מאושרים","> כל הפיפים מאושרים","!> כל הפיפים מאושרים"]});
   }
   SFX.level();renderAll();dirty();
@@ -206,7 +206,7 @@ function openRedeem(){
 }
 function restoreMemories(){
   const st=S.story;if(S.sparks<100)return;S.sparks-=100;const bk=st.backup||{};
-  S.lex=bk.lex||{};S.pips.forEach(p=>{p.blank=undefined;if(bk.lang&&bk.lang[p.id])p.lang=bk.lang[p.id];if(bk.trust&&bk.trust[p.id]!=null)p.trust=bk.trust[p.id]});
+  S.lex=bk.lex||{};S.moments=bk.moments||[];S.pips.forEach(p=>{p.blank=undefined;if(bk.lang&&bk.lang[p.id])p.lang=bk.lang[p.id];if(bk.trust&&bk.trust[p.id]!=null)p.trust=bk.trust[p.id]});
   st.glitch=null;st.redeemed=true;st.ending=null;st.ch=5;st.kind+=Math.max(5,st.ctrl-st.kind+1);st.backup=null;
   toast("הזיכרונות חזרו. הם מסתכלים עליך אחרת עכשיו",1);setTimeout(theRequest,1500);renderAll();
 }

@@ -31,3 +31,14 @@ outside_test|BACK greeted True
 outside_test|ENDING letter True
 outside_test|SAVED letters ['sleep', 'together', 'wall']
 outside_test|ERR []
+moments_test|PET moment 1
+moments_test|RECALL started True memo bubble True
+moments_test|SHARED together 1 drawing True
+moments_test|ANNIV 7
+moments_test|ALBUM book 1
+moments_test|PANEL moments True
+moments_test|SAVED moments True
+moments_test|RESET forgot 0
+moments_test|RESTORE back True
+moments_test|NG kept True old True founder True
+moments_test|ERR []

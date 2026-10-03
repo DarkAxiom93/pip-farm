@@ -22,7 +22,7 @@ async def main():
         print("NG story ch",st["story"]["ch"],"ending",st["story"]["ending"],"wood",st["wood"],"sparks",st["sparks"])
         
         # reload: the new run must be what loads
-        pg2=pg;await pg.reload();await pg.wait_for_timeout(2500)
+        await pg.evaluate("localStorage.setItem('pf.noinject','1')");pg2=pg;await pg.reload();await pg.wait_for_timeout(2500)
         print("NG reload loop",await pg2.evaluate("__pip.S.loop"),"pips",await pg2.evaluate("__pip.S.pips.length"),"stored loop",await pg2.evaluate("JSON.parse(localStorage.getItem('pipfarm.v1')).loop"))
         # music: mode follows the farm, and a reset ending turns it sad
         await pg2.mouse.click(5,5);await pg2.evaluate("__pip.S.sound=true;__pip.audio()");await pg2.wait_for_timeout(1500)

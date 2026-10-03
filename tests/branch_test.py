@@ -11,7 +11,7 @@ base=lambda **k: dict({"ch":0,"frag":0,"kind":0,"ctrl":0,"started":now,"nextGlit
 async def page(b,d,errs,tag):
     pg=await b.new_page(viewport={"width":1280,"height":800})
     pg.on("pageerror",lambda e:errs.append(tag+": "+str(e)));pg.on("console",lambda m:errs.append(tag+": "+m.text) if m.type=="error" and "ERR_" not in m.text else None)
-    await pg.add_init_script("if(!sessionStorage.x){sessionStorage.x=1;localStorage.setItem('pipfarm.v1',"+json.dumps(json.dumps(d))+")}")
+    await pg.add_init_script("if(!sessionStorage.x&&!localStorage.getItem('pf.noinject')){sessionStorage.x=1;localStorage.setItem('pipfarm.v1',"+json.dumps(json.dumps(d))+")}")
     await pg.goto("file://"+os.path.join(os.path.dirname(os.path.abspath(__file__)),"t.html"));await pg.wait_for_timeout(1500)
     return pg
 async def tapw(pg,wx,wy):
