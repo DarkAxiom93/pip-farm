@@ -35,6 +35,7 @@ const ACH=[
   {id:"col15",n:"חוקר טבע",d:"15 דברים שונים בספר האוסף",r:20,v:()=>Object.keys(S.col||{}).length,g:15},
   {id:"colall",n:"מוזיאון",d:"ספר אוסף מלא",r:120,v:()=>Object.keys(S.col||{}).length,g:()=>SPECIES.length},
   {id:"dig20",n:"ארכיאולוג",d:"לחפור 20 פעמים",r:20,v:()=>S.stats.digs||0,g:20},
+  {id:"decor5",n:"מעצב",d:"לשים 5 קישוטים בחווה",r:20,v:()=>(S.decor||[]).length,g:5},
   {id:"daily10",n:"קבוע",d:"לסיים את כל מטרות היום 10 פעמים",r:40,v:()=>S.stats.dailyDone||0,g:10}
 ];
 const achGoal=a=>typeof a.g==="function"?a.g():a.g;

@@ -103,7 +103,7 @@ $("lexList").addEventListener("click",e=>{
 
 /* farm tab */
 function renderFarm(){
-  renderShop();$("achBox").innerHTML=achHtml();
+  renderShop();renderDecorShop();$("achBox").innerHTML=achHtml();
   const words=new Set(S.pips.flatMap(p=>p.vocab)).size,maxGen=Math.max(...S.pips.map(p=>p.gen));
   $("farmStats").innerHTML=[...(loopN()?[[loopN()+1,"הפעלה"]]:[]),[S.pips.length+"/"+cap(),"פיפים"],[maxGen,"דורות"],[words,"מילים בחווה"],[S.stats.splits,"התפצלויות"],[S.stats.harvests,"קטיפים"],[S.stats.tasksDone,"משימות שסיימת"],[Object.keys(S.lex).length,"מילים פיפיות"],[S.stats.decoded,"פוענחו"],[S.stats.choirs,"מקהלות"],[S.pips.filter(p=>p.mut).length,"מוטנטים"],[S.tribes.length,"שבטים"],[S.wood||0,"עצים"],[Object.values(S.builds).filter((b:any)=>b.done).length+"/3","מבנים"],[Math.round(avgTrust()),"אמון ממוצע"],[S.streak.best||0,"רצף שיא"],[S.stats.focusMin||0,"דקות ריכוז"],[S.statue?(S.statue.done?"גמור":Math.round(S.statue.p)+"%"):"—","פסל"],[unlockedCount()+1+"/"+ZONES.length,"אזורים"],[S.stats.calmed,"ויכוחים שהרגעת"]]
     .map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
@@ -121,6 +121,8 @@ $("optStory").addEventListener("change",e=>{S.fastStory=e.target.checked;dirty()
 $("optSeason").addEventListener("change",e=>{S.fastSeasons=e.target.checked;seasonT=0;dirty()});
 $("optAi").addEventListener("change",e=>{S.ai=e.target.checked;voiceNote();dirty()});
 function soundBtn(){const b=$("hSound");b.textContent="צליל: "+(S.sound?"פועל":"כבוי");b.setAttribute("aria-pressed",String(S.sound))}
+$("decorBox").addEventListener("click",(e:any)=>{const b=e.target.closest("button");if(!b||b.disabled)return;audio();if(b.dataset.decorBuy)startPlacing(b.dataset.decorBuy);else if(b.dataset.decorCancel)cancelPlacing()});
+addEventListener("keydown",e=>{if(e.key==="Escape"){cancelPlacing();if(starMode)endStarMode(false)}});
 $("hStars").addEventListener("click",()=>{audio();toggleStarMode()});
 $("hHide").addEventListener("click",()=>{if(hide){toast(hide.phase==="seek"?"משחקים! חפש אותם במפה":"הם עוד מתחבאים…");return}startHide()});
 $("hChoir").addEventListener("click",()=>{audio();if(choir){toast("המקהלה כבר מתאספת");return}startChoir(true)});

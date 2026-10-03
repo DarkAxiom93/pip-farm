@@ -73,3 +73,12 @@ nature_test|FLOWERS song 1
 nature_test|BOOK shown 1 items True
 nature_test|SAVED col True
 nature_test|ERR []
+decor_test|SHOP items 8
+decor_test|PLACING True
+decor_test|BAD spot refused True still placing True
+decor_test|PLACED 1 paid True
+decor_test|STORED True
+decor_test|FREE from storage True
+decor_test|PIP swings True
+decor_test|SAVED decor
+decor_test|ERR []

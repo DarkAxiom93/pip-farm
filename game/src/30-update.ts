@@ -50,6 +50,7 @@ function updPip(p,dt){
       if(r.wait<=0&&p.energy>30&&Math.random()<.15&&startStatueWork(p))break;
       if(r.wait<=0&&p.energy>30&&Math.random()<.2&&startGather(p))break;
       if(r.wait<=0&&inPond(p.x-8,p.y)||r.wait<=0&&Math.hypot(p.x-POND.x,p.y-POND.y)<34)langSpeak(p,"water",.25);
+      if(r.wait<=0&&S.decor&&S.decor.length&&!night&&Math.random()<.2&&decorWander(p,r))break;
       if(r.wait<=0){const[x,y]=wanderTarget(p);r.goal="wander";r.state="walk";setT(p,x,y)}
       break;
     case "walk":{
@@ -59,6 +60,7 @@ function updPip(p,dt){
         else if(r.goal==="build"){r.state="build";r.workT=r.workMax=3}
         else if(r.goal==="form"){r.state="form";r.ct=60;r.dir=1}
         else if(r.goal==="push"){r.state="push";r.ct=rand(10,16);r.dir=1}
+        else if(r.goal==="decor"){useDecor(p)}
         else if(r.goal==="hide"){r.state="hidden";r.goal=null;clearBubble(p.id)}
         else if(r.goal==="story"){r.state="sbuild3";r.workT=r.workMax=3}
         else if(r.goal==="gate"){r.state="act";r.act="hop";r.ct=1;r.goal=null;p.x+=rand(-6,6);burst(p.x,p.y-6,"spark",6)}
@@ -82,8 +84,9 @@ function updPip(p,dt){
     case "act":r.ct-=dt;
       if(r.act==="spin"&&Math.random()<dt*10)r.dir=-r.dir;
       if(r.act==="nuzzle"&&Math.random()<dt*2){burst(p.x,p.y-10,"heart",1);const h=parts[parts.length-1];h.vx=rand(-6,6);h.vy=-14}
+      if(r.act==="swing"&&r.fx!=null){p.x=r.fx+Math.sin(r.anim*3)*4}
       if(r.act==="hide"){const dx=p.x-(r.fx??p.x+1),d=Math.abs(dx)||1;p.x=clamp(p.x+dx/d*10*dt,6,WW-6)}
-      if(r.ct<=0){r.state="idle";r.act=null;r.wait=rand(1,3)}break;
+      if(r.ct<=0){if(r.act==="swing"&&r.fx!=null)p.x=r.fx;r.state="idle";r.act=null;r.decor=null;r.wait=rand(1,3)}break;
     case "argue":r.ct-=dt;if(r.ct<=0){r.state="idle";r.wait=1}break;
     case "gather":r.workT-=dt;if(NODES[r.node].k!=="fish"&&Math.random()<dt*3)burst(p.x+r.dir*5,p.y-3,"dust",1);if(r.workT<=0)finishGather(p);break;
     case "sbuild":r.workT-=dt;if(Math.random()<dt*4)burst(p.x,p.y-4,"dust",1);if(r.workT<=0)finishStatue(p);break;

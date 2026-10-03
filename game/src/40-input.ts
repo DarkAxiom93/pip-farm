@@ -72,6 +72,7 @@ $("zIn").addEventListener("click",()=>{zoomAt(cam.z*1.5,.5,.5)});
 $("zOut").addEventListener("click",()=>{zoomAt(cam.z/1.5,.5,.5)});
 function tapAt(e){
   if(starMode){starTap(e);return}
+  if(placing){const[wx,wy]=toWorld(e);placeDecorAt(wx,wy);return}
   if(night&&S.stars.length){const b=cv.getBoundingClientRect(),sx=(e.clientX-b.left)/b.width*CW,sy=(e.clientY-b.top)/b.height*CH;
     const st=S.stars.find(q=>{const{fx,fy}=starPos(q);return Math.hypot(fx*CW-sx,fy*CH-sy)<9});
     if(st){openStar(st);return}}
@@ -86,6 +87,7 @@ function tapAt(e){
   }
   if(catchFlyAt(x,y))return; // pips first, then the fireflies around them
   if(natureTap(x,y))return;
+  {const d=decorAt(x,y);if(d){openDecor(d);return}}
   for(let i=0;i<PLOTS.length;i++){const g=PLOTS[i];if(g.z&&!zoneOpen(g.z))continue;if(x>=g.x-2&&x<=g.x+PW+2&&y>=g.y-2&&y<=g.y+PH+4){openPlot(i);return}}
   if(S.visitor&&Math.abs(x-S.visitor.x)<8&&y>S.visitor.y-22&&y<S.visitor.y+3){openVisitor();return}
   if(S.meteor&&S.meteor.landed&&!S.meteor.taken&&Math.hypot(x-S.meteor.x,y-S.meteor.y+3)<10){takeMeteor();return}
@@ -199,6 +201,7 @@ function openPlot(i){
 function closePlot(){$("pmenu").hidden=true;openPlotIdx=-1}
 $("pmenu").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b||b.disabled)return;
+  if(b.dataset.decor){decorAction(b.dataset.decor,b.dataset.id);closePlot();return}
   if(b.dataset.build){const k=b.dataset.build,B=BUILD[k];if((S.wood||0)>=B.cost&&!S.builds[k]){S.wood-=B.cost;S.builds[k]={p:0,done:false};SFX.coin();toast(`התחילו לבנות ${B.n}. הפיפים יבנו אותו`,1);dirty()}closePlot();refresh();return}
   if(b.dataset.craft){const i=b.dataset.craft,it=ITEMS[i];if((S.wood||0)>=it.cost&&!S.items[i]&&!S.craftQ.includes(i)){S.wood-=it.cost;S.craftQ.push(i);SFX.coin();toast(`הוזמן בבית המלאכה: ${it.n}`);dirty()}openBuilding("workshop");refresh();return}
   if(b.dataset.visit){visitGift();closePlot();return}

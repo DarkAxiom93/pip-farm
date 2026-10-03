@@ -159,7 +159,7 @@ function render(t){
   drawStatue(t);
   for(const tr of S.tribes)drawCamp(tr,t);
   drawTrees(t);
-  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);
+  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);
   const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
   drawVisitor(t);
@@ -182,7 +182,7 @@ function render(t){
   W2();
   if(night){
     for(const p of S.pips)if(p.mut==="glow"&&inView(p.x,p.y,20)){const rg=ctx.createRadialGradient(p.x,p.y-5,1,p.x,p.y-5,16);rg.addColorStop(0,`hsla(${p.hue},100%,80%,.45)`);rg.addColorStop(1,`hsla(${p.hue},100%,80%,0)`);ctx.fillStyle=rg;ctx.fillRect(p.x-16,p.y-21,32,32)}
-    const gl=ctx.createRadialGradient(BURROW.x+7,BURROW.y-13,1,BURROW.x+7,BURROW.y-13,26);gl.addColorStop(0,"rgba(255,209,102,.35)");gl.addColorStop(1,"rgba(255,209,102,0)");ctx.fillStyle=gl;ctx.fillRect(BURROW.x-20,BURROW.y-40,54,54);drawLanternGlow(t);
+    const gl=ctx.createRadialGradient(BURROW.x+7,BURROW.y-13,1,BURROW.x+7,BURROW.y-13,26);gl.addColorStop(0,"rgba(255,209,102,.35)");gl.addColorStop(1,"rgba(255,209,102,0)");ctx.fillStyle=gl;ctx.fillRect(BURROW.x-20,BURROW.y-40,54,54);drawLanternGlow(t);drawDecorGlow(t);
     if(zoneOpen("cave"))for(const m of CMUSH){const a=.35+.15*Math.sin(t*2+m.x);const g2=ctx.createRadialGradient(m.x,m.y,1,m.x,m.y,10);g2.addColorStop(0,`rgba(120,240,255,${a})`);g2.addColorStop(1,"rgba(120,240,255,0)");ctx.fillStyle=g2;ctx.fillRect(m.x-10,m.y-10,20,20)}
     for(const f of flies){f.a+=.016;f.x+=Math.cos(f.a*1.3)*.25;f.y+=Math.sin(f.a)*.18;if(f.x<0)f.x=WW;if(f.x>WW)f.x=0;if(f.y<4)f.y=WH;if(f.y>WH)f.y=4;
       if(Math.sin(f.a*3)>-.2)R(f.x,f.y,1,1,"#f6ff9a")}
