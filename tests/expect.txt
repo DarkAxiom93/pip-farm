@@ -92,3 +92,17 @@ singalong_test|SNAP on chord True beat delay ok True
 singalong_test|HUM 1
 singalong_test|MUSIC off untouched True no delay True
 singalong_test|ERR []
+words_test|CHOICES by listening 0 4 3
+words_test|LEVEL תייר
+words_test|TAB guess right True
+words_test|TAB guess wrong True
+words_test|BUBBLE asks True
+words_test|POPUP choices 4
+words_test|WORLD guess right True
+words_test|TAUGHT True counted 1
+words_test|LEVEL after מבין קצת
+words_test|ERR []
+buddy_test|STRIP drawn True
+buddy_test|CLICK tap sent True
+buddy_test|DROP no extra tap True
+buddy_test|ERR []

@@ -45,7 +45,7 @@ function langSpeak(p,c,ch){
   }
   if(!S.lex[w])S.lex[w]={c,ok:false,born:Date.now(),heard:0};
   S.lex[w].heard=(S.lex[w].heard||0)+1;S.lex[w].last=Date.now();
-  say(p,w,2.4,"lang",(CONCEPT_REACT[c]||["content"])[0]);
+  say(p,w,2.4,"lang",(CONCEPT_REACT[c]||["content"])[0]);wordSaid(p,w,c);
   if(tab==="lang")renderLangSoon();
   dirty();return true;
 }

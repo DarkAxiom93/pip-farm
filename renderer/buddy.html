@@ -3,18 +3,25 @@
 <style>
 html,body{margin:0;height:100%;background:transparent;overflow:hidden}
 canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.tag{position:absolute;transform:translate(-50%,-100%);font:700 13px system-ui,"Segoe UI",sans-serif;direction:rtl;white-space:nowrap;pointer-events:none;
+  background:#e3f1ff;color:#2a1830;border-radius:10px;padding:2px 8px;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.tag.sign{background:#f5eddc;border:2px solid #8a6a45;border-radius:4px;padding:3px 9px;font-size:14px}
 </style></head><body>
 <canvas id="c"></canvas>
 <script>
-// A strip along the bottom of the screen where a few pips from the farm walk around.
-// Click a pip to answer its need (or pet it); double-click to open the farm on it.
+// The pips live along the bottom of the screen, above the taskbar, even when the farm window is closed.
+// - they walk, nap at night, and show what they need; click one to answer it, double-click to open the farm
+// - they notice the mouse: they look at it, hop when it comes close, and you can pick one up and drop it
+// - they notice you: while you work they sit and watch, when you are away for a while they nap or play tag
+// - now and then one says a word in their language
+// - after a long stretch at the computer, one of them holds up a sign for a short break
 const S=3,c=document.getElementById("c"),g=c.getContext("2d");
 let W=0,H=0;
 function size(){W=Math.floor(innerWidth/S);H=Math.floor(innerHeight/S);c.width=W;c.height=H;g.imageSmoothingEnabled=false}
 addEventListener("resize",size);size();
 const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)};
-let snap={pips:[]},walkers=new Map(),AC=null;
-const rand=(a,b)=>a+Math.random()*(b-a);
+const rand=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
+let snap={pips:[]},walkers=new Map(),AC=null,mouse={x:-99,y:-99,t:0},idle=0,breakSign=null,drag=null,lastHover=0;
 
 function pickShown(){
   const list=snap.pips||[],needy=list.filter(p=>p.need),rest=list.filter(p=>!p.need);
@@ -23,23 +30,26 @@ function pickShown(){
 pipDesktop.onSnapshot(s=>{
   snap=s||{pips:[]};
   const shown=pickShown(),ids=new Set(shown.map(p=>p.id));
-  for(const id of [...walkers.keys()])if(!ids.has(id))walkers.delete(id);
+  for(const id of [...walkers.keys()])if(!ids.has(id)&&(!drag||drag.w.p.id!==id)){const w=walkers.get(id);if(w.el)w.el.remove();walkers.delete(id)}
   for(const p of shown){
     let w=walkers.get(p.id);
-    if(!w){w={x:rand(10,W-10),tx:0,dir:1,wait:rand(0,3),hop:0,anim:rand(0,9)};w.tx=w.x;walkers.set(p.id,w)}
+    if(!w){w={x:rand(10,W-10),y:0,vy:0,tx:0,dir:1,wait:rand(0,3),hop:0,anim:rand(0,9),say:null,sayT:0,nextSay:rand(8,30),mode:"walk"};w.tx=w.x;walkers.set(p.id,w)}
     w.p=p;
   }
 });
-function chirp(f){
-  try{if(!AC)AC=new AudioContext();const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.type="triangle";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*1.5,t+.12);v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(.12,t+.01);v.gain.exponentialRampToValueAtTime(.0001,t+.15);o.connect(v);v.connect(AC.destination);o.start(t);o.stop(t+.2)}catch(_){}
-}
+pipDesktop.onActivity&&pipDesktop.onActivity(a=>{idle=a.idle||0});
+pipDesktop.onBreak&&pipDesktop.onBreak(()=>{const w=pick([...walkers.values()].filter(w=>!w.p.sleep));if(w){breakSign={w,t:0};w.tx=W/2;w.say=null}});
+
+function tone(f,d,type,vol){try{if(!AC)AC=new AudioContext();const t=AC.currentTime,o=AC.createOscillator(),v=AC.createGain();o.type=type||"triangle";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*1.5,t+d*.8);v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(vol||.1,t+.01);v.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(v);v.connect(AC.destination);o.start(t);o.stop(t+d+.05)}catch(_){}}
+const chirp=p=>tone(500+(p.hue%200),.15,"triangle",.12);
+
 function drawPip(w,t){
-  const p=w.p,base=H-2,bw=p.g&&p.g.body?11:9,bh=bw-1;
+  const p=w.p,base=H-2-w.y,bw=p.g&&p.g.body?11:9,bh=bw-1;
   const hop=w.hop>0?Math.abs(Math.sin(w.hop*12))*6:(w.moving?Math.abs(Math.sin(w.anim*11))*1.5:0);
   const x0=Math.round(w.x-bw/2),y0=Math.round(base-bh-hop);
   const hue=p.mut==="rainbow"?(p.hue+t*70)%360:p.hue,sat=p.elder?45:80;
   const C=l=>p.mut==="gold"?`hsl(46,92%,${l}%)`:`hsl(${hue},${sat}%,${l}%)`;
-  R(w.x-bw/2+1,base-1,bw-2,2,"rgba(0,0,0,.25)");
+  if(w.y<2)R(w.x-bw/2+1,H-3,bw-2,2,"rgba(0,0,0,.25)");else R(w.x-bw/2+2,H-3,bw-4,1,"rgba(0,0,0,.15)");
   if(p.mut==="glow"){R(x0-2,y0-2,bw+4,bh+4,`hsla(${hue},100%,82%,${.2+.15*Math.sin(t*3)})`)}
   if(p.mut==="wings"){const f=Math.floor(t*9)%2;R(x0-3,y0+1-f,3,2+f,"#eef7ff");R(x0+bw,y0+1-f,3,2+f,"#eef7ff")}
   R(x0,y0-1,bw,bh+2,C(24));R(x0-1,y0,bw+2,bh,C(24));
@@ -51,11 +61,15 @@ function drawPip(w,t){
   else if(p.sprout===4){R(cx-1,y0-3,3,1,"#ff9db5");R(cx,y0-4,1,3,"#ff9db5")}
   else if(p.sprout===5){R(x0+1,y0-2,1,2,"#f5eddc");R(x0+bw-2,y0-2,1,2,"#f5eddc")}
   else{R(cx,y0-2,1,2,C(52))}
-  const off=w.dir>0?1:0,ey=y0+3,el=cx-2+off,er=cx+1+off;
-  if(p.sleep){R(el,ey+1,2,1,"#2a1830");R(er,ey+1,2,1,"#2a1830")}
+  // eyes follow the mouse when it is near
+  let off=w.dir>0?1:0,lookUp=0;
+  const mx=mouse.x/S,my=mouse.y/S;if(performance.now()-mouse.t<3000&&Math.abs(mx-w.x)<50){off=mx>w.x?1:0;lookUp=my<y0?-1:0}
+  const ey=y0+3+lookUp,el=cx-2+off,er=cx+1+off;
+  const asleep=p.sleep||w.mode==="nap";
+  if(asleep){R(el,ey+1,2,1,"#2a1830");R(er,ey+1,2,1,"#2a1830");if(Math.sin(t*2+w.anim)>.6)R(x0+bw+1,y0-3-Math.round((t*4+w.anim)%4),2,1,"#cfe0ff")}
   else if(Math.sin(t*1.3+w.anim)>.97){R(el,ey+1,1,1,"#2a1830");R(er,ey+1,1,1,"#2a1830")}
   else{R(el,ey,1,2,"#2a1830");R(er,ey,1,2,"#2a1830");R(el,ey,1,1,"#fff")}
-  if(p.mood>55){R(el-1,ey+2,1,1,"#ff9db5");R(er+1,ey+2,1,1,"#ff9db5")}
+  if(p.mood>55&&!asleep){R(el-1,ey+2,1,1,"#ff9db5");R(er+1,ey+2,1,1,"#ff9db5")}
   if(p.elder){R(cx-2+off,ey+3,4,2,"#f4f1ea")}
   if(snap.season==="winter")R(x0,y0+bh-4,bw,1,"#e8433f");
   if(p.need){
@@ -66,29 +80,64 @@ function drawPip(w,t){
     else if(p.need==="pet"){R(nx-2,ny-1,2,1,col);R(nx+1,ny-1,2,1,col);R(nx-2,ny,5,1,col);R(nx-1,ny+1,3,1,col);R(nx,ny+2,1,1,col)}
     else{R(nx-1,ny-1,3,3,col);if(p.need==="food")R(nx,ny-2,1,1,"#6fcf5a")}
   }
+  // words and the break sign are real text on top, so Hebrew stays sharp
+  const sign=breakSign&&breakSign.w===w,text=sign?"הפסקה? 💧":(!p.need&&w.say)||null;
+  if(sign)R(w.x,y0-12,1,12,"#8a6a45");
+  if(text){if(!w.el){w.el=document.createElement("div");document.body.appendChild(w.el)}w.el.className="tag"+(sign?" sign":"");w.el.textContent=text;w.el.style.left=(w.x*S)+"px";w.el.style.top=((y0-(sign?12:3))*S)+"px";w.el.hidden=false}
+  else if(w.el)w.el.hidden=true;
 }
-let last=performance.now();
+let last=performance.now(),tagT=0;
 function frame(now){
   const dt=Math.min(.1,(now-last)/1000);last=now;const t=now/1000;
   g.clearRect(0,0,W,H);
-  for(const w of walkers.values()){
+  const working=idle<5,away=idle>300,list=[...walkers.values()];
+  if(away){tagT+=dt}else tagT=0;
+  for(const w of list){
     w.anim+=dt;if(w.hop>0)w.hop=Math.max(0,w.hop-dt);
-    if(w.p.sleep){w.moving=false}
-    else{const d=w.tx-w.x;
-      if(Math.abs(d)<1){w.moving=false;w.wait-=dt;if(w.wait<=0){w.tx=Math.max(8,Math.min(W-8,w.x+rand(-120,120)));w.wait=rand(2,8)}}
-      else{w.moving=true;w.dir=d>0?1:-1;w.x+=Math.sign(d)*Math.min(Math.abs(d),12*dt)}}
+    if(w.sayT>0){w.sayT-=dt;if(w.sayT<=0)w.say=null}
+    if(drag&&drag.w===w){w.x=mouse.x/S;w.y=Math.max(0,H-2-mouse.y/S+4);w.vy=0;w.moving=false;drawPip(w,t);continue}
+    // falling back to the ground after being dropped
+    if(w.y>0||w.vy){w.vy-=220*dt;w.y+=w.vy*dt;if(w.y<=0){w.y=0;if(w.vy<-60){w.vy=-w.vy*.35;chirp(w.p)}else w.vy=0}}
+    if(w.p.sleep){w.moving=false;w.mode="walk"}
+    else if(breakSign&&breakSign.w===w){const d=W/2-w.x;w.moving=Math.abs(d)>1;if(w.moving){w.dir=d>0?1:-1;w.x+=Math.sign(d)*Math.min(Math.abs(d),20*dt)}}
+    else if(away&&tagT>20){
+      // the keeper is away: some nap, some play tag
+      if(w.mode==="walk")w.mode=Math.random()<.5?"nap":"tag";
+      if(w.mode==="tag"){const other=list.find(o=>o!==w&&o.mode==="tag");if(other){const d=other.x-w.x+Math.sin(t+w.anim)*30;w.moving=true;w.dir=d>0?1:-1;w.x+=Math.sign(d)*Math.min(Math.abs(d),28*dt);if(Math.random()<dt*.6)w.hop=.4}}
+      else w.moving=false;
+    }else{
+      if(w.mode!=="walk")w.mode="walk";
+      const d=w.tx-w.x;
+      if(Math.abs(d)<1){w.moving=false;w.wait-=dt*(working?.35:1);if(w.wait<=0){w.tx=Math.max(8,Math.min(W-8,w.x+rand(-120,120)));w.wait=rand(2,8)}}
+      else{w.moving=true;w.dir=d>0?1:-1;w.x+=Math.sign(d)*Math.min(Math.abs(d),12*dt)}
+    }
+    // now and then a word in their language, or a sound
+    w.nextSay-=dt;if(w.nextSay<=0&&!w.p.sleep&&w.mode!=="nap"){w.nextSay=rand(20,60);if(!w.p.need&&Math.random()<.6){w.say=w.p.word&&Math.random()<.6?w.p.word:pick(["פיפ!","♪","בלופ","מי?","הה"]);w.sayT=2.5}}
     drawPip(w,t);
   }
+  if(breakSign){breakSign.t+=dt;if(breakSign.t>90)breakSign=null}
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-function hit(e){const x=e.clientX/S,y=e.clientY/S;for(const w of walkers.values()){if(Math.abs(x-w.x)<8&&y>H-26)return w}return null}
+function hit(e){const x=e.clientX/S,y=e.clientY/S;for(const w of walkers.values()){const base=H-2-w.y;if(Math.abs(x-w.x)<8&&y>base-26&&y<base+3)return w}return null}
 let over=false;
-addEventListener("mousemove",e=>{const o=!!hit(e);if(o!==over){over=o;pipDesktop.buddyMouse(o);c.style.cursor=o?"pointer":"default"}});
-addEventListener("mouseleave",()=>{if(over){over=false;pipDesktop.buddyMouse(false)}});
+function setOver(o){if(o!==over){over=o;pipDesktop.buddyMouse(o);c.style.cursor=o?"grab":"default"}}
+addEventListener("mousemove",e=>{
+  mouse={x:e.clientX,y:e.clientY,t:performance.now()};
+  const w=hit(e);setOver(!!w||!!drag);
+  if(drag){if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>6)drag.moved=true;return}
+  if(w&&!w.p.sleep&&performance.now()-lastHover>1500){lastHover=performance.now();w.hop=.4}
+});
+addEventListener("mouseleave",()=>{if(!drag)setOver(false)});
+addEventListener("mousedown",e=>{const w=hit(e);if(!w)return;drag={w,sx:e.clientX,sy:e.clientY,moved:false};c.style.cursor="grabbing"});
+addEventListener("mouseup",e=>{
+  if(!drag)return;const d=drag;drag=null;c.style.cursor="grab";
+  if(d.moved){d.w.tx=d.w.x;tone(700,.12,"sine",.1);return}
+  const w=d.w;
+  if(breakSign&&breakSign.w===w){breakSign=null;for(const o of walkers.values())o.hop=.6;tone(660,.2,"triangle",.12);setTimeout(()=>tone(880,.2,"triangle",.12),150);pipDesktop.buddyCommand({type:"break"});return}
+  clearTimeout(clickT);clickT=setTimeout(()=>{w.hop=.6;chirp(w.p);pipDesktop.buddyCommand({type:"tap",id:w.p.id});if(w.p.need)w.p.need=null},220);
+});
 let clickT=null;
-addEventListener("click",e=>{const w=hit(e);if(!w)return;
-  clearTimeout(clickT);clickT=setTimeout(()=>{w.hop=.6;chirp(500+(w.p.hue%200));pipDesktop.buddyCommand({type:"tap",id:w.p.id});if(w.p.need)w.p.need=null},220)});
 addEventListener("dblclick",e=>{const w=hit(e);if(!w)return;clearTimeout(clickT);pipDesktop.buddyCommand({type:"open",id:w.p.id})});
 </script>
 </body></html>

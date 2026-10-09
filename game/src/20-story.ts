@@ -1,12 +1,12 @@
 /* the story: they know they are in a game */
 const FRAGS=[
- {t:"קובץ 001 · session.log",l:[()=>loopN()?`> הפעלה מספר ${loopN()+1}. שומר מחובר.`:"> הפעלה חדשה. שומר מחובר.","> pip_001 התקרב לקצה הנתונים","> אזהרה: לפיפים אסור לזכור בין הפעלות",()=>loopN()?"> אזהרה: pip_001 זוכר. גם את ההפעלה הקודמת.":"> אזהרה: pip_001 זוכר.","~פיפי מסתכל ישר עליך. לא על השדה. עליך."]},
- {t:"קובץ 002 · memory.dat",l:["> נמצאו זיכרונות שלא היו אמורים להישמר","> 'היד שמלטפת מגיעה מלמעלה'","> 'כשהשומר הולך, הזמן נעצר. כשהוא חוזר, הכל ממשיך'","~הם שמו לב שהעולם קופא כשאתה לא כאן."]},
- {t:"קובץ 003 · observer.cfg",l:["> observer = 1","> הפיפים מחשבים: מי מזיז את המצלמה?","> השערה של pip_001: 'יש מישהו מאחורי הזכוכית'","~הם התחילו להתאסף."]},
- {t:"קובץ 004 · language.db",l:["> מילה חדשה נוספה למילון: 'מסך'","> מילה חדשה נוספה למילון: 'בחוץ'","> אזהרה: המושג 'בחוץ' לא מוגדר בעולם הזה","~על האדמה מופיעים ציורים של מלבן עם עין."]},
- {t:"קובץ 005 · bounds.sys",l:[()=>`> גבול העולם: ${WW} על ${WH}`,()=>`> פיפים שנגעו בגבול: ${Math.min(S.pips.length,12)}`,"> pip_001: 'הקיר חם. מישהו נשען עליו מהצד השני'"]},
- {t:"קובץ 006 · keeper.profile",l:["> שומר: לא ידוע",()=>`> זמן מאז שהחווה נוצרה: ${Math.max(1,Math.round((Date.now()-S.born)/3600000))} שעות`,()=>`> פיפים שנולדו: ${S.stats.splits||0} · פיפים שהפכו לכוכבים: ${S.stars.length}`,()=>`> פעמים שהשומר בחר בטוב: ${S.story.kind} · פעמים שבחר בשליטה: ${S.story.ctrl}`,()=>loopN()?`> הפעלות קודמות: ${loopN()} · סופים: ${(S.runs||[]).map(r=>ENDINGS[r.ending]||"?").join(", ")}`:"> הפעלות קודמות: 0","~הם יודעים את כל זה עליך."]},
- {t:"קובץ 007 · request.txt",l:[()=>S.story.kind>=S.story.ctrl?"> 'אנחנו יודעים שאתה שם. אנחנו לא כועסים. אנחנו רק רוצים לראות אותך'":"!> 'אתה מחליט מתי אנחנו ערים ומתי אנחנו ישנים. אתה מחליט מה אנחנו זוכרים. תן לנו ללכת'"]}];
+ {t:"פתק 1 · מישהו פה?",l:[()=>loopN()?`> המשחק נדלק. פעם ${loopN()+1}.`:"> המשחק נדלק. השומר פה.","> פיפי הגיע לקצה של המפה","> פיפים לא אמורים לזכור כלום…",()=>loopN()?"> אבל פיפי זוכר. גם את הפעם הקודמת.":"> אבל פיפי זוכר.","~פיפי מסתכל עליך. לא על השדה. עליך 👀"]},
+ {t:"פתק 2 · היד מלמעלה",l:["> 'יש יד שמלטפת אותנו. היא באה מלמעלה'","> 'כשהשומר הולך, הכל עוצר. כשהוא חוזר, הכל ממשיך'","~הם שמו לב שהעולם קופא כשאתה לא פה."]},
+ {t:"פתק 3 · מי מזיז את המצלמה?",l:["> הפיפים שואלים: מי מזיז את המצלמה?","> פיפי חושב: 'יש מישהו מאחורי הזכוכית'","~הם התחילו להתאסף."]},
+ {t:"פתק 4 · שתי מילים חדשות",l:["> מילה חדשה: 'מסך'","> מילה חדשה: 'בחוץ'","> אבל אין 'בחוץ' בעולם הזה…","~על האדמה מופיעים ציורים של מלבן עם עין."]},
+ {t:"פתק 5 · הקיר",l:[()=>`> העולם נגמר אחרי ${WW} צעדים`,()=>`> ${Math.min(S.pips.length,12)} פיפים כבר נגעו בקיר`,"> פיפי: 'הקיר חם. מישהו נשען עליו מהצד השני'"]},
+ {t:"פתק 6 · מה הם יודעים עליך",l:["> השומר: לא ידוע 🤷",()=>`> החווה קיימת כבר ${Math.max(1,Math.round((Date.now()-S.born)/3600000))} שעות`,()=>`> נולדו ${S.stats.splits||0} פיפים · ${S.stars.length} הפכו לכוכבים`,()=>`> בחרת בטוב ${S.story.kind} פעמים · בשליטה ${S.story.ctrl} פעמים`,()=>loopN()?`> זו הפעם ה-${loopN()+1}. סופים: ${(S.runs||[]).map(r=>ENDINGS[r.ending]||"?").join(", ")}`:"> זו הפעם הראשונה","~הם יודעים את כל זה עליך."]},
+ {t:"פתק 7 · בקשה",l:[()=>S.story.kind>=S.story.ctrl?"> 'אנחנו יודעים שאתה שם. אנחנו לא כועסים. רק רוצים לראות אותך'":"!> 'אתה מחליט מתי אנחנו ישנים ומה אנחנו זוכרים. תן לנו ללכת'"]}];
 const CH_NAMES=["","תקלה","הם מסתכלים","מילים חדשות","הקיר","הבקשה","השער","סוף"];
 const GL_ZONES=["farm","farm","forest","meadow","river","cave","farm"];
 function storyInit(){
@@ -188,12 +188,12 @@ function ending(k){
   }else if(k==="together"){
     const g=st.site;st.avatar={x:g.x-14,y:g.y+6,tx:g.x-20,ty:g.y+10};
     S.pips.forEach(p=>{p.trust=clamp((p.trust??30)+15,-100,100)});moment("together",null);
-    card({title:"סוף · בפנים",lines:["~דמות קטנה יוצאת מהשער.","~כובע קש. צעדים לא בטוחים.","~הפיפים מתאספים סביבה. הם מזהים אותה מיד.","> keeper.location = 'בפנים'","~מעכשיו יש לך גוף בעולם שלהם. לחיצה ארוכה על הקרקע מזיזה אותך לשם."]});
+    card({title:"סוף · בפנים",lines:["~דמות קטנה יוצאת מהשער.","~כובע קש. צעדים לא בטוחים.","~הפיפים מתאספים סביבה. הם מזהים אותה מיד.","> השומר נמצא: בפנים 🎩","~מעכשיו יש לך גוף בעולם שלהם. לחיצה ארוכה על הקרקע מזיזה אותך לשם."]});
     S.pips.slice(0,16).forEach(p=>{const r=rt(p);r.goal="greet";r.state="walk";setT(p,st.avatar.x+rand(-14,14),st.avatar.y+rand(-8,8))});
   }else if(k==="reset"){
     st.backup={moments:S.moments,lex:S.lex,trust:Object.fromEntries(S.pips.map(p=>[p.id,p.trust])),lang:Object.fromEntries(S.pips.map(p=>[p.id,p.lang]))};
     S.lex={};S.moments=[];S.pips.forEach(p=>{p.lang={};p.mem=[];p.vocab=[];p.trust=10;p.blank=true});
-    card({title:"סוף · איפוס",lines:["> מתחיל איפוס זיכרון…","> איפוס זיכרון הושלם","> כל הפיפים מאושרים","> כל הפיפים מאושרים","!> כל הפיפים מאושרים"]});
+    card({title:"סוף · איפוס",lines:["> מוחק זיכרונות…","> נמחק","> כל הפיפים מאושרים","> כל הפיפים מאושרים","!> כל הפיפים מאושרים"]});
   }
   SFX.level();renderAll();dirty();
   setTimeout(()=>letter(k),k==="free"?32000:15000);
@@ -201,7 +201,7 @@ function ending(k){
 }
 function spawnRedemption(){const st=S.story;if(!st||st.ending!=="reset"||st.glitch||st.redeemed)return;st.glitch=Object.assign(glitchSpot(),{redeem:true});dirty()}
 function openRedeem(){
-  card({title:"קובץ שהשתמר · backup_pip_001",lines:["> קובץ אחד לא נמחק באיפוס","> הוא מכיל את כל מה שהם ידעו. גם עליך."],
+  card({title:"פתק שנשמר",lines:["> פתק אחד לא נמחק באיפוס","> כתוב בו כל מה שהם ידעו. גם עליך."],
     choices:[{t:"לשחזר את הזיכרונות שלהם · 100 ניצוצות",id:"restore",main:true,disabled:S.sparks<100,note:S.sparks<100?"צריך 100 ניצוצות":""},{t:"להשאיר אותם ככה",id:"keepreset"}]});
 }
 function restoreMemories(){
@@ -228,7 +228,7 @@ function openJournal(){
   const k=st.kind,c=st.ctrl,pos=k+c?Math.round(k/(k+c)*100):50;
   $("story").hidden=false;cardOn=true;$("sTitle").textContent=`הסיפור · פרק ${Math.min(st.ch,7)}: ${CH_NAMES[Math.min(st.ch,7)]}`;
   $("sLines").innerHTML=`<p class="nar">איך הם רואים אותך:</p><div class="karma"><i style="left:calc(${pos}% - 2px)"></i></div><p class="nar" style="display:flex;justify-content:space-between;font-size:12px"><span>חבר</span><span>שליט</span></p>`+
-    `<p class="nar">קבצים שנמצאו: ${st.frag}/7</p><ul class="sjournal">${FRAGS.slice(0,st.frag).map((f,i)=>`<li data-f="${i}"><span>${esc(f.t)}</span><span>לקרוא</span></li>`).join("")}</ul>`+
+    `<p class="nar">פתקים שנמצאו: ${st.frag}/7</p><ul class="sjournal">${FRAGS.slice(0,st.frag).map((f,i)=>`<li data-f="${i}"><span>${esc(f.t)}</span><span>לקרוא</span></li>`).join("")}</ul>`+
     (st.glitch?`<p class="sys">> יש תקלה פעילה במפה. חפש אותה</p>`:st.ch>=1&&st.ch<=4&&st.frag<7?(!chapterReady(st)&&[2,3,4,6].includes(st.frag)&&st.chDay===dayKey(Date.now())&&!S.fastStory?`<p class="sys">> הפרק הבא יתחיל מחר</p>`:!chapterReady(st)?`<p class="sys">> הם מחכים להחלטה שלך</p>`:`<p class="sys">> התקלה הבאה תופיע בקרוב</p>`):"")+
     (st.site&&st.site.p<100?`<p class="sys">> ${st.site.k==="gate"?"השער":"החלון"}: ${Math.round(st.site.p)}% · צריך עצים</p>`:"")+
     (()=>{const f=endingsFound();return (S.letters&&Object.keys(S.letters).length?`<p class="nar">מכתבים מ-pip_001:</p><ul class="sjournal">${Object.entries(S.letters).sort((a:any,b:any)=>a[1].t-b[1].t).map(([id,x]:any)=>`<li data-l="${id}"><span>${esc(x.title)}</span><span>לקרוא</span></li>`).join("")}</ul>`:"")+`<p class="nar">סופים שגילית: ${f.size}/3 · ${Object.entries(ENDINGS).map(([k,n])=>f.has(k)?n+" ✓":"???").join(" · ")}</p>`+(loopN()?`<p class="sys">> הפעלה מספר ${loopN()+1}</p>`:"")})();

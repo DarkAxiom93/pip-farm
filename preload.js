@@ -18,5 +18,7 @@ contextBridge.exposeInMainWorld("pipDesktop", {
   // used by the desktop buddies strip
   onSnapshot: fn => ipcRenderer.on("snapshot", (_e, snap) => fn(snap)),
   buddyMouse: over => ipcRenderer.send("buddy:mouse", !!over),
-  buddyCommand: cmd => ipcRenderer.send("buddy:command", cmd)
+  buddyCommand: cmd => ipcRenderer.send("buddy:command", cmd),
+  onActivity: fn => ipcRenderer.on("activity", (_e, a) => fn(a)),
+  onBreak: fn => ipcRenderer.on("break", () => fn())
 });

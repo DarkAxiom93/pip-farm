@@ -16,10 +16,13 @@ function notify(title:string,body:string,force?:boolean){
   try{pipDesktop.notify(title,body)}catch(_){}
 }
 function deskSnapshot(){
-  try{pipDesktop.snapshot({night,season:curSeason,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,hue:Math.round(p.hue),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep"}))})}catch(_){}
+  try{pipDesktop.snapshot({night,season:curSeason,total:S.pips.length,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,word:deskWord(p),hue:Math.round(p.hue),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep"}))})}catch(_){}
 }
 setInterval(deskSnapshot,2500);
-pipDesktop.onCommand(cmd=>{if(cmd&&cmd.type==="flush"){saveNow();return}const p=cmd&&cmd.id&&byId(cmd.id);if(!p)return;audio();if(cmd.type==="tap")tapPip(p);else if(cmd.type==="open"){select(p.id,true)}deskSnapshot()});
+// a word this pip says on the desktop: one you understand, or any of its own
+function deskWord(p){const ws=Object.values(p.lang||{}) as string[];if(!ws.length)return null;const known=ws.filter(w=>S.lex[w]&&S.lex[w].ok);return pick(known.length&&Math.random()<.7?known:ws)}
+pipDesktop.onCommand(cmd=>{if(cmd&&cmd.type==="flush"){saveNow();return}
+  if(cmd&&cmd.type==="break"){S.stats.breaks=(S.stats.breaks||0)+1;S.pips.slice(0,8).forEach(p=>{const r=rt(p);if(r.state==="idle"){r.state="celebrate";r.ct=1.2}});notify("הפסקה 💧","קום, תמתח, תשתה מים. הפיפים מחכים לך",true);dirty();return}const p=cmd&&cmd.id&&byId(cmd.id);if(!p)return;audio();if(cmd.type==="tap")tapPip(p);else if(cmd.type==="open"){select(p.id,true)}deskSnapshot()});
 function platformVoiceNote(n:HTMLElement):boolean{
   if(!sample&&S.ai){n.textContent="הפיפים מבינים לפי מילות מפתח. אפשר להוסיף מפתח Claude בהגדרות כדי שיבינו יותר";return true}
   return false;
@@ -40,12 +43,13 @@ function platformBoot(local):boolean{
       const st=await pipDesktop.getSettings();
       sample=st.hasKey?Object.assign(async(input)=>({text:await pipDesktop.ask(String(input))}),{json:async(input)=>{const t=await pipDesktop.ask(String(input)+"\n\nהחזר אובייקט JSON אחד בלבד, בלי שום טקסט נוסף.");const m=String(t).match(/\{[\s\S]*\}/);if(!m)throw{code:"bad"};return JSON.parse(m[0])}}):null;
       aiDenied=false;voiceNote();
-      deskLetters=st.letters!==false;$("optLetters").checked=deskLetters;
+      deskLetters=st.letters!==false;$("optLetters").checked=deskLetters;$("optBreaks").checked=st.breaks!==false;
       $("optBuddy").checked=!!st.buddy;$("optAuto").checked=!!st.autostart;$("optKeyNote").textContent=st.hasKey?"יש מפתח שמור. Claude פעיל":"אין מפתח. הפיפים מבינים לפי מילות מפתח";
     };
     $("deskSettings").hidden=false;await setupAI();
     $("optBuddy").onchange=e=>pipDesktop.setSettings({buddy:e.target.checked});
     $("optAuto").onchange=e=>pipDesktop.setSettings({autostart:e.target.checked});
+    $("optBreaks").onchange=e=>pipDesktop.setSettings({breaks:e.target.checked});
     $("optLetters").onchange=e=>{deskLetters=e.target.checked;pipDesktop.setSettings({letters:e.target.checked})};
     $("optKeySave").onclick=async()=>{const v=$("optKey").value.trim();await pipDesktop.setSettings({apiKey:v});$("optKey").value="";await setupAI();toast(v?"המפתח נשמר":"המפתח נמחק",1)};
     // version and updates

@@ -81,7 +81,7 @@ function tapAt(e){
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
   if(fireTap(x,y))return; // the fire sits in a ring of pips, so it is checked before them
   // a pip that is remembering something is tapped first, even in a crowd
-  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall||rt(b).dream?1:0)-(rt(a).recall||rt(a).dream?1:0)||b.y-a.y);
+  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall||rt(b).dream||rt(b).said?1:0)-(rt(a).recall||rt(a).dream||rt(a).said?1:0)||b.y-a.y);
   for(const p of ord){
     const bw=7+Math.floor(Math.min(level(p),10)*.4);
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}
@@ -144,6 +144,7 @@ function tapPip(p){
   r.taps=(r.taps||[]).filter(x=>now-x<2500);r.taps.push(now);
   if(r.taps.length>=6){r.taps=[];bond(p,-4,"poke");r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,"!!",1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
   if((p.trust??30)<-20&&Math.random()<.5&&r.state!=="sleep"){r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,pick(["!?","איק!"]),1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
+  if(r.said&&performance.now()<r.said.until){if(sel!==p.id)select(p.id);if(openWordGuess(p))return}
   if(peekDream(p)){if(sel!==p.id)select(p.id);return}
   if(shareRecall(p)){if(sel!==p.id)select(p.id);return}
   if(r.state==="argue"){calm(p);if(sel!==p.id)select(p.id);return}
@@ -203,6 +204,7 @@ function closePlot(){$("pmenu").hidden=true;openPlotIdx=-1}
 $("pmenu").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b||b.disabled)return;
   if(b.dataset.decor){decorAction(b.dataset.decor,b.dataset.id);closePlot();return}
+  if(b.dataset.wguess){guessWord(b.dataset.w,b.dataset.wguess,b.dataset.p&&byId(b.dataset.p));closePlot();return}
   if(b.dataset.build){const k=b.dataset.build,B=BUILD[k];if((S.wood||0)>=B.cost&&!S.builds[k]){S.wood-=B.cost;S.builds[k]={p:0,done:false};SFX.coin();toast(`התחילו לבנות ${B.n}. הפיפים יבנו אותו`,1);dirty()}closePlot();refresh();return}
   if(b.dataset.craft){const i=b.dataset.craft,it=ITEMS[i];if((S.wood||0)>=it.cost&&!S.items[i]&&!S.craftQ.includes(i)){S.wood-=it.cost;S.craftQ.push(i);SFX.coin();toast(`הוזמן בבית המלאכה: ${it.n}`);dirty()}openBuilding("workshop");refresh();return}
   if(b.dataset.visit){visitGift();closePlot();return}

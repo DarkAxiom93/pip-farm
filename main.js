@@ -75,7 +75,7 @@ function showFarm() { if (!farmWin) createFarm(); farmWin.show(); farmWin.focus(
 
 function createBuddy() {
   if (buddyWin) return;
-  const wa = screen.getPrimaryDisplay().workArea, h = 110;
+  const wa = screen.getPrimaryDisplay().workArea, h = 150;
   buddyWin = new BrowserWindow({
     x: wa.x, y: wa.y + wa.height - h, width: wa.width, height: h,
     transparent: true, frame: false, resizable: false, movable: false, skipTaskbar: true,
@@ -83,6 +83,7 @@ function createBuddy() {
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false }
   });
   buddyWin.setAlwaysOnTop(true, "screen-saver");
+  buddyWin.setVisibleOnAllWorkspaces && buddyWin.setVisibleOnAllWorkspaces(true);
   buddyWin.setIgnoreMouseEvents(true, { forward: true });
   buddyWin.loadFile(path.join(__dirname, "renderer", "buddy.html"));
   buddyWin.webContents.on("did-finish-load", () => { if (lastSnapshot) buddyWin.webContents.send("snapshot", lastSnapshot); });
@@ -150,13 +151,21 @@ let installUpdate = () => {};
 // Every 30 s look at how long the computer has been idle. When someone comes back after 10+ minutes,
 // tell the farm so the pips can greet them.
 function watchPresence() {
-  let away = 0;
+  let away = 0, workStart = Date.now(), lastBreak = Date.now();
   setInterval(() => {
     let idle = 0;
     try { idle = powerMonitor.getSystemIdleTime(); } catch { return; }
+    // the desktop pips react to the keeper working or being away
+    if (buddyWin) buddyWin.webContents.send("activity", { idle });
     if (idle >= 600) away = Math.max(away, idle);
     else if (away && idle < 30) { if (farmWin) farmWin.webContents.send("presence", away / 60); away = 0; }
-  }, 30000);
+    // a gentle break reminder after 50 minutes at the computer without a 3 minute pause
+    if (idle >= 180) workStart = Date.now();
+    const s = readSettings();
+    if (s.breaks !== false && buddyWin && Date.now() - workStart > 50 * 60000 && Date.now() - lastBreak > 50 * 60000) {
+      lastBreak = Date.now(); buddyWin.webContents.send("break");
+    }
+  }, 3000);
 }
 
 // ---------- IPC from the pages ----------
@@ -164,13 +173,14 @@ ipcMain.handle("app:info", () => ({ version: app.getVersion(), updateReady }));
 ipcMain.on("update:install", () => installUpdate());
 ipcMain.handle("save:load", () => readSave());
 ipcMain.on("save:write", (_e, json) => { try { writeSave(json); } catch (err) { console.error("save failed", err); } });
-ipcMain.handle("settings:get", () => { const s = readSettings(); return { buddy: !!s.buddy, autostart: !!s.autostart, letters: s.letters !== false, hasKey: !!getApiKey() }; });
+ipcMain.handle("settings:get", () => { const s = readSettings(); return { buddy: !!s.buddy, autostart: !!s.autostart, letters: s.letters !== false, breaks: s.breaks !== false, hasKey: !!getApiKey() }; });
 ipcMain.handle("settings:set", (_e, patch) => {
   if ("apiKey" in patch) setApiKey(String(patch.apiKey || "").trim());
   const s = readSettings();
   if ("buddy" in patch) s.buddy = !!patch.buddy;
   if ("autostart" in patch) s.autostart = !!patch.autostart;
   if ("letters" in patch) s.letters = !!patch.letters;
+  if ("breaks" in patch) s.breaks = !!patch.breaks;
   writeSettings(s); applyBuddy(); applyAutostart();
   return true;
 });
@@ -193,7 +203,14 @@ ipcMain.on("letter:write", (_e, { id, title, text }) => {
     fs.writeFileSync(file, body, { encoding: "utf8", flag: "wx" });
   } catch (err) { console.error("letter failed", err && err.message); }
 });
-ipcMain.on("snapshot", (_e, snap) => { lastSnapshot = snap; if (buddyWin) buddyWin.webContents.send("snapshot", snap); });
+ipcMain.on("snapshot", (_e, snap) => {
+  lastSnapshot = snap; if (buddyWin) buddyWin.webContents.send("snapshot", snap);
+  // the tray tells how the farm is doing, even with every window closed
+  try {
+    const n = (snap.total || (snap.pips || []).length), needs = (snap.pips || []).filter(p => p.need).length;
+    if (tray) tray.setToolTip(`חוות הפיפים · ${n} פיפים${needs ? ` · ${needs} צריכים אותך` : ""}${snap.night ? " · לילה, ישנים" : ""}`);
+  } catch {}
+});
 ipcMain.on("buddy:mouse", (_e, over) => { if (buddyWin) buddyWin.setIgnoreMouseEvents(!over, { forward: true }); });
 ipcMain.on("buddy:command", (_e, cmd) => {
   if (!farmWin) return;
@@ -216,6 +233,8 @@ ipcMain.handle("ask", async (_e, prompt) => {
 // ---------- lifecycle ----------
 app.on("second-instance", showFarm);
 app.whenReady().then(() => {
+  // from 1.14 the pips live on the desktop by default (once; the keeper can turn it off)
+  { const s = readSettings(); if (!s.buddyAsked) { s.buddy = true; s.buddyAsked = true; writeSettings(s); } }
   createFarm();
   createTray();
   applyBuddy();

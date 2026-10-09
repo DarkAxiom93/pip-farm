@@ -28,8 +28,9 @@ async def main():
             await pg.wait_for_timeout(2000)
         print("POND frog",frog,"ripples seen",await pg.evaluate("__pip.ripples.length"))
         # flowers: eight taps play the song
+        await pg.evaluate("__pip.critters.length=0;__pip.fishes.length=0;__pip.S.digs=[]")
         f=await pg.evaluate("__pip.FLOWERS[0]")
-        for i in range(8): await tapw(pg,f["x"],f["y"]-6);await pg.wait_for_timeout(120)
+        for i in range(8): await pg.evaluate("__pip.critters.length=0");await tapw(pg,f["x"],f["y"]-6);await pg.wait_for_timeout(120)
         print("FLOWERS song",await pg.evaluate("__pip.S.stats.songs||0"))
         # the book in the album
         await pg.evaluate("__pip.setTab('album')");await pg.wait_for_timeout(300)
