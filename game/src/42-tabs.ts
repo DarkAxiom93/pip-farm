@@ -80,6 +80,8 @@ $("albBody").addEventListener("click",e=>{const c=e.target.closest(".card");if(!
 const guessCd={};
 function renderLangCount(){const n=Object.keys(S.lex).filter(w=>!S.lex[w].ok&&speakers(w)>0).length;$("langCount").textContent=n?n:""}
 function renderLang(){renderLangNew()}
+for(const ev of ["pointermove","pointerdown","focusin"])$("lexList").addEventListener(ev,()=>{langTouch=Date.now()});
+$("lexList").addEventListener("pointerleave",()=>{langTouch=0;renderLangSoon()});
 $("lexList").addEventListener("click",(e:any)=>{const b=e.target.closest("[data-wguess]");if(!b)return;audio();const ok=guessWord(b.dataset.w,b.dataset.wguess);if(ok===false){const li=b.closest(".lexi");li.classList.remove("no");void li.offsetWidth;li.classList.add("no")}});
 
 /* farm tab */
@@ -135,5 +137,5 @@ function refresh(){
   }
   if(openPlotIdx>=0&&$("pmLeft")){const pl=S.plots[openPlotIdx];if(pl.crop){const l=cropLeft(pl.crop);if(l<=0)openPlot(openPlotIdx);else $("pmLeft").textContent="בשל בעוד "+fmtT(l)}}
 }
-function renderAll(){renderHead();renderChat();renderCount();renderLangCount();renderAlbCount();if(tab==="album")renderAlbum();if(tab==="lang")renderLang();if(tab==="tasks")renderTasks();if(tab==="farm")renderFarm();refresh()}
+function renderAll(){renderHead();renderChat();renderCount();renderLangCount();renderAlbCount();if(tab==="album")renderAlbum();if(tab==="lang")langRefresh();if(tab==="tasks")renderTasks();if(tab==="farm")renderFarm();refresh()}
 

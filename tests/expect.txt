@@ -94,6 +94,7 @@ singalong_test|MUSIC off untouched True no delay True
 singalong_test|ERR []
 words_test|CHOICES by listening 0 4 3
 words_test|LEVEL תייר
+words_test|STEADY list True same pictures True counter updated True
 words_test|TAB guess right True
 words_test|TAB guess wrong True
 words_test|BUBBLE asks True

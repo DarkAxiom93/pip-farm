@@ -15,6 +15,15 @@ async def main():
         n0=await pg.locator(".lexi[data-w='בלופ'] [data-wguess]").count();n3=await pg.locator(".lexi[data-w='זומי'] [data-wguess]").count();n6=await pg.locator(".lexi[data-w='טיקו'] [data-wguess]").count()
         print("CHOICES by listening",n0,n3,n6)
         print("LEVEL",await pg.locator(".langlvl b").inner_text())
+        # while you are choosing, words being said again must not redraw the list or change the pictures
+        await pg.evaluate("document.querySelector(\".lexi[data-w='זומי']\").dataset.mark='1'")
+        before=await pg.locator(".lexi[data-w='זומי'] [data-wguess]").evaluate_all("els=>els.map(e=>e.dataset.wguess).join(',')")
+        await pg.locator(".lexi[data-w='זומי']").hover()
+        for i in range(4): await pg.evaluate("(()=>{const P=__pip,p=P.S.pips[i%12];P.S.pips.forEach(q=>P.clearBubble(q.id));P.langSpeak(p,'sleep',1)})()".replace("i%12",str(i)));await pg.wait_for_timeout(700)
+        after=await pg.locator(".lexi[data-w='זומי'] [data-wguess]").evaluate_all("els=>els.map(e=>e.dataset.wguess).join(',')")
+        same=await pg.evaluate("document.querySelector(\".lexi[data-w='זומי']\").dataset.mark==='1'")
+        heard=await pg.locator(".lexi[data-w='זומי'] .lm").inner_text()
+        print("STEADY list",same,"same pictures",before==after,"counter updated",int("".join(ch for ch in heard if ch.isdigit()) or 0)>=7)
         await pg.locator(".lexi[data-w='זומי'] [data-wguess='sleep']").click();await pg.wait_for_timeout(300)
         print("TAB guess right",await pg.evaluate("__pip.S.lex['זומי'].ok"))
         # wrong guess -> wait

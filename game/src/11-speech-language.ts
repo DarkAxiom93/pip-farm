@@ -50,5 +50,5 @@ function langSpeak(p,c,ch){
   dirty();return true;
 }
 function lexIn(text){const t=text.replace(/[^\p{L}\p{N} ]+/gu," ").split(/\s+/);return t.find(w=>S.lex[w])||null}
-let lexT=null;function renderLangSoon(){clearTimeout(lexT);lexT=setTimeout(renderLang,600)}
+let lexT=null;function renderLangSoon(){clearTimeout(lexT);lexT=setTimeout(langRefresh,600)}
 

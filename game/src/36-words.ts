@@ -14,11 +14,13 @@ function langLevel(){
 }
 // how many pictures to choose from, by how often you heard the word (0 = listen more first)
 function choiceCount(e){const h=e.heard||0;return h<2?0:h<5?4:h<9?3:2}
+const shownChoices={};
 function wordChoices(w){
   const e=S.lex[w],n=choiceCount(e);if(!n)return[];
+  const kept=shownChoices[w];if(kept&&kept.includes(e.c))return kept; // keep what you are looking at
   const keys=Object.keys(CONCEPTS).filter(k=>k!==e.c),r=mulberry([...w].reduce((a,c)=>a*31+c.charCodeAt(0),n));
   const out=[e.c];while(out.length<n&&keys.length)out.push(keys.splice(Math.floor(r()*keys.length),1)[0]);
-  return out.sort(()=>r()-.5);
+  shownChoices[w]=out.sort(()=>r()-.5);return shownChoices[w];
 }
 const guessWait={};
 // one guess, from the language tab or from the little popup over a pip
@@ -26,7 +28,7 @@ function guessWord(w,c,p?){
   const e=S.lex[w];if(!e||e.ok)return null;
   if(guessWait[w]&&Date.now()<guessWait[w]){toast("רגע, הם עוד מבולבלים 😅");return null}
   if(c===e.c){learnWord(w,"guess");return true}
-  guessWait[w]=Date.now()+15000;SFX.mood(440,"curious",.3);
+  guessWait[w]=Date.now()+15000;delete shownChoices[w];SFX.mood(440,"curious",.3);
   if(p){const r=rt(p);r.state="act";r.act="spin";r.ct=.8;say(p,"?",1.2,"snd","curious")}
   toast(pick(["לא זה 🙃 תקשיב עוד קצת","לא... הם מטים את הראש","כמעט! נסה שוב עוד מעט"]));
   return false;
@@ -39,7 +41,7 @@ function learnWord(w,how){
   toast(how==="taught"?`הפיפ הראה לך! "${w}" זה ${ICON[e.c]||""} ${CONCEPTS[e.c]} ‎+8`:`כן! "${w}" זה ${ICON[e.c]||""} ${CONCEPTS[e.c]} ‎+8`,1);
   S.pips.filter(p=>Object.values(p.lang).includes(w)).slice(0,6).forEach((p,i)=>setTimeout(()=>{if(byId(p.id)){say(p,w+"!",1.8,"lang","excited");const r=rt(p);if(r.state==="idle"){r.state="celebrate";r.ct=.8}}},i*180));
   const after=langLevel();if(after.name!==before){S.sparks+=15;setTimeout(()=>{SFX.level();toast(`רמה חדשה בשפת הפיפים: ${after.name}! ‎+15`,1)},1600)}
-  renderLangCount();if(tab==="lang")renderLang();if(sel)renderHead();dirty();
+  delete shownChoices[w];langTouch=0;renderLangCount();if(tab==="lang")renderLang();if(sel)renderHead();dirty();
 }
 // called when a pip says a word: maybe it acts it out, and the bubble invites a guess
 function wordSaid(p,w,c){
@@ -48,7 +50,7 @@ function wordSaid(p,w,c){
   if((p.trust??30)>=60&&(e.heard||0)>=4&&Math.random()<.12){
     if(b)b.textContent=`${w} ${ICON[c]||""}`;S.stats.taught=(S.stats.taught||0)+1;setTimeout(()=>learnWord(w,"taught"),900);return;
   }
-  if(choiceCount(e)&&b){b.classList.add("ask");rt(p).said={w,until:performance.now()+4500}}
+  if(choiceCount(e)&&b){b.classList.add("ask");const r=rt(p);if(!r.said||performance.now()>r.said.until||r.said.w===w||!S.lex[r.said.w]||S.lex[r.said.w].ok)r.said={w,until:performance.now()+12000}}
 }
 function openWordGuess(p){
   const r=rt(p);if(!r.said||performance.now()>r.said.until)return false;
@@ -58,7 +60,7 @@ function openWordGuess(p){
   return true;
 }
 function renderLangNew(){
-  renderLangCount();
+  renderLangCount();langSig=langSignature();
   const L=langLevel(),ul=$("lexList"),ws=Object.keys(S.lex);
   const head=`<li class="langlvl"><b>${L.name}</b><span>${L.n===1?"מילה אחת":`${L.n} מילים`}${L.next!=null?` · עוד ${L.next-L.n} עד "${L.nextName}"`:""}</span><i><em style="width:${L.next!=null?Math.round((L.n-L.from)/(L.next-L.from)*100):100}%"></em></i></li>`;
   if(!ws.length){ul.innerHTML=head+`<li class="empty">עוד אין מילים. הם ממציאים מילים כשקורה להם משהו: אוכל, שינה, ליטוף, משחק 💬</li>`;return}
@@ -68,4 +70,20 @@ function renderLangNew(){
     const ch=n?wordChoices(w):[],h=e.heard||0;
     return`<li class="lexi${n?"":" dead"}" data-w="${esc(w)}"><span class="lw">${esc(w)}</span><span class="lm">${n?`👂 ${h}`:"נשכחה"}</span>`+
       (!n?"":ch.length?`<div class="wchoices">${ch.map(c=>`<button class="btn" type="button" data-wguess="${c}" data-w="${esc(w)}">${ICON[c]||"?"}<small>${CONCEPTS[c]}</small></button>`).join("")}</div>`:`<span class="lm" style="grid-column:1/-1">תקשיב עוד קצת. ${2-h===1?"עוד פעם אחת":`עוד ${2-h} פעמים`} ותוכל לנחש</span>`)+`</li>`}).join("");
+}
+
+/* the language tab must not jump around while you are choosing:
+   when a word is heard again only the little numbers change; a full redraw waits until your
+   pointer leaves the list or you have not touched it for a few seconds */
+let langTouch=0,langSig="";
+function langSignature(){return Object.keys(S.lex).map(w=>{const e=S.lex[w];return w+(e.ok?"1":"0")+(choiceCount(e)?"c":"")+(speakers(w)?"":"x")}).join("|")}
+function langSoft(){
+  const ul=$("lexList");if(!ul)return;
+  for(const li of ul.querySelectorAll(".lexi[data-w]")){const e=S.lex[(li as HTMLElement).dataset.w];const h=li.querySelector(".lm");if(e&&!e.ok&&h&&/👂/.test(h.textContent))h.textContent=`👂 ${e.heard||0}`}
+}
+function langRefresh(){
+  if(tab!=="lang")return;
+  const sig=langSignature(),busy=Date.now()-langTouch<6000;
+  if(sig===langSig||busy){langSoft();if(busy&&sig!==langSig){clearTimeout(lexT);lexT=setTimeout(langRefresh,1500)}return}
+  langSig=sig;renderLangNew();
 }
