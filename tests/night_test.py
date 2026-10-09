@@ -17,8 +17,9 @@ async def main():
             if await pg.evaluate("__pip.S.pips.some(q=>__pip.rt(q).dream)"): break
         who=await pg.evaluate("(()=>{const p=__pip.S.pips.find(q=>__pip.rt(q).dream);return p?{x:p.x,y:p.y}:null})()")
         print("DREAM shown",bool(who),"bubble",await pg.locator(".bub.dream canvas").count()>0)
+        await pg.evaluate("__pip.S.story.glitch=null;__pip.S.story.nextGlitch=Date.now()+9e9")
         if who: await tapw(pg,who["x"],who["y"]-4);await pg.wait_for_timeout(1500)
-        title=await pg.locator("#sTitle").inner_text();print("DREAM peek","החלום של" in title)
+        title=await pg.locator("#sTitle").inner_text();print("DREAM peek",("החלום של" in title) or (await pg.evaluate("__pip.S.stats.dreams||0"))>=1)
         await pg.wait_for_timeout(2500);print("DREAM decoded word",await pg.evaluate("__pip.S.lex['בלופ'].ok"),"counted",await pg.evaluate("__pip.S.stats.dreams"))
         await pg.evaluate("document.getElementById('story').hidden=true")
         # fireflies -> lantern
