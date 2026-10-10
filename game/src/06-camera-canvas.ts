@@ -8,9 +8,11 @@ function lookAt(x,y){camGoal={x:x-CW/cam.z/2,y:y-CH/cam.z/2};const vw=CW/cam.z,v
 function inView(x,y,m){return x>cam.x-m&&x<cam.x+CW/cam.z+m&&y>cam.y-m&&y<cam.y+CH/cam.z+m}
 
 /* ================= canvas ================= */
-const cv=$("cv"),ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+// the canvas has 2 real pixels per logical pixel (PR), so sprites can use half-pixel detail
+const PR=2,cv=$("cv"),ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
 let CX=ctx;
-const R=(x,y,w,h,c)=>{CX.fillStyle=c;CX.fillRect(Math.round(x),Math.round(y),w,h)};
+const R=(x,y,w,h,c)=>{CX.fillStyle=c;CX.fillRect(Math.round(x*2)/2,Math.round(y*2)/2,w,h)};
+const SCREEN=()=>ctx.setTransform(PR,0,0,PR,0,0);
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const bg=document.createElement("canvas");bg.width=WW;bg.height=WH;
 /* ground: every zone has its own texture over the whole world, and a warped zone map decides which one
@@ -24,7 +26,7 @@ function vnoise(seed,scale){
     a=G[y0*cols+x0],b=G[y0*cols+x0+1],c=G[(y0+1)*cols+x0],d=G[(y0+1)*cols+x0+1];
     return a+(b-a)*fx+(c-a)*fy+(a-b-c+d)*fx*fy};
 }
-const ZMAP=new Uint8Array(WW*WH);
+const ZMAP=new Uint8Array(WW*WH),BGTREES=[],BGBUSH=[];
 (function zoneMap(){
   const n1=vnoise(31,28),n2=vnoise(32,28),n3=vnoise(33,9),n4=vnoise(34,9);
   const idx=(x,y)=>{x=clamp(x,0,WW-1);y=clamp(y,0,WH-1);for(let k=0;k<ZONES.length;k++){const z=ZONES[k];if(x>=z.x&&x<z.x+z.w&&y>=z.y&&y<z.y+z.h)return k}return 0};
@@ -98,9 +100,9 @@ function lockedMask(){
   B(POND.x-12,POND.y-5,6,1,"#8cc4ea");B(POND.x+4,POND.y+2,8,1,"#6aaedc");
   B(POND.x+10,POND.y-3,5,3,"#5fae58");B(POND.x+11,POND.y-4,2,1,"#5fae58");
   // trees and bushes
-  const tree=(x,y,rr)=>{B(x-1,y,3,6,"#5a3d2b");for(let dy=-rr;dy<=rr;dy++){const hw=Math.round(rr*Math.sqrt(1-(dy/rr)**2));B(x-hw,y-rr+dy,hw*2,1,dy<0?"#3d7a35":"#336a2d")}for(let i=0;i<10;i++)B(x-rr/2+r()*rr,y-rr*1.6+r()*rr,1,1,"#4f9446")};
+  const tree=(x,y,rr)=>{BGTREES.push({x,y,rr});B(x-1,y,3,6,"#5a3d2b");for(let dy=-rr;dy<=rr;dy++){const hw=Math.round(rr*Math.sqrt(1-(dy/rr)**2));B(x-hw,y-rr+dy,hw*2,1,dy<0?"#3d7a35":"#336a2d")}for(let i=0;i<10;i++)B(x-rr/2+r()*rr,y-rr*1.6+r()*rr,1,1,"#4f9446")};
   tree(10,12,9);tree(64,10,7);tree(250,150,10);tree(232,164,7);
-  const bush=(x,y)=>{for(let dy=-4;dy<=0;dy++){const hw=Math.round(6*Math.sqrt(1-(dy/4.5)**2));B(x-hw,y+dy,hw*2,1,"#2f6a33")}B(x-3,y-3,1,1,"#ff5d73");B(x+2,y-2,1,1,"#ff5d73");B(x,y-4,1,1,"#ff5d73")};
+  const bush=(x,y)=>{BGBUSH.push({x,y});for(let dy=-4;dy<=0;dy++){const hw=Math.round(6*Math.sqrt(1-(dy/4.5)**2));B(x-hw,y+dy,hw*2,1,"#2f6a33")}B(x-3,y-3,1,1,"#ff5d73");B(x+2,y-2,1,1,"#ff5d73");B(x,y-4,1,1,"#ff5d73")};
   bush(70,160);bush(122,162);bush(178,160);bush(8,92);
   const circ=(x,y,rr,c)=>{for(let dy=-rr;dy<=rr;dy++){const hw=Math.round(rr*Math.sqrt(1-(dy/rr)**2));B(x-hw,y+dy,hw*2,1,c)}};
   // forest: trees and mushrooms where the forest ground is

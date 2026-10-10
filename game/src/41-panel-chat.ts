@@ -8,8 +8,8 @@ function setTab(t){
 document.querySelector(".tabs").addEventListener("click",(e:any)=>{const b=e.target.closest("button");if(b){audio();setTab(b.dataset.tab)}});
 
 function portrait(p){
-  const c=document.createElement("canvas");c.width=20;c.height=20;c.className="portrait";
-  const g=c.getContext("2d");g.imageSmoothingEnabled=false;g.fillStyle="#3f6e38";g.fillRect(0,0,20,20);g.fillStyle="#35612e";g.fillRect(0,15,20,5);
+  const c=document.createElement("canvas");c.width=40;c.height=40;c.className="portrait";
+  const g=c.getContext("2d");g.imageSmoothingEnabled=false;g.scale(2,2);g.fillStyle="#3f6e38";g.fillRect(0,0,20,20);g.fillStyle="#35612e";g.fillRect(0,15,20,5);
   const old=CX;CX=g;
   try{drawPip(p,performance.now()/1000,false,{state:"idle",dir:1,anim:0,blink:2,talk:0,ct:0},10,16)}finally{CX=old}
   return c;

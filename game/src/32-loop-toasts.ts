@@ -4,7 +4,7 @@ let errCount=0;
 function frame(now){
   const dt=Math.min(.1,(now-last)/1000);last=now;
   try{update(dt)}catch(e){if(errCount++<5)console.error("update",e)}
-  try{render(now/1000)}catch(e){if(errCount++<5)console.error("render",e);try{ctx.setTransform(1,0,0,1,0,0);CX=ctx;ctx.globalAlpha=1}catch(_){}}
+  try{render(now/1000)}catch(e){if(errCount++<5)console.error("render",e);try{ctx.setTransform(PR,0,0,PR,0,0);CX=ctx;ctx.globalAlpha=1}catch(_){}}
   requestAnimationFrame(frame);
 }
 

@@ -32,7 +32,7 @@ function cuddleTick(p,dt){
   if(r.cud>=1.4&&!r.cudDone){r.cudDone=true;award(p,4,"pet");bond(p,3,"pet");if(r.need&&(r.need.type==="pet"||r.need.type==="play"))fulfill(p);langSpeak(p,"love",.5);quest("cuddle")}
 }
 cv.addEventListener("pointerdown",e=>{
-  audio();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  audio();camVel=null;try{cv.setPointerCapture(e.pointerId)}catch(_){}
   ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(ptrs.size===1){
     const[wx,wy]=toWorld(e),pp=hitPip(wx,wy);
@@ -54,7 +54,8 @@ cv.addEventListener("pointermove",e=>{
     if(!drag.moved&&Math.hypot(dx,dy)>7){drag.moved=true;clearTimeout(drag.timer);closePlot();camGoal=null;
       if(drag.pip){const p=byId(drag.pip);const r=p&&rt(p);if(p&&!["sleep","split","pass","choir","argue"].includes(r.state)){drag.held=true;liftPip(p)}}}
     if(drag.held){const p=byId(drag.pip);if(p){const[wx,wy]=toWorld(e);p.x=clamp(wx,4,WW-4);p.y=clamp(wy+5,16,WH-2);const r=rt(p);r.anim+=.05}}
-    else if(drag.moved){cam.x=drag.cx-dx/b.width*CW/cam.z;cam.y=drag.cy-dy/b.height*CH/cam.z;clampCam()}}
+    else if(drag.moved){cam.x=drag.cx-dx/b.width*CW/cam.z;cam.y=drag.cy-dy/b.height*CH/cam.z;clampCam();
+      const now=performance.now();if(drag.lt){const d=(now-drag.lt)/1000;if(d>0){drag.vx=(cam.x-drag.lcx)/d;drag.vy=(cam.y-drag.lcy)/d}}drag.lt=now;drag.lcx=cam.x;drag.lcy=cam.y}}
 });
 cv.addEventListener("pointerup",e=>{
   if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);
@@ -63,7 +64,8 @@ cv.addEventListener("pointerup",e=>{
     const p=drag.pip&&byId(drag.pip);
     if(drag.held&&p){dropPip(p);quest("carry")}
     else if(drag.hold&&p){const r=rt(p);if(r.state==="cuddle"){r.state="celebrate";r.ct=.6}}
-    else if(!drag.moved&&!drag.hold)tapAt(e);}
+    else if(!drag.moved&&!drag.hold)tapAt(e);
+    else if(drag.moved&&!drag.held&&drag.lt&&performance.now()-drag.lt<80){const v={x:drag.vx||0,y:drag.vy||0},sp=Math.hypot(v.x,v.y),mx=400;if(sp>20)camVel=sp>mx?{x:v.x/sp*mx,y:v.y/sp*mx}:v}}
   drag=null;
 });
 cv.addEventListener("pointercancel",e=>{ptrs.delete(e.pointerId);if(drag){clearTimeout(drag.timer);const p=drag.pip&&byId(drag.pip);if(p&&["held","cuddle"].includes(rt(p).state)){rt(p).state="idle";rt(p).wait=1}}drag=null;pinch=null});

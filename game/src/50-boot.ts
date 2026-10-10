@@ -6,6 +6,7 @@ function boot(){
   sel=S.pips[0].id;
   soundBtn();renderAll();curSeason=calcSeason();S.lastSeason=S.lastSeason||curSeason;$("hWeather").textContent=weatherLabel();clampCam();
   if(!local)setTimeout(()=>toast("הקש על פיפי כדי לענות לו. הקש שוב כדי ללטף"),900);
+  if(!S.tipKeys&&matchMedia("(pointer:fine)").matches){S.tipKeys=1;setTimeout(()=>toast("טיפ: גלגלת לזום, גרירה להזזת המפה, חיצים ו-WASD לזוז, מקשים 1 עד 5 ללשוניות",1),local?4000:9000)}
   requestAnimationFrame(frame);
   storyInit();
   if(S.story.ending==="free"&&S.story.site){const today=dayKey(Date.now());if(S.story.note!==today){S.story.note=today;const a=pick(S.pips);if(a){S.drawings.push({x:S.story.site.x-14,y:S.story.site.y+12,k:pick(["heart","keeper","sun"]),by:a.id,name:a.name,t:Date.now(),away:0});setTimeout(()=>toast("הפיפים השאירו לך הודעה ליד השער",1),3000);dirty()}}}

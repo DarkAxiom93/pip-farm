@@ -107,3 +107,10 @@ buddy_test|STRIP drawn True
 buddy_test|CLICK tap sent True
 buddy_test|DROP no extra tap True
 buddy_test|ERR []
+controls_test|HOVER pip pip cursor pointer
+controls_test|HOVER plot box
+controls_test|KEY move True
+controls_test|KEY zoom True
+controls_test|KEY tab lang
+controls_test|GLIDE keeps moving True
+controls_test|ERR []

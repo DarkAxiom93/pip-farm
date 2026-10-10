@@ -126,7 +126,7 @@ function drawHide(t){
 function drawHideHud(){
   if(!hide||hide.phase!=="seek")return;
   const left=Math.max(0,Math.ceil(hide.t)),txt=`נמצאו ${hide.found} מתוך ${hide.total} · ${left} שניות`;
-  CX.save();CX.setTransform(1,0,0,1,0,0);(CX as any).direction="rtl";CX.font="bold 12px Fredoka,sans-serif";CX.textAlign="center";CX.textBaseline="middle";
+  CX.save();CX.setTransform(PR,0,0,PR,0,0);(CX as any).direction="rtl";CX.font="bold 12px Fredoka,sans-serif";CX.textAlign="center";CX.textBaseline="middle";
   const w=Math.ceil(CX.measureText(txt).width)+16;
   CX.fillStyle="rgba(0,0,0,.5)";CX.fillRect(Math.round(CW/2-w/2),30,w,18);
   CX.fillStyle=left<=10?"#ff8f8f":"#fff7d6";CX.fillText(txt,CW/2,39);CX.restore();

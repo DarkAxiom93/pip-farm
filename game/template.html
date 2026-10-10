@@ -60,7 +60,9 @@ canvas.doodle{display:block;image-rendering:pixelated}
 .ico.veg{background:var(--berry);border-radius:50% 50% 45% 45%;box-shadow:inset 0 3px 0 -1px var(--leaf)}
 .ico.pip{background:#b9a2f0;border-radius:3px}
 .ico.wood{background:#a87a42;border-radius:50%;box-shadow:inset 0 0 0 2px #7a4a2a,inset 0 0 0 3px #c89c63}
-button.chip{cursor:pointer}
+button.chip{cursor:pointer;transition:transform .08s ease,border-color .15s,background .15s}
+button.chip:hover{border-color:var(--butter);background:rgba(52,42,60,.92)}
+button.chip:active{transform:translateY(1px) scale(.97)}
 
 .toasts{position:absolute;bottom:8px;inset-inline:8px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
 .toast{background:rgba(33,26,40,.92);border:2px solid var(--wood-edge);color:var(--ink);padding:3px 10px;border-radius:8px;font-size:13px;font-weight:500;transition:opacity .4s,transform .4s;max-width:100%}
@@ -70,7 +72,11 @@ button.chip{cursor:pointer}
 .pmenu h4{margin:0;font-size:14px;font-weight:600}
 .pmenu p{margin:0;font-size:12px;color:var(--ink-dim)}
 .btn{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:8px;padding:5px 10px;cursor:pointer;font-weight:500;text-align:start;display:flex;justify-content:space-between;gap:10px;align-items:center}
-.btn:hover:not(:disabled){border-color:var(--butter)}
+.btn{transition:transform .08s ease,border-color .15s,background .15s,box-shadow .15s;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn:hover:not(:disabled){border-color:var(--butter);background:color-mix(in srgb,var(--wood-2) 85%,var(--butter))}
+.btn:active:not(:disabled){transform:translateY(1px) scale(.98);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.btn.main:hover:not(:disabled){filter:brightness(1.07)}
+.btn:focus-visible,button.chip:focus-visible{outline:2px solid var(--butter);outline-offset:2px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.main{background:var(--butter);color:var(--ink-dark);border-color:var(--butter);font-weight:600;justify-content:center}
 .btn small{font-family:var(--pixel);font-size:11px;opacity:.8}
@@ -274,7 +280,7 @@ details.more[open] summary::before{content:"▾ "}
 
 <div class="app" dir="rtl">
   <div class="stage" id="stage">
-    <canvas id="cv" width="512" height="336" aria-label="החווה: הקש על פיפ כדי לבחור אותו, על חלקה כדי לשתול או לקטוף"></canvas>
+    <canvas id="cv" width="1024" height="672" aria-label="החווה: הקש על פיפ כדי לבחור אותו, על חלקה כדי לשתול או לקטוף"></canvas>
     <div class="bubbles" id="bubbles"></div>
     <div class="hud">
       <span class="chip" title="ניצוצות"><span class="ico star"></span><b id="hSparks">0</b></span>

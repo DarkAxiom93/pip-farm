@@ -26,10 +26,9 @@ function drawTrees(t){
     const up=treeUp(i),cut=S.treeCut[i];
     if(!up){const g=(Date.now()-cut)/360000;R(tr.x-2,tr.y-2,5,2,"#8a6a45");R(tr.x-1,tr.y-3,3,1,"#c89c63");if(g>.5){R(tr.x,tr.y-6,1,4,"#3f8f3a");R(tr.x-1,tr.y-6,3,1,"#6fcf5a")}return}
     const sh=treeShake[i]>0?Math.round(Math.sin(t*60)*treeShake[i]*3):0;
-    R(tr.x-1,tr.y-6,3,6,"#5a3d2b");
-    const c1=curSeason==="autumn"?"#c9772f":curSeason==="winter"?"#2f5a2c":"#3d7a35",c2=curSeason==="autumn"?"#a85a28":curSeason==="winter"?"#264a24":"#336a2d";
     const cy=tr.y-6-tr.s;
-    for(let dy=-tr.s;dy<=tr.s;dy++){const hw=Math.round(tr.s*Math.sqrt(1-(dy/(tr.s+.5))**2));R(tr.x-hw+sh,cy+dy,hw*2,1,dy<0?c1:c2)}
+    softShadow(tr.x+1,tr.y,tr.s*.8,1.8,.22);
+    treeArt(R,tr.x,cy,tr.s,treePal(curSeason==="autumn"?"autumn":curSeason==="winter"?"winter":"summer"),i*131+7,sh,tr.y);
     if(curSeason==="winter")for(let dy=-tr.s;dy<-tr.s/2;dy++){const hw=Math.round(tr.s*Math.sqrt(1-(dy/(tr.s+.5))**2));R(tr.x-hw+sh,cy+dy,hw*2,1,"#eef3fa")}
     if(curSeason==="spring"){R(tr.x-2+sh,cy-2,1,1,"#ffc7d8");R(tr.x+2+sh,cy+1,1,1,"#ffc7d8");R(tr.x+sh,cy-tr.s+2,1,1,"#ffffff")}
     if(treeHp[i]!=null&&treeHp[i]<3){R(tr.x-1,tr.y-4,1,1,"#e9d3a0")}

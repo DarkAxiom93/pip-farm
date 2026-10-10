@@ -8,9 +8,11 @@ function drawPlot(i,t){
     return;
   }
   const c=pl.crop,wet=c&&c.water;
-  R(g.x-1,g.y-1,PW+2,PH+2,"#3d2819");
+  softShadow(g.x+PW/2,g.y+PH+1,PW/2+1,2,.18);
+  R(g.x-1.5,g.y-1.5,PW+3,PH+3,"#2e1e12");R(g.x-1,g.y-1,PW+2,PH+2,"#8a6a45");R(g.x-1,g.y-1,PW+2,.5,"#b88f5f");R(g.x-.5,g.y-.5,PW+1,PH+1,"#3d2819");
   R(g.x,g.y,PW,PH,wet?"#4e3423":"#6b4a32");
-  for(let y=4;y<PH;y+=6)R(g.x+2,g.y+y,PW-4,2,wet?"#3f2a1c":"#5a3d29");
+  for(let y=4;y<PH;y+=6){R(g.x+2,g.y+y,PW-4,2,wet?"#3f2a1c":"#5a3d29");R(g.x+2,g.y+y+2,PW-4,.5,wet?"#5e4230":"#7d5a3e")}
+  for(let k=0;k<14;k++){const sx=g.x+2+((k*17+i*5)%(PW-4)),sy=g.y+1+((k*11+i*3)%(PH-2));R(sx,sy,.5,.5,k%2?"rgba(0,0,0,.25)":"rgba(255,230,190,.18)")}
   if(!c){if(pl.pending)R(g.x+PW/2-1,g.y+PH/2-1,3,3,"#c89c63");return}
   const cr=CROPS[c.type],f=cropFrac(c),st=f>=1?3:Math.floor(f*3);
   for(let j=0;j<2;j++)for(let k=0;k<4;k++){
@@ -49,7 +51,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   const C=(l,sat?)=>mut==="gold"?`hsl(46,${sat??92}%,${l}%)`:`hsl(${hue},${sat??(eld?45:80)}%,${l}%)`;
   if(r.state==="pass")CX.globalAlpha=.25+.75*fade;
   const body=C(72),dark=C(52,46),lite=C(86,80),out=C(24,55);
-  R(px-bw/2+1,py-1,bw-2,2,"rgba(0,0,0,.28)");
+  softShadow(px,py-.2,bw/2+.6,1.3,.26);
   if(mut==="glow"){const a=.2+.14*Math.sin(t*3);R(x0-2,y0-1,bww+4,bh+3,`hsla(${hue},100%,82%,${a})`);R(x0-1,y0-3,bww+2,bh+6,`hsla(${hue},100%,82%,${a})`)}
   if(lv>=10){const gl=.35+.25*Math.sin(t*2);R(x0+1,y0-6,bww-2,1,`rgba(255,226,140,${gl})`);R(x0,y0-5,1,1,`rgba(255,226,140,${gl})`);R(x0+bww-1,y0-5,1,1,`rgba(255,226,140,${gl})`)}
   const bh2=bh-breath,dir=r.dir||1,ax=dir>0?x0-1:x0+bww;
@@ -60,11 +62,8 @@ function drawPip(p,t,isSel,r?,px?,py?){
   else if(g.tail===3){TR(0,bh2-4,2,1,"#3f8f3a");TR(1,bh2-6,3,2,"#6fcf5a")}
   if(mut==="wings"){const f=Math.floor(t*9+(p.born%5))%2;R(x0-3,y0+1-f,3,2+f,"#eef7ff");R(x0+bww,y0+1-f,3,2+f,"#eef7ff");R(x0-3,y0+1-f,1,1,"#bcdcff");R(x0+bww+2,y0+1-f,1,1,"#bcdcff")}
   if(mut==="crystal")CX.globalAlpha=.6;
-  R(x0,y0-1,bww,bh2+2,out);R(x0-1,y0,bww+2,bh2,out);
-  R(x0+1,y0,bww-2,bh2,body);R(x0,y0+1,bww,bh2-2,body);
-  R(x0+1,y0+bh2-2,bww-2,2,dark);R(x0,y0+bh2-3,1,1,dark);R(x0+bww-1,y0+bh2-3,1,1,dark);
+  blob(x0,y0,bww,bh2,out,body,dark,lite);
   CX.globalAlpha=1;
-  R(x0+1,y0+1,2,1,lite);R(x0+1,y0+2,1,1,lite);
   if(mut==="crystal"){const k=Math.floor(t*3)%Math.max(1,bww-2);R(x0+1+k,y0+1+(k%3),1,1,"#ffffff")}
   if(mut==="gold"){const k=Math.floor(t*7)%(bww+8)-4;if(k>=0&&k<bww)R(x0+k,y0+1,1,Math.max(1,bh2-2),"rgba(255,255,225,.75)")}
   const cx=x0+(bww>>1);
@@ -90,9 +89,9 @@ function drawPip(p,t,isSel,r?,px?,py?){
   else if(happy){R(el,ey+1,1,1,eye);R(el+1,ey,1,1,eye);R(er,ey,1,1,eye);R(er+1,ey+1,1,1,eye)}
   else if(r.blink<0||r.state==="split"){R(el,ey+1,ew,1,eye);R(er,ey+1,ew,1,eye)}
   else if(g.eyes===2){R(el,ey,1,1,dark);R(er,ey,1,1,dark);R(el,ey+1,1,1,eye);R(er,ey+1,1,1,eye)}
-  else{R(el,ey,ew,2,eye);R(er,ey,ew,2,eye);R(el,ey,1,1,"#ffffff");if(big)R(er,ey,1,1,"#ffffff")}
+  else{R(el,ey,ew,2,eye);R(er,ey,ew,2,eye);R(el,ey,.5,.5,"#ffffff");R(er,ey,.5,.5,"#ffffff");R(el+ew-.5,ey+1.5,.5,.5,"rgba(255,255,255,.45)");R(er+ew-.5,ey+1.5,.5,.5,"rgba(255,255,255,.45)");if(big){R(el,ey,1,1,"#ffffff");R(er,ey,1,1,"#ffffff")}}
   if(p.awake&&!sleep&&!stare){R(el,ey,1,1,"#9fe8ff");R(er,ey,1,1,"#9fe8ff")}
-  if(p.mood>55&&!sleep&&!p.blank){R(el-1,ey+2,1,1,"#ff9db5");R(er+ew,ey+2,1,1,"#ff9db5")}
+  if(p.mood>55&&!sleep&&!p.blank){R(el-1,ey+2,1.5,.5,"rgba(255,140,170,.85)");R(er+ew-.5,ey+2,1.5,.5,"rgba(255,140,170,.85)");R(el-.5,ey+2.5,.5,.5,"rgba(255,140,170,.5)");R(er+ew,ey+2.5,.5,.5,"rgba(255,140,170,.5)")}
   if(p.blank&&!sleep)R(cx-1+off,ey+3,3,1,"#5a2a3a");
   if(g.pattern===4){R(el,ey+3,1,1,dark);R(er+ew-1,ey+3,1,1,dark)}
   if(eld&&!sleep){R(cx-2+off,ey+3,4,2,"#f4f1ea");R(cx-1+off,ey+5,2,1,"#f4f1ea");R(el,ey-1,ew,1,"#f4f1ea");R(er,ey-1,ew,1,"#f4f1ea")}
@@ -103,7 +102,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(RT.get(p.id)===r){if(curSeason==="winter"){R(x0,y0+bh2-4,bww,1,"#e8433f");R(dir>0?x0-1:x0+bww,y0+bh2-4,1,3,"#e8433f")}holidayLook(p,x0,y0,bww,ey)}
   if(r.talk>0&&!sleep)R(cx-1+off,ey+3,2,(Math.floor(t*12)%2)+1,"#5a2a3a");
   else if(p.food<20&&!sleep)R(cx-1+off,ey+3,2,1,"#5a2a3a");
-  if(r.state==="walk"&&mut!=="wings"){const st=Math.floor(r.anim*10)%2;R(x0+1+st,py-1,2,1,dark);R(x0+bww-3-st,py-1,2,1,dark)}
+  if(r.state==="walk"&&mut!=="wings"){const st=Math.floor(r.anim*10)%2;R(x0+1+st,py-.5,2,.5,out);R(x0+1.5+st,py-1,1,.5,dark);R(x0+bww-3-st,py-.5,2,.5,out);R(x0+bww-2.5-st,py-1,1,.5,dark)}
   if(rainy()&&RT.get(p.id)===r&&r.state!=="sleep"&&r.state!=="choir"&&S.weather){R(cx-4,y0-7,9,1,"#3f8f3a");R(cx-3,y0-8,7,1,"#6fcf5a");R(cx-1,y0-9,3,1,"#6fcf5a");R(cx,y0-6,1,4,"#2f6a33")}
   if(r.state==="gather"&&NODES[r.node]&&NODES[r.node].k==="fish"){const fx=dir>0?x0+bww:x0-1;for(let k=0;k<5;k++)R(fx+dir*k,y0+1-k,1,1,"#8a6a45");R(fx+dir*5,y0-4,1,7,"rgba(230,230,230,.7)")}
   if(r.state==="work"||r.state==="gather"||r.state==="build"||r.state==="sbuild"||r.state==="construct"||r.state==="sbuild3"){const pr=1-r.workT/(r.workMax||1);R(x0-1,y0-6,bww+2,2,"rgba(20,14,24,.7)");R(x0-1,y0-6,Math.round((bww+2)*pr),2,"#86d47f");
@@ -141,13 +140,15 @@ function drawParticles(){
 }
 const flies=Array.from({length:40},()=>({x:rand(0,WW),y:rand(10,WH),a:rand(0,9)}));
 function render(t){
-  ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#16221a";ctx.fillRect(0,0,CW,CH);
-  const W2=()=>ctx.setTransform(cam.z,0,0,cam.z,-cam.x*cam.z,-cam.y*cam.z);W2();
-  ctx.drawImage(bg,0,0);
-  const rp=Math.floor(t*1.2)%3;R(POND.x-14+rp*9,POND.y+4-rp,5,1,"rgba(160,210,240,.55)");
+  ctx.setTransform(PR,0,0,PR,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#16221a";ctx.fillRect(0,0,CW,CH);
+  const W2=()=>ctx.setTransform(cam.z*PR,0,0,cam.z*PR,-cam.x*cam.z*PR,-cam.y*cam.z*PR);W2();
+  ctx.drawImage(bg2,0,0,WW,WH);
+  // water: little highlights drift across the pond, streaks flow down the river
+  if(inView(POND.x,POND.y,30))for(let i=0;i<7;i++){const x=POND.x-20+((t*3+i*11)%40),y=POND.y-9+i*2.8;if(inPond(x,y)&&inPond(x+3,y))R(x,y,2+(i%3),.5,i%2?"rgba(220,240,255,.5)":"rgba(140,200,240,.45)")}
+  if(inView(POND.x,POND.y,30)&&Math.sin(t*1.7)>.85)R(POND.x+6,POND.y-2,.5,.5,"#ffffff");
   R(BURROW.x+7,BURROW.y-12,1,3,"#5a3d2b");R(BURROW.x+6,BURROW.y-14,3,2,night?"#ffd166":"#b88a3b");
   // river shimmer
-  if(inView(548,0,300))for(let i=0;i<10;i++){const y=(t*18+i*34)%WH,c=riverX(y);R(c-8+Math.sin(t+i)*5,y,4,1,"rgba(170,215,245,.6)")}
+  if(inView(548,0,300))for(let i=0;i<22;i++){const y=(t*16+i*15.3)%WH,c=riverX(y);if(onBridge(y))continue;R(c-9+((i*37)%18)+Math.sin(t*.8+i)*1.5,y,2+(i%3),.5,i%3?"rgba(170,215,245,.55)":"rgba(230,245,255,.6)")}
   // resource nodes
   NODES.forEach((n,i)=>{if(!inView(n.x,n.y,20))return;const ok=nodeReady(i);
     if(n.k==="berry"){for(let dy=-5;dy<=0;dy++){const hw=Math.round(7*Math.sqrt(1-(dy/5.5)**2));R(n.x-hw,n.y+dy,hw*2,1,"#2f6a33")}if(ok){[[-3,-3],[2,-2],[0,-5],[-5,-1],[4,-4]].forEach(([dx,dy])=>R(n.x+dx,n.y+dy,1,1,"#ff5d73"))}}
@@ -162,7 +163,7 @@ function render(t){
   drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);drawFire(t);
   const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
-  drawFireGlow(t);
+  drawFireGlow(t);drawHover(t);
   drawVisitor(t);
   drawParticles();
   // cloud shadows
@@ -171,7 +172,7 @@ function render(t){
   // the fog follows the same soft, wandering edge as the ground (zoneMask)
   drawLockFog(t);
   // light and weather tint, in screen space
-  ctx.setTransform(1,0,0,1,0,0);
+  ctx.setTransform(PR,0,0,PR,0,0);
   const d=new Date(),h=d.getHours()+d.getMinutes()/60;
   let tint=null;
   if(night)tint="rgba(18,22,70,.46)";else if(h<7.5)tint="rgba(255,150,90,.16)";else if(h>18.5)tint="rgba(255,120,80,.18)";
@@ -190,12 +191,12 @@ function render(t){
   }
   if(zoneOpen("cave"))for(const m of CMUSH){R(m.x,m.y,1,2,"#d9f7ff");R(m.x-1,m.y-1,3,1,"#7ff0ff")}
   drawSky(t);
-  if(night&&S.stars.length){ctx.setTransform(1,0,0,1,0,0);
+  if(night&&S.stars.length){ctx.setTransform(PR,0,0,PR,0,0);
     for(const st of S.stars){const{fx,fy}=starPos(st),x=Math.round(fx*CW),y=Math.round(fy*CH),tw=.55+.45*Math.sin(t*1.7+fx*40),fresh=Date.now()-st.died<86400000;
       ctx.fillStyle=`hsla(${st.hue},90%,88%,${tw})`;ctx.fillRect(x,y,3,3);ctx.fillStyle=`hsla(${st.hue},90%,88%,${tw*.5})`;ctx.fillRect(x-2,y+1,7,1);ctx.fillRect(x+1,y-2,1,7);if(fresh){ctx.fillRect(x-3,y+1,9,1);ctx.fillRect(x+1,y-3,1,9)}}
     W2()}
   // rain, lightning, rainbow in screen space
-  ctx.setTransform(1,0,0,1,0,0);
+  ctx.setTransform(PR,0,0,PR,0,0);
   if(rainy()){const n=stormy()?170:90;while(drops.length<n)drops.push({x:rand(0,CW),y:rand(-CH,0),v:rand(260,360)});drops.length=n;
     ctx.fillStyle=stormy()?"rgba(200,215,255,.55)":"rgba(190,210,255,.45)";
     const snow=curSeason==="winter";if(snow)ctx.fillStyle="rgba(255,255,255,.85)";

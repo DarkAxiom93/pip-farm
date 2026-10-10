@@ -110,7 +110,7 @@ function starTap(e){
 function drawSky(t){
   if(!night)return;
   const all=skyStars(),pos={};for(const s of all)pos[s.key]=s;
-  ctx.save();ctx.setTransform(1,0,0,1,0,0);
+  ctx.save();ctx.setTransform(PR,0,0,PR,0,0);
   // the pips' constellations
   const line=(l,col)=>{const a=pos[l[0]],b=pos[l[1]];if(!a||!b)return;ctx.beginPath();ctx.moveTo(a.fx*CW+1,a.fy*CH+1);ctx.lineTo(b.fx*CW+1,b.fy*CH+1);ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke()};
   for(const c of S.constellations||[])c.lines.forEach(l=>line(l,"rgba(200,220,255,.28)"));
