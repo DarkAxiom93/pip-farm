@@ -213,6 +213,10 @@ button.chip:active{transform:translateY(1px) scale(.97)}
 .mem li small{color:var(--ink-dim);white-space:nowrap}
 .focus{background:var(--wood-2);border:2px solid var(--wood-edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
 .focus.on{border-color:var(--sky)}
+.buildbar{position:absolute;right:8px;top:42px;display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-start;max-width:min(560px,72%);
+  background:rgba(22,18,28,.82);border:2px solid var(--butter);border-radius:12px;padding:6px 8px;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.buildbar .chip{font-size:12.5px;padding:4px 10px}
+.buildbar .chip.done{background:var(--butter);color:var(--ink-dark);font-weight:700}
 .chip.on{background:var(--butter);color:var(--ink-dark)}
 .focus h3{margin:0;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
 .focus h3 small{font-size:11px;color:var(--ink-dim);font-weight:400}
@@ -296,6 +300,7 @@ details.more[open] summary::before{content:"▾ "}
       <button class="chip" id="hFocus" type="button" hidden>ריכוז</button>
       <button class="chip storychip" id="hStory" type="button" hidden>סיפור</button>
       <button class="chip sec" id="hLog" type="button">יומן</button>
+      <button class="chip choirbtn" id="hBuild" type="button">🔨 בנייה</button>
       <button class="chip choirbtn sec" id="hHide" type="button">מחבואים</button>
       <button class="chip choirbtn sec" id="hStars" type="button">✦ כוכבים</button>
       <button class="chip choirbtn sec" id="hChoir" type="button">♪ מקהלה</button>
@@ -309,6 +314,7 @@ details.more[open] summary::before{content:"▾ "}
     <div class="story" id="story" hidden><div class="sbox" id="sBox"><p class="stitle" id="sTitle"></p><div class="slines" id="sLines"></div><div class="schoices" id="sChoices"></div></div></div>
     <div class="logbox" id="logBox" hidden><header>יומן החווה<button type="button" id="logClose" aria-label="לסגור">×</button></header><ol id="logList"></ol></div>
     <div class="pmenu" id="pmenu" hidden></div>
+    <div class="buildbar" id="buildBar" hidden></div>
   </div>
 
   <aside class="panel">

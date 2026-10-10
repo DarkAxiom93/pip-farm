@@ -34,6 +34,7 @@ function cuddleTick(p,dt){
 cv.addEventListener("pointerdown",e=>{
   audio();camVel=null;try{cv.setPointerCapture(e.pointerId)}catch(_){}
   ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1&&buildDown(e)){drag=null;return}
   if(ptrs.size===1){
     const[wx,wy]=toWorld(e),pp=hitPip(wx,wy);
     drag={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y,moved:false,pip:pp?pp.id:null,held:false,hold:false,wx,wy};
@@ -46,6 +47,7 @@ cv.addEventListener("pointerdown",e=>{
 });
 cv.addEventListener("pointermove",e=>{
   mouseW=toWorld(e);
+  if(bDrag&&buildMove(e))return;
   if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   const b=cv.getBoundingClientRect();
   if(pinch&&ptrs.size===2){const[p1,p2]=[...ptrs.values()];zoomAt(pinch.z*Math.hypot(p1.x-p2.x,p1.y-p2.y)/pinch.d,((p1.x+p2.x)/2-b.left)/b.width,((p1.y+p2.y)/2-b.top)/b.height);camGoal=null;return}
@@ -59,6 +61,7 @@ cv.addEventListener("pointermove",e=>{
 });
 cv.addEventListener("pointerup",e=>{
   if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);
+  if(bDrag&&buildUp(e))return;
   if(pinch){if(ptrs.size<2)pinch=null;drag=null;return}
   if(drag){clearTimeout(drag.timer);
     const p=drag.pip&&byId(drag.pip);
@@ -72,6 +75,8 @@ cv.addEventListener("pointercancel",e=>{ptrs.delete(e.pointerId);if(drag){clearT
 cv.addEventListener("wheel",e=>{e.preventDefault();const b=cv.getBoundingClientRect();zoomAt(cam.z*(e.deltaY<0?1.25:.8),(e.clientX-b.left)/b.width,(e.clientY-b.top)/b.height);camGoal=null},{passive:false});
 $("zIn").addEventListener("click",()=>{zoomAt(cam.z*1.5,.5,.5)});
 $("zOut").addEventListener("click",()=>{zoomAt(cam.z/1.5,.5,.5)});
+// when pips overlap, the one that is waiting for you wins: a dream, then a memory, then a word with "?"
+function tapPriority(p){const r=rt(p),now=performance.now();return r.dream&&now<r.dream.until?3:r.recall&&now<r.recall.until?2:r.said&&now<r.said.until&&r.state!=="sleep"?1:0}
 function tapAt(e){
   if(starMode){starTap(e);return}
   if(placing){const[wx,wy]=toWorld(e);placeDecorAt(wx,wy);return}
@@ -83,7 +88,7 @@ function tapAt(e){
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
   if(fireTap(x,y))return; // the fire sits in a ring of pips, so it is checked before them
   // a pip that is remembering something is tapped first, even in a crowd
-  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>(rt(b).recall||rt(b).dream||rt(b).said?1:0)-(rt(a).recall||rt(a).dream||rt(a).said?1:0)||b.y-a.y);
+  const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>tapPriority(b)-tapPriority(a)||b.y-a.y);
   for(const p of ord){
     const bw=7+Math.floor(Math.min(level(p),10)*.4);
     if(Math.abs(x-p.x)<bw/2+3+m&&y>p.y-bw-6-m&&y<p.y+3+m){tapPip(p);return}
@@ -146,8 +151,8 @@ function tapPip(p){
   r.taps=(r.taps||[]).filter(x=>now-x<2500);r.taps.push(now);
   if(r.taps.length>=6){r.taps=[];bond(p,-4,"poke");r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,"!!",1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
   if((p.trust??30)<-20&&Math.random()<.5&&r.state!=="sleep"){r.state="act";r.act="hide";r.ct=1.6;r.fx=p.x+1;say(p,pick(["!?","איק!"]),1.4,"snd","scared");if(sel!==p.id)select(p.id);return}
-  if(r.said&&performance.now()<r.said.until){if(sel!==p.id)select(p.id);if(openWordGuess(p))return}
   if(peekDream(p)){if(sel!==p.id)select(p.id);return}
+  if(r.said&&performance.now()<r.said.until&&r.state!=="sleep"){if(sel!==p.id)select(p.id);if(openWordGuess(p))return}
   if(shareRecall(p)){if(sel!==p.id)select(p.id);return}
   if(r.state==="argue"){calm(p);if(sel!==p.id)select(p.id);return}
   if(r.state==="choir"){SFX.happy(p.pitch*2);burst(p.x,p.y-12,"heart",1);if(sel!==p.id)select(p.id);return}

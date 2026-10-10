@@ -142,7 +142,7 @@ const flies=Array.from({length:40},()=>({x:rand(0,WW),y:rand(10,WH),a:rand(0,9)}
 function render(t){
   ctx.setTransform(PR,0,0,PR,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#16221a";ctx.fillRect(0,0,CW,CH);
   const W2=()=>ctx.setTransform(cam.z*PR,0,0,cam.z*PR,-cam.x*cam.z*PR,-cam.y*cam.z*PR);W2();
-  ctx.drawImage(bg2,0,0,WW,WH);
+  ctx.drawImage(bg2,0,0,WW,WH);drawPaint();
   // water: little highlights drift across the pond, streaks flow down the river
   if(inView(POND.x,POND.y,30))for(let i=0;i<7;i++){const x=POND.x-20+((t*3+i*11)%40),y=POND.y-9+i*2.8;if(inPond(x,y)&&inPond(x+3,y))R(x,y,2+(i%3),.5,i%2?"rgba(220,240,255,.5)":"rgba(140,200,240,.45)")}
   if(inView(POND.x,POND.y,30)&&Math.sin(t*1.7)>.85)R(POND.x+6,POND.y-2,.5,.5,"#ffffff");
@@ -170,6 +170,7 @@ function render(t){
   if(S.weather.k==="cloudy"||rainy()){for(let i=0;i<4;i++){const x=((t*6+i*190)%(WW+160))-80,y=40+i*80;ctx.fillStyle="rgba(0,0,0,.08)";ctx.beginPath();ctx.ellipse(x,y,60,22,0,0,7);ctx.fill()}}
   // fog over locked zones
   // the fog follows the same soft, wandering edge as the ground (zoneMask)
+  drawBuildOverlay(t);
   drawLockFog(t);
   // light and weather tint, in screen space
   ctx.setTransform(PR,0,0,PR,0,0);

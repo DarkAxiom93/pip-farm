@@ -114,3 +114,10 @@ controls_test|KEY zoom True
 controls_test|KEY tab lang
 controls_test|GLIDE keeps moving True
 controls_test|ERR []
+build_test|BUILD on True bar True
+build_test|MOVED field True
+build_test|BAD spot back True
+build_test|NEW field True owned True paid 40
+build_test|PAINT cells True
+build_test|RELOAD kept True moved True paint True
+build_test|ERR []

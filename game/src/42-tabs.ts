@@ -105,7 +105,9 @@ $("optSeason").addEventListener("change",e=>{S.fastSeasons=e.target.checked;seas
 $("optAi").addEventListener("change",e=>{S.ai=e.target.checked;voiceNote();dirty()});
 function soundBtn(){const b=$("hSound");b.textContent="צליל: "+(S.sound?"פועל":"כבוי");b.setAttribute("aria-pressed",String(S.sound))}
 $("decorBox").addEventListener("click",(e:any)=>{const b=e.target.closest("button");if(!b||b.disabled)return;audio();if(b.dataset.decorBuy)startPlacing(b.dataset.decorBuy);else if(b.dataset.decorCancel)cancelPlacing()});
-addEventListener("keydown",e=>{if(e.key==="Escape"){cancelPlacing();if(starMode)endStarMode(false)}});
+addEventListener("keydown",e=>{if(e.key==="Escape"){cancelPlacing();if(buildMode)toggleBuild(false);if(starMode)endStarMode(false)}});
+$("hBuild").addEventListener("click",()=>{audio();toggleBuild()});
+$("buildBar").addEventListener("click",(e:any)=>{const b=e.target.closest("[data-tool]");if(!b)return;audio();const k=b.dataset.tool;if(k==="done"){toggleBuild(false);return}buildTool=k;renderBuildBar()});
 $("hStars").addEventListener("click",()=>{audio();toggleStarMode()});
 $("hHide").addEventListener("click",()=>{if(hide){toast(hide.phase==="seek"?"משחקים! חפש אותם במפה":"הם עוד מתחבאים…");return}startHide()});
 $("hChoir").addEventListener("click",()=>{audio();if(choir){toast("המקהלה כבר מתאספת");return}startChoir(true)});

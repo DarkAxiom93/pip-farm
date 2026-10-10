@@ -83,8 +83,7 @@ function finishConstruct(p){
   dirty();
 }
 function drawBuildings(t){
-  if(!inView(165,20,120))return;
-  for(const k in BUILD){const B=BUILD[k],st=S.builds[k],x=B.x,y=B.y;
+  for(const k in BUILD){const B=BUILD[k],st=S.builds[k],x=B.x,y=B.y;if(!inView(x,y,24))continue;
     if(!st){for(let i=-10;i<10;i+=3){R(x+i,y,2,1,"rgba(255,255,255,.3)");R(x+i,y-12,2,1,"rgba(255,255,255,.18)")}R(x-1,y-7,3,3,"rgba(255,255,255,.3)");continue}
     if(!st.done){const h=Math.round(st.p/100*12);R(x-10,y-14,1,14,"#8a6a45");R(x+9,y-14,1,14,"#8a6a45");R(x-10,y-14,20,1,"#8a6a45");R(x-9,y-h,18,h,"rgba(168,122,66,.85)");continue}
     if(k==="storage"){R(x-9,y-10,18,10,"#a87a42");for(let i=-9;i<9;i+=3)R(x+i,y-10,1,10,"#8a6a45");for(let j=0;j<5;j++)R(x-10+j,y-11-j,20-j*2,1,"#7a4a2a");R(x-2,y-6,4,6,"#4a2e1a");R(x+5,y-3,3,3,"#c89c63");R(x-8,y-3,3,3,"#c89c63")}
