@@ -55,7 +55,7 @@ function drawVisitor(t){
 }
 function openVisitor(){
   const v=S.visitor,m=popAt(v.x,v.y-16);
-  m.innerHTML=`<h4>${esc(v.name)}, אורח מרחוק</h4><p>יצור מעולם אחר עצר בחווה. הפיפים סקרנים מאוד</p>`+(v.done?`<p>הוא כבר קיבל ממך מתנה</p>`:`<button class="btn main" data-visit="1" ${S.basket<3?"disabled":""}>לתת לו 3 ירקות מהסל</button>${S.basket<3?"<p>צריך לפחות 3 ירקות בסל</p>":""}`);
+  m.innerHTML=`<h4>${esc(v.name)}, אורח מרחוק</h4><p>יצור מעולם אחר עצר בחווה. הפיפים סקרנים מאוד</p>`+(v.done?`<p>הוא כבר קיבל ממך מתנה</p>`:`<button class="btn main" data-visit="1" ${S.basket<3?"disabled":""}>לתת לו 3 ביטים מהסל</button>${S.basket<3?"<p>צריך לפחות 3 ביטים בסל</p>":""}`);
 }
 function visitGift(){
   const v=S.visitor;if(!v||v.done||S.basket<3)return;S.basket-=3;v.done=true;moment("visitor",null,v.name,false);

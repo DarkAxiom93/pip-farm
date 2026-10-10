@@ -3,7 +3,7 @@ const SEASON_NAME={spring:"אביב",summer:"קיץ",autumn:"סתיו",winter:"�
 let curSeason="autumn";
 function calcSeason(){if(S.fastSeasons)return["spring","summer","autumn","winter"][Math.floor((Date.now()-S.born)/86400000)%4];const m=new Date().getMonth();return m===11||m<=1?"winter":m<=4?"spring":m<=7?"summer":"autumn"}
 function weatherLabel(){const w=S.weather.k==="rain"&&curSeason==="winter"?"שלג":S.weather.k==="storm"&&curSeason==="winter"?"סופת שלג":WNAME[S.weather.k];return SEASON_NAME[curSeason]+" · "+w}
-const SEASON_MSG={spring:"אביב הגיע: הפיפים מתפצלים מהר יותר",summer:"קיץ: הירקות גדלים מהר",autumn:"סתיו: כל קטיף נותן ירק נוסף",winter:"חורף: הירקות גדלים לאט, אבל יורד שלג"};
+const SEASON_MSG={spring:"אביב הגיע: הפיפים מתפצלים מהר יותר",summer:"קיץ: הביטים גדלים מהר",autumn:"סתיו: כל קטיף נותן ביט נוסף",winter:"חורף: הביטים גדלים לאט, אבל יורד שלג"};
 let seasonT=0;
 const sparts=Array.from({length:46},()=>({x:Math.random()*512,y:Math.random()*336,v:Math.random(),c:0}));
 const flies2=Array.from({length:7},()=>({x:Math.random()*256,y:20+Math.random()*140,a:Math.random()*9,h:Math.floor(Math.random()*4)}));

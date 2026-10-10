@@ -19,10 +19,13 @@ function drawPlot(i,t){
     const x=g.x+7+k*11,y=g.y+11+j*12;
     if(st===0){R(x,y-1,1,2,cr.leaf)}
     else if(st===1){R(x,y-2,1,3,cr.leaf);R(x-1,y-2,1,1,cr.leaf);R(x+1,y-3,1,1,cr.leaf)}
-    else if(st===2){R(x,y-4,1,5,cr.leaf);R(x-2,y-3,2,1,cr.leaf);R(x+1,y-4,2,1,cr.leaf);R(x,y-5,1,1,cr.fruit)}
+    else if(st===2){R(x,y-4,1,5,cr.leaf);R(x-2,y-3,2,1,cr.leaf);R(x+1,y-4,2,1,cr.leaf);R(x,y-5,1,1,cr.fruit);R(x,y-5,.5,.5,"#fff")}
     else{R(x,y-4,1,4,cr.leaf);R(x-2,y-3,2,1,cr.leaf);R(x+1,y-3,2,1,cr.leaf);
-      if(cr.star){R(x-1,y-7,3,1,cr.fruit);R(x,y-8,1,3,cr.fruit);R(x,y-7,1,1,"#fff7c2")}
-      else{R(x-1,y-6,3,3,cr.fruit);R(x-1,y-6,1,1,"rgba(255,255,255,.55)")}
+      if(cr.star){R(x-1,y-7,3,1,cr.fruit);R(x,y-8,1,3,cr.fruit);R(x,y-7,1,1,"#fff7c2");R(x-.5,y-7.5,.5,.5,"#fff")}
+      else if(cr.kind==="chip"){R(x-2,y-7,5,4,"#1c2230");R(x-1.5,y-6.5,4,3,"#2f3a52");R(x-.5,y-5.5,2,1,cr.fruit);
+        for(let q=0;q<3;q++){R(x-1.5+q*1.5,y-8,.5,1,cr.fruit);R(x-1.5+q*1.5,y-3,.5,1,cr.fruit)}}
+      else{const on=((k+j+Math.floor(t*1.5))&1)===0;R(x-1.5,y-7,3,3,on?cr.fruit:"#2fbf7f");R(x-1.5,y-7,3,.5,"rgba(255,255,255,.5)");
+        R(x-.5,y-6.5,1,2,on?"#0d3d2a":"#cfffe6");R(x-1,y-4,2,.5,"rgba(0,0,0,.3)")}
       if(Math.sin(t*3+k*1.7+j)>.92)R(x+2,y-8,1,1,"#fff")}
   }
   if(st<3){const w=Math.round(PW*clamp(f,0,1));R(g.x,g.y+PH+2,PW,2,"rgba(0,0,0,.35)");R(g.x,g.y+PH+2,w,2,wet?"#6aaedc":"#86d47f")}
@@ -107,7 +110,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(r.state==="gather"&&NODES[r.node]&&NODES[r.node].k==="fish"){const fx=dir>0?x0+bww:x0-1;for(let k=0;k<5;k++)R(fx+dir*k,y0+1-k,1,1,"#8a6a45");R(fx+dir*5,y0-4,1,7,"rgba(230,230,230,.7)")}
   if(r.state==="work"||r.state==="gather"||r.state==="build"||r.state==="sbuild"||r.state==="construct"||r.state==="sbuild3"){const pr=1-r.workT/(r.workMax||1);R(x0-1,y0-6,bww+2,2,"rgba(20,14,24,.7)");R(x0-1,y0-6,Math.round((bww+2)*pr),2,"#86d47f");
     R(dir>0?x0+bww:x0-2,y0+bh-4+Math.round(Math.sin(r.anim*16)),2,2,"#c89c63")}
-  if(r.state==="eat")R(dir>0?x0+bww-1:x0-1,ey+3,2,2,"#ff5d73");
+  if(r.state==="eat"){const ex=dir>0?x0+bww-1:x0-1;R(ex,ey+3,2,2,"#5dffb0");R(ex,ey+3,1,1,"#0d3d2a");if(Math.random()<.3)R(ex+(dir>0?2:-1),ey+2-Math.random()*3,.5,.5,"#9dffd0")}
   if(isSel){const b=Math.round(Math.sin(t*5)*1.2),ty=y0-(lv>=10?11:9)+b;R(cx-2,ty,5,1,"#ffd166");R(cx-1,ty+1,3,1,"#ffd166");R(cx,ty+2,1,1,"#ffd166")}
   CX.globalAlpha=1;
 }
@@ -142,7 +145,7 @@ const flies=Array.from({length:40},()=>({x:rand(0,WW),y:rand(10,WH),a:rand(0,9)}
 function render(t){
   ctx.setTransform(PR,0,0,PR,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#16221a";ctx.fillRect(0,0,CW,CH);
   const W2=()=>ctx.setTransform(cam.z*PR,0,0,cam.z*PR,-cam.x*cam.z*PR,-cam.y*cam.z*PR);W2();
-  ctx.drawImage(bg2,0,0,WW,WH);drawPaint();
+  ctx.drawImage(bg2,0,0,WW,WH);drawPaint();drawDigital(t);
   // water: little highlights drift across the pond, streaks flow down the river
   if(inView(POND.x,POND.y,30))for(let i=0;i<7;i++){const x=POND.x-20+((t*3+i*11)%40),y=POND.y-9+i*2.8;if(inPond(x,y)&&inPond(x+3,y))R(x,y,2+(i%3),.5,i%2?"rgba(220,240,255,.5)":"rgba(140,200,240,.45)")}
   if(inView(POND.x,POND.y,30)&&Math.sin(t*1.7)>.85)R(POND.x+6,POND.y-2,.5,.5,"#ffffff");

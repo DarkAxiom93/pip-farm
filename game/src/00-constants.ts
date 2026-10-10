@@ -12,9 +12,9 @@ const ZONES=[
 const CMUSH=[{x:30,y:262},{x:62,y:318},{x:196,y:228},{x:236,y:288},{x:150,y:322},{x:104,y:246}];
 const BURROW={x:34,y:46}, POND={x:34,y:140,rx:24,ry:13};
 const CROPS=[
-  {name:"צנון",grow:120,spark:3,yld:2,cost:0,fruit:"#ff5d73",leaf:"#6fcf5a"},
-  {name:"דלעת ירח",grow:360,spark:10,yld:4,cost:40,fruit:"#ffb347",leaf:"#59b852"},
-  {name:"פרח כוכב",grow:900,spark:30,yld:2,cost:120,fruit:"#c9a2ff",leaf:"#4fae7a",star:true}
+  {name:"ביטים",grow:120,spark:3,yld:2,cost:0,fruit:"#5dffb0",leaf:"#6fcf5a",kind:"bit"},
+  {name:"שבב ירח",grow:360,spark:10,yld:4,cost:40,fruit:"#ffcf4a",leaf:"#59b852",kind:"chip"},
+  {name:"פיקסל כוכב",grow:900,spark:30,yld:2,cost:120,fruit:"#c9a2ff",leaf:"#4fae7a",star:true,kind:"star"}
 ];
 const SYL=["פי","פו","מי","בלו","טיק","נו","פיפ","מוק","לי","בי","דו","קי","פופ","וי","מו","בופ","טי","לו"];
 const NA=["פי","מו","בו","טו","לו","קי","נו","זו","בי","דו","פו","רי","שו","גי","צי","מי"];

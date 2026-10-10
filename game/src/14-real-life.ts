@@ -9,7 +9,7 @@ function streakTick(){
   SFX.level();toast(st.days===1?`רצף התחיל! ‎+${bonus} ניצוצות`:`רצף של ${st.days} ימים! ‎+${bonus} ניצוצות`);
   if([3,7,30,100].includes(st.days))moment("streak",null,st.days,false);
   if(st.days===3)setTimeout(()=>toast("רצף 3: מזג האוויר בחווה נהיה נעים יותר"),2500);
-  if(st.days===7)setTimeout(()=>toast("רצף 7: הירקות גדלים מהר יותר ב-20%"),2500);
+  if(st.days===7)setTimeout(()=>toast("רצף 7: הביטים גדלים מהר יותר ב-20%"),2500);
   renderStreak();dirty();return true;
 }
 function streakCheck(){
@@ -21,7 +21,7 @@ function renderStreak(){
   const st=S.streak,b=$("streakBox"),h=$("hStreak");
   const today=st.last===dayKey(Date.now());
   b.className="streak"+(st.days>=3?" hot":"");
-  b.innerHTML=`<b>${st.days}</b><div><strong>${st.days?`רצף של ${st.days} ימים`:"אין רצף עדיין"}</strong><p>${today?"היום כבר נספר. חזור מחר":"סיים משימה אמיתית היום כדי "+(st.days?"להמשיך את הרצף":"להתחיל רצף")} · שיא: ${st.best||0}${st.days>=7?" · ירקות גדלים מהר יותר":st.days>=3?" · מזג אוויר נעים":""}</p></div>`;
+  b.innerHTML=`<b>${st.days}</b><div><strong>${st.days?`רצף של ${st.days} ימים`:"אין רצף עדיין"}</strong><p>${today?"היום כבר נספר. חזור מחר":"סיים משימה אמיתית היום כדי "+(st.days?"להמשיך את הרצף":"להתחיל רצף")} · שיא: ${st.best||0}${st.days>=7?" · ביטים גדלים מהר יותר":st.days>=3?" · מזג אוויר נעים":""}</p></div>`;
   h.hidden=!st.days;h.textContent="רצף "+st.days;
 }
 function startFocus(min){

@@ -195,7 +195,7 @@ function openPlot(i){
   m.hidden=false;
   const[sl,st]=scr(g.x+PW/2,g.y),[,sb]=scr(0,g.y+PH+4);m.style.left=clamp(sl,22,78)+"%";const below=st<38;m.style.top=(below?sb:st)+"%";m.style.transform=below?"translate(-50%,0)":"translate(-50%,-104%)";
   let h="";
-  if(!pl.owned){const cost=PLOT_COST[i];h=`<h4>חלקה חדשה</h4><p>עוד מקום לגדל ירקות</p><button class="btn main" data-act="buy" ${S.sparks<cost?"disabled":""}>לקנות · ${cost} ניצוצות</button>`}
+  if(!pl.owned){const cost=PLOT_COST[i];h=`<h4>חלקה חדשה</h4><p>עוד מקום לגדל ביטים</p><button class="btn main" data-act="buy" ${S.sparks<cost?"disabled":""}>לקנות · ${cost} ניצוצות</button>`}
   else if(pl.pending)h=`<h4>פיפ בדרך</h4><p>הוא יגיע עוד רגע</p>`;
   else if(!pl.crop){
     h=`<h4>מה לשתול?</h4>`+CROPS.map((c,k)=>S.seeds[k]?`<button class="btn" data-act="plant" data-seed="${k}">${c.name}<small>${fmtT(c.grow)}</small></button>`:"").join("");

@@ -69,7 +69,7 @@ function peekDream(p){
   }else{
     const m=pick(momentsOf(p).filter(m=>MOMENTS[m.k].i===icon));
     if(m)lines.push(`~${p.name} חולם על ${momentText(m).replace(/^היום שבו /,"היום ש")}.`,"~בחלום הכל קצת יותר גדול, ואתה שם.");
-    else lines.push(`~${p.name} חולם ש${pick(["הוא עף מעל החווה","כל השדה מלא בתותים","הוא גדול כמו עץ","הגשם עשוי מסוכריות","הוא מדבר את השפה שלך"])}.`,"~הוא מחייך מתוך שינה.");
+    else lines.push(`~${p.name} חולם ש${pick(["הוא עף מעל החווה","כל השדה מלא בביטים זוהרים","הוא גדול כמו עץ","הגשם עשוי מסוכריות","הוא מדבר את השפה שלך"])}.`,"~הוא מחייך מתוך שינה.");
   }
   if(reward){S.sparks+=2;bond(p,2,"dream")}
   card({title:`החלום של ${p.name}`,lines});

@@ -19,7 +19,7 @@ const TREES=(()=>{const r=mulberry(77),L=[{x:90,y:24,s:5,z:"farm"},{x:247,y:22,s
   for(let i=0;i<120&&L.filter(t=>t.z==="forest").length<18;i++){const x=268+r()*188,y=18+r()*146;if(NODES.some(n=>Math.hypot(n.x-x,n.y-y)<18)||L.some(t=>Math.hypot(t.x-x,t.y-y)<17))continue;L.push({x:Math.round(x),y:Math.round(y),s:6+Math.floor(r()*3),z:"forest"})}
   return L})();
 const treeHp={},treeShake={};
-const BUILD={storage:{n:"מחסן",d:"מקום לעוד 60 ירקות בסל",cost:20,x:125,y:26},well:{n:"באר",d:"משקה כל שתילה חדשה, והירקות בשדה גדלים מהר יותר",cost:15,x:165,y:26},workshop:{n:"בית מלאכה",d:"הפיפים מכינים בו כלים מעץ",cost:25,x:205,y:26}};
-const ITEMS={hoe:{n:"מעדרים",d:"עבודה בשדה מהירה יותר",cost:8},rod:{n:"חכות",d:"כל דג נותן ירק נוסף",cost:6},lamp:{n:"פנסים",d:"עובדים גם בלילה, ויש אור בחווה",cost:10},sack:{n:"סלים קלועים",d:"עוד 20 מקום בסל",cost:5}};
+const BUILD={storage:{n:"מחסן",d:"מקום לעוד 60 ביטים בסל",cost:20,x:125,y:26},well:{n:"באר",d:"משקה כל שתילה חדשה, והביטים בשדה גדלים מהר יותר",cost:15,x:165,y:26},workshop:{n:"בית מלאכה",d:"הפיפים מכינים בו כלים מעץ",cost:25,x:205,y:26}};
+const ITEMS={hoe:{n:"מעדרים",d:"עבודה בשדה מהירה יותר",cost:8},rod:{n:"חכות",d:"כל דג נותן ביט נוסף",cost:6},lamp:{n:"פנסים",d:"עובדים גם בלילה, ויש אור בחווה",cost:10},sack:{n:"סלים קלועים",d:"עוד 20 מקום בסל",cost:5}};
 function nodeReady(i){return Date.now()>=((S.nodeCd||{})[i]||0)}
 

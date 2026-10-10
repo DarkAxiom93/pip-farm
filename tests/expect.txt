@@ -121,3 +121,10 @@ build_test|NEW field True owned True paid 40
 build_test|PAINT cells True
 build_test|RELOAD kept True moved True paint True
 build_test|ERR []
+digital_test|CROPS digital bit,chip,star
+digital_test|LEVEL start 0 traces True
+digital_test|LEVEL mid True steps 2
+digital_test|LEVEL end 1 steps 4
+digital_test|HUD ביטים בסל
+digital_test|SAVED digi 4
+digital_test|ERR []
