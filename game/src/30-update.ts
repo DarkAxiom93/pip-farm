@@ -8,7 +8,7 @@ function update(dt){
   socialT-=dt;if(socialT<=0){socialT=rand(2,4);social()}
   updateChoir(dt);updateArgs(dt);updateWeather(dt);updateFocus(dt);seasonTick(dt);spawnWild(dt);
   storyT-=dt;if(storyT<=0){storyT=2;try{storyTick()}catch(e){console.error(e)}}
-  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
+  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);netTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
   if(camGoal){const k=Math.min(1,dt*5);cam.x+=(camGoal.x-cam.x)*k;cam.y+=(camGoal.y-cam.y)*k;clampCam();if(Math.hypot(camGoal.x-cam.x,camGoal.y-cam.y)<.5)camGoal=null}
   tribeT-=dt;if(tribeT<=0){tribeT=6;updateTribes();updateLoyalty()}
   choirT-=dt;if(choirT<=0){choirT=rand(150,300);if(!night&&!focusing()&&S.pips.length>=4)startChoir(false)}
@@ -17,7 +17,7 @@ function update(dt){
   for(const [id,el] of needEls){const p=byId(id);if(!p){el.remove();needEls.delete(id);continue}const r=rt(p),[l,tp]=scr(p.x+3,(r.head??p.y-12)-1);el.style.left=l+"%";el.style.top=tp+"%";el.style.visibility=l<-5||l>105||tp<-5||tp>110?"hidden":"visible";el.classList.toggle("late",!!r.need&&r.need.left<12)}
   for(const [id,b] of bubbleEls){const p=byId(id);if(!p){b.remove();bubbleEls.delete(id);continue}placeBubble(p,b);if(now>b._until){if(!b.classList.contains("out")){b.classList.add("out");b._until=now+400}else{b.remove();bubbleEls.delete(id)}}}
   syncLocks();
-  uiT-=dt;if(uiT<=0){uiT=.5;refresh();drawMini()}
+  uiT-=dt;if(uiT<=0){uiT=.5;refresh();drawMini();fitHud()}
 }
 function updPip(p,dt){
   const r=rt(p);
@@ -104,7 +104,7 @@ function updPip(p,dt){
     case "build":r.workT-=dt;if(Math.random()<dt*4)burst(p.x+r.dir*5,p.y-3,"dust",1);if(r.workT<=0)finishBuild(p);break;
     case "celebrate":case "chat":case "eat":r.ct-=dt;if(r.ct<=0){r.state="idle";r.wait=rand(1,3)}break;
     case "split":r.ct-=dt;if(r.ct<=0)doSplit(p);break;
-    case "pass":r.ct-=dt;if(Math.random()<dt*6)parts.push({x:p.x+rand(-4,4),y:p.y-6,vx:0,vy:-16,life:1.4,kind:"spark"});if(r.ct<=0){burst(p.x,p.y-8,"spark",24);becomeStar(p)}break;
+    case "pass":r.ct-=dt;if(Math.random()<dt*6)parts.push(dstage(p)>=4?{x:p.x+rand(-4,4),y:p.y-6,vx:0,vy:-30,life:1.4,kind:"px",c:dcol(p)}:{x:p.x+rand(-4,4),y:p.y-6,vx:0,vy:-16,life:1.4,kind:"spark"});if(r.ct<=0){burst(p.x,p.y-8,"spark",24);if(dstage(p)>=4)uploadPip(p);else becomeStar(p)}break;
     case "choir":r.sing=Math.max(0,r.sing-dt);if(!choir)r.state="idle";break;
   }
   const awake=r.state!=="sleep"&&r.state!=="split";

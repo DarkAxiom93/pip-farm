@@ -143,3 +143,13 @@ pipdata_test|RIDE started True arrived True
 pipdata_test|CHILD data 50 mod 1 stage 0
 pipdata_test|SAVED ds 2 mod 1 bin True
 pipdata_test|ERR []
+network_test|NET start 0 chip hidden True
+network_test|NET nodes 12 chip True milestone 1 card הרשת מתעוררת
+network_test|NET kept 12
+network_test|UPLOAD up 1 no star True gone True
+network_test|PASS uploads 2
+network_test|RAIN on True
+network_test|ECHO on True
+network_test|END True title הרשת שלנו moment True
+network_test|SAVED net 100 uploaded 2 done True
+network_test|ERR []

@@ -48,6 +48,7 @@ function drawDreamScreen(x,y,t){
   if(p){const bm=DOODLES[rt(p).dream.icon]||DOODLES.heart,h=bm.length,w=bm[0].length,ox=x-w/2,oy=y-10.5-h/2;
     bm.forEach((row,yy)=>[...row].forEach((v,xx)=>{if(v==="1")R(ox+xx,oy+yy,1,1,"#bfffe0")}));
     R(x+5,y-15,1,1,`hsl(${p.hue},70%,60%)`)}
+  else if(screenFace(x,y,t)){}
   else if(night){for(let i=0;i<10;i++)R(x-7+Math.floor(Math.random()*14),y-16+Math.floor(Math.random()*11),1,1,"rgba(150,200,180,.35)")}
   else{for(let c=0;c<7;c++){const yy=(t*(5+c%3*2)+c*5)%11;R(x-6.5+c*2,y-16+yy,1,1,(c+Math.floor(t*2))&1?"#5dffb0":"#2fbf7f")}}
   R(x-7,y-16,14,.5,"rgba(255,255,255,.12)");

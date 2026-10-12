@@ -110,6 +110,9 @@ addEventListener("keydown",e=>{if(e.key==="Escape"){cancelPlacing();if(buildMode
 $("hBuild").addEventListener("click",()=>{audio();toggleBuild()});
 $("buildBar").addEventListener("click",(e:any)=>{const b=e.target.closest("[data-tool]");if(!b)return;audio();const k=b.dataset.tool;if(k==="done"){toggleBuild(false);return}buildTool=k;renderBuildBar()});
 $("hStars").addEventListener("click",()=>{audio();toggleStarMode()});
+// squeeze the top bar a little when it would wrap to a second row
+function fitHud(){const h=document.querySelector(".hud") as HTMLElement;if(!h)return;h.classList.remove("tight");if(h.offsetHeight>34)h.classList.add("tight")}
+$("hNetChip").addEventListener("click",()=>{audio();netInfo()});
 $("hHide").addEventListener("click",()=>{if(hide){toast(hide.phase==="seek"?"משחקים! חפש אותם במפה":"הם עוד מתחבאים…");return}startHide()});
 $("hChoir").addEventListener("click",()=>{audio();if(choir){toast("המקהלה כבר מתאספת");return}startChoir(true)});
 $("hSound").addEventListener("click",()=>{audio();S.sound=!S.sound;soundBtn();if(tab==="farm")renderFarm();dirty()});

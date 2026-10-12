@@ -68,7 +68,7 @@ function finishCompile(p){
   if(s===2&&p.dmod==null)p.dmod=dmain(p);
   S.stats.compiles=(S.stats.compiles||0)+1;
   burst(p.x,p.y-8,"spark",18);SFX.level();
-  if(s===1&&!S.dFirst){S.dFirst=p.id;
+  if(s===1&&!S.dFirst){S.dFirst=p.id;moment("compile",[p]);
     card({title:`${p.name} גילה משהו`,lines:[`~${p.name} מסתכל על פיקסל שזוהר לו על הבטן.`,"~הביטים שהוא אכל לא נעלמו. הם נשארו בפנים.","~הוא מזיז אותם קצת, והפיקסל זז איתו.","> data.log: 'אפשר לבנות את עצמי ממה שאני אוכל'"]})}
   else if(s===2&&!S.dFirst2){S.dFirst2=p.id;const m=DMOD[p.dmod];
     card({title:`${p.name} בנה לעצמו ${m.n}`,lines:[`~${p.name} סידר את הדאטה שלו מחדש.`,`~עכשיו יש לו ${m.n}. ${m.d}.`,"~הפיפים האחרים מסתכלים עליו. חלק כבר אוכלים יותר מהר.","> data.log: 'אנחנו יכולים לבחור מה להיות'"]})}
