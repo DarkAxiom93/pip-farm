@@ -35,7 +35,9 @@ function renderHead(){
     <span>אנרגיה</span><div class="bar"><i id="bEnergy" style="background:var(--sky)"></i></div><em id="nEnergy"></em>
     <span>התפצלות</span><div class="bar"><i id="bSplit" style="background:var(--leaf)"></i></div><em id="nSplit"></em>
     <span>אמון בך</span><div class="bar"><i id="bTrust" style="background:var(--butter)"></i></div><em id="nTrust"></em>
+    <span>דאטה</span><div class="bar"><i id="bData" style="background:#5dffb0"></i></div><em id="nData"></em>
   </div>
+  <p class="label" id="dataTxt" style="margin:4px 0 0;color:#7dffbf"></p>
   <div class="hint" id="pipHint"></div>
   <details class="more" id="moreBox"${moreOpen?" open":""}><summary>עוד על ${esc(p.name)}: אופי, זיכרונות, גנים ושפה</summary>
   <div style="margin-top:8px"><p class="label">אופי</p><div class="chips">${tr.length?tr.map(k=>`<span class="tag trait">${TRAIT_NAME[k]}</span>`).join(""):`<span class="tag">עוד לא ברור. תעבדו, תדברו, תלטפו</span>`}</div></div>

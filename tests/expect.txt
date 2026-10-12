@@ -132,3 +132,12 @@ digital_test|LOCKED early 3
 digital_test|SHOP digital 3 open 3
 digital_test|PLACED digital antenna,screen,server
 digital_test|SERVER bit True
+pipdata_test|BASKET 8 bin 0,5,0
+pipdata_test|DATA 15 diet 0,3,0
+pipdata_test|READY True
+pipdata_test|STAGE1 1 card True blocked True
+pipdata_test|STAGE2 2 module 1 album True
+pipdata_test|CAP no stage3 True
+pipdata_test|CHILD data 50 mod 1 stage 0
+pipdata_test|SAVED ds 2 mod 1 bin True
+pipdata_test|ERR []

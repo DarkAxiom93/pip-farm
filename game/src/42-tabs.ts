@@ -41,6 +41,7 @@ function renderAlbCount(){const n=Object.keys(S.album).length;$("albCount").text
 function samplePip(key){
   const[c,v]=key.split(":");
   const p={hue:84,sprout:1,xp:60,mood:70,food:80,c:{work:0,talk:0,pet:0,task:0},g:{pattern:0,tail:2,eyes:0,body:0},mut:null,born:3};
+  if(c==="dig"){const i=+v;(p as any).ds=i===0?1:i<4?2:i===4?3:4;(p as any).dmod=i>=1&&i<=3?i-1:0;(p as any).diet=[1,0,0];return p}
   if(c==="head")p.sprout=+v;else if(c==="mut")p.mut=v;else{p.g[c]=+v;if(c!=="tail")p.g.tail=0}
   if(c==="tail")p.sprout=0;
   return p;
@@ -126,7 +127,7 @@ function refresh(){
   if(p&&$("bFood")){
     const set=(k,v,n?)=>{$("b"+k).style.width=clamp(v,0,100)+"%";$("n"+k).textContent=n??Math.round(v)};
     set("Food",p.food);set("Mood",p.mood);set("Energy",p.energy);
-    set("Trust",((p.trust??30)+100)/2,trustWord(p.trust??30));
+    set("Trust",((p.trust??30)+100)/2,trustWord(p.trust??30));set("Data",dataFrac(p),String(p.data||0));const dt=$("dataTxt");if(dt)dt.textContent=dataPanelText(p);
     const need=splitNeed();set("Split",p.growth/need*100,Math.min(100,Math.round(p.growth/need*100))+"%");
     const r=rt(p);let h="";
     if(S.pips.length>=cap())h="החווה מלאה, אין מקום לפיפים חדשים";

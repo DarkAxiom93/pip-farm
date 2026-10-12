@@ -55,7 +55,7 @@ function startWork(p){
   r.state="work";
   if(j.type!=="water")langSpeak(p,"work",.18);
   const base={plant:3,water:2,harvest:3}[j.type];
-  r.workMax=r.workT=base*(dom(p)==="work"?.65:1)*(p.food<15?1.4:1)*(S.items&&S.items.hoe?.7:1);
+  r.workMax=r.workT=base*(dom(p)==="work"?.65:1)*(pipMod(p)===0?.85:1)*(p.food<15?1.4:1)*(S.items&&S.items.hoe?.7:1);
 }
 function finishJob(p){
   const r=rt(p),j=r.job,pl=S.plots[j.plot],g=PLOTS[j.plot];
@@ -64,7 +64,7 @@ function finishJob(p){
   if(j.type==="plant"&&!pl.crop){pl.crop={type:j.seed,planted:Date.now(),water:!!(S.builds.well&&S.builds.well.done)};SFX.plop();quest("plant");burst(g.x+24,g.y+15,"dust",8);award(p,10,j.auto?null:"work")}
   else if(j.type==="water"&&pl.crop&&!pl.crop.water){pl.crop.water=true;SFX.water();burst(g.x+24,g.y+15,"drop",12);award(p,6,j.auto?null:"work");langSpeak(p,"water",.3)}
   else if(j.type==="harvest"&&pl.crop&&cropFrac(pl.crop)>=1){
-    const c=CROPS[pl.crop.type];pl.crop=null;S.sparks+=c.spark;addFood(c.yld+(curSeason==="autumn"?1:0));S.stats.harvests++;quest("harvest");goal("harvest");if([1,25,100,500].includes(S.stats.harvests))moment("harvest",null,S.stats.harvests,false);
+    const ct=pl.crop.type,c=CROPS[ct];pl.crop=null;S.sparks+=c.spark;const extra=pipMod(p)===1&&Math.random()<.3?1:0;addBits(ct,c.yld+(curSeason==="autumn"?1:0)+extra);if(extra)say(p,"+1",1.2,"snd","happy");S.stats.harvests++;quest("harvest");goal("harvest");if([1,25,100,500].includes(S.stats.harvests))moment("harvest",null,S.stats.harvests,false);
     SFX.coin();burst(g.x+24,g.y+12,"spark",14);award(p,22,j.auto?null:"work");
     if(c.star){S.pips.forEach(q=>q.mood=Math.min(100,q.mood+20));toast("פרח כוכב! כל הפיפים שמחים")}
     if(!j.auto)toast(`${p.name} קטף ${c.name}: ‎+${c.spark} ניצוצות, ‎+${c.yld} לסל`);

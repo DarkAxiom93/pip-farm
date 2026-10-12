@@ -180,7 +180,7 @@ function pet(p){
   refresh();
 }
 function feed(p){
-  S.basket--;p.food=Math.min(100,p.food+30);p.mood=Math.min(100,p.mood+6);award(p,4,"pet");bond(p,3,"fed");quest("feed");goal("feed");
+  eatFood(p);p.food=Math.min(100,p.food+30);p.mood=Math.min(100,p.mood+6);award(p,4,"pet");bond(p,3,"fed");quest("feed");goal("feed");
   const r=rt(p);if(["idle","walk","chat"].includes(r.state)){r.state="eat";r.ct=1.4}
   SFX.crunch();if(!langSpeak(p,"food",.5))say(p,pick(["נום נום","ממממ ♪","קראנץ"]),1.6,"snd","happy");
   if(sel===p.id)renderHead();refresh();dirty();

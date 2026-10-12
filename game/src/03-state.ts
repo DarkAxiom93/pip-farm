@@ -6,7 +6,7 @@ function wpick(ws){let k=Math.random()*ws.reduce((a,b)=>a+b,0);for(let i=0;i<ws.
 function rollGenes(){const g={};for(const k in GENE_W)g[k]=wpick(GENE_W[k]);return g}
 function inherit(pg){const g={};for(const k in GENE_W)g[k]=Math.random()<.78?(pg&&pg[k]!=null?pg[k]:0):wpick(GENE_W[k]);return g}
 function rollMut(par){if(par.mut&&Math.random()<.45)return par.mut;if((par.cave||0)>=3&&Math.random()<.1)return "crystal";return Math.random()<.04*(par.mood>90?2:1)*(S.meteorBoost>0?2:1)?pick(MUTS):null}
-function traitKeys(p){const g=p.g||{};const k=[`head:${p.sprout}`,`pattern:${g.pattern||0}`,`tail:${g.tail||0}`,`eyes:${g.eyes||0}`,`body:${g.body||0}`];if(p.mut)k.push("mut:"+p.mut);return k}
+function traitKeys(p){const g=p.g||{};const k=[`head:${p.sprout}`,`pattern:${g.pattern||0}`,`tail:${g.tail||0}`,`eyes:${g.eyes||0}`,`body:${g.body||0}`];if(p.mut)k.push("mut:"+p.mut);const ds=p.ds||0;if(ds>=1)k.push("dig:0");if(ds>=2)k.push("dig:"+(1+(p.dmod??0)));if(ds>=3)k.push("dig:4");if(ds>=4)k.push("dig:5");return k}
 function traitLabel(key){const[c,v]=key.split(":"),sec=ALBUM.find(a=>a.k===c);if(!sec)return key;const i=c==="mut"?MUTS.indexOf(v):+v;return sec.items[i]||key}
 function discover(p,announce){
   let found=[];
@@ -28,6 +28,7 @@ function newPip(parent){
     c:parent?{work:parent.c.work>>1,talk:parent.c.talk>>1,pet:parent.c.pet>>1,task:parent.c.task>>1}:{work:0,talk:0,pet:0,task:0},
     vocab:parent?parent.vocab.filter(()=>Math.random()<.55):[],
     gen:parent?parent.gen+1:1,parent:parent?parent.id:null,born:Date.now(),convo:[],lang:parent?Object.assign({},parent.lang||{}):{},tribe:parent?parent.tribe||null:null,awake:parent?parent.awake||undefined:undefined,life:Math.round(rand(6,9)*86400000),trust:parent?Math.round((parent.trust??30)*.7+10):30,mem:parent?[{k:'born',t:Date.now(),v:Math.round(parent.trust??30)}]:[],
+    data:parent?Math.floor((parent.data||0)/2):0,diet:parent&&parent.diet?parent.diet.map(v=>v>>1):[0,0,0],dmod:parent&&parent.dmod!=null?parent.dmod:undefined,
     x:parent?parent.x+6:150,y:parent?parent.y:84};
   return p;
 }
@@ -49,7 +50,7 @@ function hydrate(d){
   S.plots=PLOTS.map((_,i)=>Object.assign({owned:i<2,crop:null},(d.plots||[])[i]||{}));
   S.plots.forEach(pl=>delete pl.pending);
   S.pips=(d.pips&&d.pips.length?d.pips:base.pips).map(p=>Object.assign(newPip(null),p,{c:Object.assign({work:0,talk:0,pet:0,task:0},p.c||{}),vocab:p.vocab||[],convo:p.convo||[],lang:p.lang||{},g:p.g||(p.name==="פיפי"&&p.gen===1?{pattern:0,tail:0,eyes:0,body:0}:rollGenes()),mut:p.mut||null})).map(p=>{if(!p.exotic&&(p.hue<HMIN||p.hue>HMAX))p.hue=HMIN+((p.hue%360+360)%360)/360*(HMAX-HMIN);return p});
-  S.tasks=d.tasks||[];
+  S.tasks=d.tasks||[];S.bin=d.bin||[S.basket||0,0,0];
   S.drawings=d.drawings||[];S.statue=d.statue||null;S.buys=d.buys||{};S.story=d.story||null;S.fastStory=!!d.fastStory;S.loop=d.loop||0;S.runs=d.runs||[];S.letters=d.letters||{};S.layout=d.layout||null;S.paint=d.paint||{};S.tipKeys=d.tipKeys||0;S.moments=d.moments||[];S.ach=d.ach||{};S.daily=d.daily||null;S.jar=d.jar||0;S.lanterns=d.lanterns||0;S.constellations=d.constellations||[];S.col=d.col||{};S.digs=d.digs||[];S.decor=d.decor||[];S.fireDay=d.fireDay||"";S.decorInv=d.decorInv||{};S.dreams=d.dreams||null;S.lateNote=d.lateNote||"";S.music=d.music!==false;S.wood=d.wood||0;S.treeCut=d.treeCut||{};S.wild=d.wild||[];S.builds=d.builds||{};S.items=d.items||{};S.craftQ=d.craftQ||[];S.hol=d.hol||{};S.meteorBoost=d.meteorBoost||0;S.nextEvent=d.nextEvent||Date.now()+5*60000;S.snowmen=d.snowmen||[];S.fastSeasons=!!d.fastSeasons;S.meteor=d.meteor||null;S.visitor=null;S.stars=d.stars||[];S.quest=d.quest!=null?d.quest:((S.stats.splits||0)>0?99:0);if(S.quest>=9&&!d.wood&&!d.builds)S.quest=9;S.streak=d.streak||{days:0,last:"",best:0};S.focus=d.focus||null;S.stats.focusMin=S.stats.focusMin||0;S.stats.focusRuns=S.stats.focusRuns||0;
   S.pips.forEach(p=>{discover(p,false);if(p.tribe&&!S.tribes.some(t=>t.id===p.tribe))p.tribe=null;if(p.trust==null)p.trust=30;if(!p.mem)p.mem=[];if(!p.life)p.life=Math.round(rand(6,9)*86400000)});
   if(!S.pips.some(p=>p.founder)){const f=S.pips.find(p=>p.gen===1&&!p.parent);if(f)f.founder=true}
@@ -64,10 +65,10 @@ function serialize(){
   S.lastSeen=Date.now();
   const big=S.pips.length>60,vN=big?24:40,cN=big?4:8;
   const tasks=[...S.tasks.filter(t=>!t.done),...S.tasks.filter(t=>t.done).slice(-15)].slice(-60);
-  return {v:1,sparks:S.sparks,basket:S.basket,seeds:S.seeds,lastSeed:S.lastSeed||0,lex:S.lex,album:S.album,tribes:S.tribes,drawings:S.drawings.slice(-14),streak:S.streak,quest:S.quest,buys:S.buys,hol:S.hol,meteorBoost:S.meteorBoost,nextEvent:S.nextEvent,snowmen:S.snowmen,fastSeasons:S.fastSeasons,meteor:S.meteor,stars:S.stars.slice(-60),story:S.story,fastStory:S.fastStory,wood:S.wood,treeCut:S.treeCut,wild:S.wild,builds:S.builds,items:S.items,craftQ:S.craftQ,focus:S.focus,statue:S.statue,zones:S.zones,nodeCd:S.nodeCd,weather:S.weather,stats:S.stats,ai:S.ai,sound:S.sound,music:S.music,loop:S.loop||0,runs:S.runs||[],letters:S.letters||{},layout:S.layout||null,paint:S.paint||{},tipKeys:S.tipKeys||0,moments:(S.moments||[]).slice(-60),ach:S.ach||{},daily:S.daily||null,jar:S.jar||0,lanterns:S.lanterns||0,constellations:S.constellations||[],col:S.col||{},digs:S.digs||[],decor:S.decor||[],fireDay:S.fireDay||"",decorInv:S.decorInv||{},dreams:S.dreams||null,lateNote:S.lateNote||"",lastSeen:S.lastSeen,born:S.born,
+  return {v:1,sparks:S.sparks,basket:S.basket,seeds:S.seeds,lastSeed:S.lastSeed||0,lex:S.lex,album:S.album,tribes:S.tribes,drawings:S.drawings.slice(-14),streak:S.streak,quest:S.quest,buys:S.buys,hol:S.hol,meteorBoost:S.meteorBoost,nextEvent:S.nextEvent,snowmen:S.snowmen,fastSeasons:S.fastSeasons,meteor:S.meteor,stars:S.stars.slice(-60),story:S.story,fastStory:S.fastStory,wood:S.wood,treeCut:S.treeCut,wild:S.wild,builds:S.builds,items:S.items,craftQ:S.craftQ,focus:S.focus,statue:S.statue,zones:S.zones,nodeCd:S.nodeCd,weather:S.weather,stats:S.stats,ai:S.ai,sound:S.sound,music:S.music,loop:S.loop||0,runs:S.runs||[],letters:S.letters||{},layout:S.layout||null,paint:S.paint||{},tipKeys:S.tipKeys||0,moments:(S.moments||[]).slice(-60),ach:S.ach||{},daily:S.daily||null,jar:S.jar||0,lanterns:S.lanterns||0,constellations:S.constellations||[],col:S.col||{},digs:S.digs||[],decor:S.decor||[],bin:S.bin||[0,0,0],dFirst:S.dFirst,dFirst2:S.dFirst2,fireDay:S.fireDay||"",decorInv:S.decorInv||{},dreams:S.dreams||null,lateNote:S.lateNote||"",lastSeen:S.lastSeen,born:S.born,
     plots:S.plots.map(p=>({owned:p.owned,crop:p.crop})),tasks,
     pips:S.pips.map(p=>({id:p.id,name:p.name,hue:Math.round(p.hue),sprout:p.sprout,pitch:Math.round(p.pitch),xp:p.xp,growth:p.growth,
       food:Math.round(p.food*10)/10,mood:Math.round(p.mood),energy:Math.round(p.energy),c:p.c,vocab:p.vocab.slice(-vN),gen:p.gen,parent:p.parent,born:p.born,
-      convo:p.convo.slice(-cN).map(m=>({r:m.r,t:String(m.t).slice(0,120),w:m.w})),lang:p.lang,g:p.g,mut:p.mut||null,tribe:p.tribe||null,cave:p.cave||0,trust:Math.round(p.trust??30),life:p.life,founder:p.founder||undefined,echo:p.echo||undefined,awake:p.awake||undefined,blank:p.blank||undefined,exotic:p.exotic||undefined,mem:(p.mem||[]).slice(-4),question:p.question||null,x:Math.round(p.x),y:Math.round(p.y)}))};
+      convo:p.convo.slice(-cN).map(m=>({r:m.r,t:String(m.t).slice(0,120),w:m.w})),lang:p.lang,g:p.g,mut:p.mut||null,tribe:p.tribe||null,cave:p.cave||0,trust:Math.round(p.trust??30),life:p.life,founder:p.founder||undefined,echo:p.echo||undefined,awake:p.awake||undefined,data:p.data||0,diet:p.diet,ds:p.ds||0,dmod:p.dmod,blank:p.blank||undefined,exotic:p.exotic||undefined,mem:(p.mem||[]).slice(-4),question:p.question||null,x:Math.round(p.x),y:Math.round(p.y)}))};
 }
 

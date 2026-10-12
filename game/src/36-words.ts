@@ -47,7 +47,8 @@ function learnWord(w,how){
 function wordSaid(p,w,c){
   const e=S.lex[w];if(!e||e.ok)return;
   const b=bubbleEls.get(p.id);
-  if((p.trust??30)>=60&&(e.heard||0)>=4&&Math.random()<.12){
+  const ant=pipMod(p)===2;
+  if(((p.trust??30)>=60||ant)&&(e.heard||0)>=(ant?2:4)&&Math.random()<(ant?.3:.12)){
     if(b)b.textContent=`${w} ${ICON[c]||""}`;S.stats.taught=(S.stats.taught||0)+1;setTimeout(()=>learnWord(w,"taught"),900);return;
   }
   if(choiceCount(e)&&b){b.classList.add("ask");const r=rt(p);if(!r.said||performance.now()>r.said.until||r.said.w===w||!S.lex[r.said.w]||S.lex[r.said.w].ok)r.said={w,until:performance.now()+12000}}

@@ -56,5 +56,5 @@ let srvAt=0;
 function serverTick(){
   const sv=(S.decor||[]).filter(d=>d.k==="server");if(!sv.length){srvAt=0;return}
   const now=Date.now();if(!srvAt){srvAt=now;return}if(now-srvAt<150000)return;srvAt=now;
-  addFood(sv.length);sv.forEach(d=>{if(inView(d.x,d.y,10))burst(d.x,d.y-15,"spark",6)});renderHead();dirty();
+  addBits(0,sv.length);sv.forEach(d=>{if(inView(d.x,d.y,10))burst(d.x,d.y-15,"spark",6)});renderHead();dirty();
 }

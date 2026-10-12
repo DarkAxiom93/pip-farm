@@ -74,6 +74,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(g.pattern===1){R(x0+1,y0+bh2-4,1,1,dark);R(x0+bww-2,y0+bh2-5,1,1,dark);R(x0+bww-3,y0+1,1,1,dark)}
   else if(g.pattern===2){R(x0+1,y0,bww-2,1,dark);R(x0,y0+1,bww,1,dark)}
   else if(g.pattern===3){R(cx-2,y0+bh2-3,4,2,lite)}
+  drawPipData(p,r,x0,y0,bww,bh2,t,r.dir||1);
   // head feature
   if(p.sprout===0){R(cx,y0-2,1,2,"#3f8f3a");R(cx-2,y0-3,2,1,"#6fcf5a");R(cx+1,y0-4,2,1,"#6fcf5a")}
   else if(p.sprout===1){R(x0+1,y0-2,2,2,body);R(x0+bww-3,y0-2,2,2,body);R(x0+1,y0-1,1,1,"#ff9db5");R(x0+bww-2,y0-1,1,1,"#ff9db5")}
