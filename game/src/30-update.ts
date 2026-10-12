@@ -75,7 +75,8 @@ function updPip(p,dt){
         else if(r.goal==="choir"){r.state="choir";r.dir=choir&&choir.cx>p.x?1:-1}
         else if(r.goal==="sleep"){r.state="sleep";r.nap=false}
         else{r.state="idle";r.wait=rand(1.5,5)}
-      }else{const s=Math.min(d,speed*dt);p.x+=dx/d*s;p.y+=dy/d*s;if(Math.abs(dx)>.5)r.dir=dx>0?1:-1}
+      }else if(r.ride||rideStart(p,r,d)){rideStep(p,r,dt)}
+      else{const s=Math.min(d,speed*dt);p.x+=dx/d*s;p.y+=dy/d*s;if(Math.abs(dx)>.5)r.dir=dx>0?1:-1}
       break}
     case "work":r.workT-=dt;if(Math.random()<dt*3)burst(p.x+r.dir*5,p.y-2,"dust",1);if(r.workT<=0)finishJob(p);break;
     case "sleep":

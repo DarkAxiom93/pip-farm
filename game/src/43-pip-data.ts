@@ -9,7 +9,7 @@ const DSTAGE=[
   {need:150,ch:4,n:"פיקסלים"},
   {need:300,ch:99,n:"צומת"}   // ch 99: only after an ending
 ];
-let DMAX=2; // how many stages are open in this version
+let DMAX=4; // how many stages are open in this version
 const DMOD=[
   {n:"רגליים",c:"#5dffb0",d:"הולך ועובד מהר יותר"},
   {n:"מעבד",c:"#ffcf4a",d:"לפעמים ביט נוסף בקטיף"},
@@ -101,3 +101,40 @@ function dataPanelText(p){
   return `${s?DSTAGE[s-1].n:"רגיל"}${m>=0?` · ${DMOD[m].n}`:""} · ${dWaitText(p)}`;
 }
 function dataFrac(p){const s=dstage(p);if(s>=DSTAGE.length)return 100;const prev=s?DSTAGE[s-1].need:0,need=DSTAGE[s].need;return clamp(((p.data||0)-prev)/(need-prev)*100,0,100)}
+
+// stage 3+ eyes and glitchy edges, stage 4 scanlines; drawn after the face
+function drawPipDataTop(p,r,x0,y0,bww,bh2,el,er,ey,sleep,t){
+  const s=dstage(p);if(s<3)return;const cc=dcol(p);
+  if(!sleep&&r.blink>=0){R(el,ey,2,2,"#0b1612");R(er,ey,2,2,"#0b1612");R(el,ey,1,1,cc);R(er,ey,1,1,cc)}
+  const g=Math.sin(t*7.3+(p.born||0)%11);if(g>.86){const k=Math.floor((t*20)%Math.max(1,bh2));R(x0-1.5,y0+k,bww,1,cc+"88");R(x0+bww-1,y0+k+1,2,.5,cc)}
+  if(s>=4){for(let i=1;i<bh2;i+=2)R(x0+.5,y0+i,bww-1,.5,"rgba(200,255,230,.18)");
+    if(r.state==="walk"&&Math.random()<.35)parts.push({x:p.x+rand(-2,2),y:p.y-rand(0,4),vx:0,vy:-6,life:.6,kind:"px",c:cc})}
+}
+// stage 3+: far walks go through the circuits in the ground instead
+function rideStart(p,r,d){
+  if(r.ride||dstage(p)<3||d<90||digi()<=0||(r.rideCd||0)>performance.now())return false;
+  r.ride={sx:p.x,sy:p.y,ex:r.tx,ey:r.ty,t:0,L:Math.abs(r.tx-p.x)+Math.abs(r.ty-p.y)};
+  burst(p.x,p.y-4,"spark",8);tone(880,.12,"square",0,.5,.1);return true;
+}
+function rideStep(p,r,dt){
+  const R0=r.ride;R0.t+=dt*110;const a=Math.abs(R0.ex-R0.sx);
+  if(R0.t<a){p.x=R0.sx+Math.sign(R0.ex-R0.sx)*R0.t;p.y=R0.sy}
+  else{p.x=R0.ex;p.y=R0.sy+Math.sign(R0.ey-R0.sy)*Math.min(R0.t-a,Math.abs(R0.ey-R0.sy))}
+  if(R0.t>=R0.L){p.x=R0.ex;p.y=R0.ey;r.ride=null;r.rideCd=performance.now()+8000;burst(p.x,p.y-4,"spark",10);tone(660,.12,"square",0,1.5,.1);S.stats.rides=(S.stats.rides||0)+1}
+}
+function drawRide(p,r,t){
+  const cc=dcol(p);R(p.x-1,p.y-2,2,2,cc);R(p.x-.5,p.y-1.5,1,1,"#ffffff");
+  for(let i=1;i<5;i++){ctx.globalAlpha=.5-i*.1;R(p.x-1,p.y-2,2,2,cc);ctx.globalAlpha=1}
+}
+// light lines from node pips (stage 4) to the nearest server or antenna, or to each other
+function drawNetLines(t){
+  const nodes=S.pips.filter(p=>dstage(p)>=4&&!rt(p).ride);if(!nodes.length)return;
+  const hubs=(S.decor||[]).filter(d=>d.k==="server"||d.k==="antenna");
+  for(const p of nodes){if(!inView(p.x,p.y,170))continue;
+    let best=null,bd=170;for(const h of hubs){const d=Math.hypot(h.x-p.x,h.y-p.y);if(d<bd){bd=d;best={x:h.x,y:h.y-12}}}
+    if(!best){for(const q of nodes){if(q===p)continue;const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best={x:q.x,y:q.y-5}}}}
+    if(!best)continue;const cc=dcol(p),x0=p.x,y0=p.y-5,dx=best.x-x0,dy=best.y-y0,n=Math.ceil(Math.hypot(dx,dy)/3);
+    ctx.globalAlpha=.35;for(let i=0;i<n;i+=2)R(x0+dx*i/n,y0+dy*i/n,.5,.5,cc);ctx.globalAlpha=1;
+    const f=(t*.6+(p.born%7)/7)%1;R(x0+dx*f-.5,y0+dy*f-.5,1,1,"#ffffff");
+  }
+}

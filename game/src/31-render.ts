@@ -32,6 +32,7 @@ function drawPlot(i,t){
 }
 function drawPip(p,t,isSel,r?,px?,py?){
   r=r||rt(p);px=px??p.x;py=py??p.y;
+  if(r.ride){if(r.state==="walk"){drawRide(p,r,t);return}r.ride=null}
   const g=p.g||{},mut=p.mut,lv=level(p);
   const bw=Math.max(5,7+Math.floor(Math.min(lv,10)*.4)+(g.body?2:0)-(mut==="tiny"?2:0)),bh=bw-1-(g.body?1:0);
   let hop=0;
@@ -64,7 +65,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   else if(g.tail===2){TR(0,bh2-5,3,3,lite);TR(2,bh2-5,1,1,out)}
   else if(g.tail===3){TR(0,bh2-4,2,1,"#3f8f3a");TR(1,bh2-6,3,2,"#6fcf5a")}
   if(mut==="wings"){const f=Math.floor(t*9+(p.born%5))%2;R(x0-3,y0+1-f,3,2+f,"#eef7ff");R(x0+bww,y0+1-f,3,2+f,"#eef7ff");R(x0-3,y0+1-f,1,1,"#bcdcff");R(x0+bww+2,y0+1-f,1,1,"#bcdcff")}
-  if(mut==="crystal")CX.globalAlpha=.6;
+  if(mut==="crystal")CX.globalAlpha=.6;else if(dstage(p)>=4)CX.globalAlpha=.72;
   blob(x0,y0,bww,bh2,out,body,dark,lite);
   CX.globalAlpha=1;
   if(mut==="crystal"){const k=Math.floor(t*3)%Math.max(1,bww-2);R(x0+1+k,y0+1+(k%3),1,1,"#ffffff")}
@@ -112,6 +113,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(r.state==="work"||r.state==="gather"||r.state==="build"||r.state==="sbuild"||r.state==="construct"||r.state==="sbuild3"){const pr=1-r.workT/(r.workMax||1);R(x0-1,y0-6,bww+2,2,"rgba(20,14,24,.7)");R(x0-1,y0-6,Math.round((bww+2)*pr),2,"#86d47f");
     R(dir>0?x0+bww:x0-2,y0+bh-4+Math.round(Math.sin(r.anim*16)),2,2,"#c89c63")}
   if(r.state==="eat"){const ex=dir>0?x0+bww-1:x0-1;R(ex,ey+3,2,2,"#5dffb0");R(ex,ey+3,1,1,"#0d3d2a");if(Math.random()<.3)R(ex+(dir>0?2:-1),ey+2-Math.random()*3,.5,.5,"#9dffd0")}
+  drawPipDataTop(p,r,x0,y0,bww,bh2,el,er,ey,sleep,t);
   if(isSel){const b=Math.round(Math.sin(t*5)*1.2),ty=y0-(lv>=10?11:9)+b;R(cx-2,ty,5,1,"#ffd166");R(cx-1,ty+1,3,1,"#ffd166");R(cx,ty+2,1,1,"#ffd166")}
   CX.globalAlpha=1;
 }
@@ -164,7 +166,7 @@ function render(t){
   drawStatue(t);
   for(const tr of S.tribes)drawCamp(tr,t);
   drawTrees(t);
-  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);drawFire(t);
+  drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawDecor(t);drawNetLines(t);drawFire(t);
   const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
   drawFireGlow(t);drawHover(t);
