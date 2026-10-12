@@ -29,7 +29,7 @@ async def main():
         print("WON over",not r["hide"],"best set",(r["best"] or 0)>0,"moment",r["m"],"none hidden",r["hidden"]==0,"sparks up",r["sp"]>sp0)
         # time runs out
         await pg.wait_for_timeout(2500);await pg.evaluate("__pip.S.pips.forEach(p=>{const r=__pip.rt(p);r.state='idle';r.need=null;r.goal=null})");await pg.evaluate("__pip.startHide()")
-        await pg.wait_for_timeout(8000);await pg.evaluate("__pip.hide.t=1");await pg.wait_for_timeout(1800)
+        await pg.wait_for_function("!__pip.hide||__pip.hide.phase==='seek'",timeout=20000);await pg.evaluate("__pip.hide&&(__pip.hide.t=1)");await pg.wait_for_timeout(1800)
         r=await pg.evaluate("({hide:!!__pip.hide,hides:__pip.S.stats.hides,hidden:__pip.S.pips.filter(p=>__pip.rt(p).state==='hidden').length})")
         print("TIMEOUT over",not r["hide"],"hides",r["hides"],"none hidden",r["hidden"]==0)
         # night: they won't play

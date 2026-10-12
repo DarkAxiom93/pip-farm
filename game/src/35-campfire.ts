@@ -19,10 +19,11 @@ function fireTick(dt){
   if(fire.phase==="tell"){
     const step=Math.floor(fire.t/3.2);
     if(step!==fire.si&&step<fire.scenes.length){fire.si=step;tellScene(fire.scenes[step],step)}
+    if(!fire)return;
     if(fire.t>fire.scenes.length*3.2+2){fire.phase="glow";fire.t=0;afterStory()}
   }
-  if(fire.phase==="glow"&&fire.t>40)endFire();
-  if(fire.logs>0)fire.logs=Math.max(0,fire.logs-dt*.4);
+  if(fire&&fire.phase==="glow"&&fire.t>40){endFire();return}
+  if(fire&&fire.logs>0)fire.logs=Math.max(0,fire.logs-dt*.4);
 }
 function lightFire(manual){
   if(!canFire()){if(manual)toast(night?"הפיפים כבר ישנים. מחר בערב":!eveningNow()?"מדליקים מדורה רק בערב, מ-17:00":"עכשיו זה לא זמן טוב למדורה");return}

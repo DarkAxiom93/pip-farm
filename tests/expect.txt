@@ -73,7 +73,7 @@ nature_test|FLOWERS song 1
 nature_test|BOOK shown 1 items True
 nature_test|SAVED col True
 nature_test|ERR []
-decor_test|SHOP items 8
+decor_test|SHOP items 11
 decor_test|PLACING True
 decor_test|BAD spot refused True still placing True
 decor_test|PLACED 1 paid True
@@ -128,3 +128,7 @@ digital_test|LEVEL end 1 steps 4
 digital_test|HUD ביטים בסל
 digital_test|SAVED digi 4
 digital_test|ERR []
+digital_test|LOCKED early 3
+digital_test|SHOP digital 3 open 3
+digital_test|PLACED digital antenna,screen,server
+digital_test|SERVER bit True

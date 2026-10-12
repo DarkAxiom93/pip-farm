@@ -13,7 +13,10 @@ function tone(f,dur,type,when,glide,vol){
   o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.03);
 }
 // a pip's voice: on the chord and on the beat when the background music plays (see 07-music)
-const vt=(f,dur,type,when,glide,vol,b)=>tone(snapF(f),dur,type,b+(when||0),glide,vol);
+// as the farm turns digital the voices turn 8-bit: square blips that step between notes instead of gliding
+const vt=(f,dur,type,when,glide,vol,b)=>{const d=digi(),w=b+(when||0);
+  if(d>0&&type!=="sawtooth"&&Math.random()<d*.75){const v=(vol||.5)*.32;tone(snapF(f),dur*.55,"square",w,0,v);if(glide&&Math.abs(glide-1)>.05)tone(snapF(f*glide),dur*.45,"square",w+dur*.55,0,v*.9);return}
+  tone(snapF(f),dur,type,w,glide,vol)};
 const SFX={
   chirp:p=>vt(p,.13,"sine",0,1.6,.5,beatDelay()),
   babble:(p,n)=>{const b=beatDelay();for(let i=0;i<n;i++)vt(p*rand(.8,1.35),.07,"triangle",i*.085,rand(.9,1.4),.4,b)},
@@ -24,7 +27,7 @@ const SFX={
   split:p=>{const b=beatDelay();[1,1.26,1.5,2,2.52].forEach((m,i)=>vt(p*m,.13,"triangle",i*.08,1,.38,b))},
   level:()=>[1,1.26,1.5,1.89,2].forEach((m,i)=>tone(523*m,.1,"square",i*.07,1,.16)),
   purr:p=>{const b=beatDelay();vt(p*.42,.35,"sawtooth",0,.85,.1,b);vt(p*1.2,.12,"sine",.25,1.4,.3,b)},
-  crunch:()=>{for(let i=0;i<3;i++)tone(rand(180,320),.04,"square",i*.07,.5,.15)},
+  crunch:()=>{if(Math.random()<.4+digi()*.6){[1,1.5,2].forEach((m,i)=>tone(660*m*rand(.97,1.03),.035,"square",i*.05,0,.1));return}for(let i=0;i<3;i++)tone(rand(180,320),.04,"square",i*.07,.5,.15)},
   q:p=>{const b=beatDelay();vt(p,.1,"sine",0,1.15,.4,b);vt(p*1.2,.16,"sine",.11,1.35,.4,b)},
   mood:(p,m,vol)=>{const pat=MOOD_SFX[m]||MOOD_SFX.content,type=m==="sad"||m==="sleepy"?"sine":m==="scared"?"square":"triangle",gap=m==="excited"?.06:m==="sleepy"?.16:.09;
     const b=beatDelay();pat.forEach((k,i)=>vt(p*k*rand(.97,1.03),m==="sleepy"?.16:.08,type,i*gap,m==="curious"&&i===pat.length-1?1.3:m==="sad"?.85:1.1,(vol||.4)*(type==="square"?.4:1),b))}

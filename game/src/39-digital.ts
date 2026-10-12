@@ -33,8 +33,28 @@ function drawDigital(t){
     for(let i=0;i<m;i++){const tr=BGTREES[i];if(!inView(tr.x,tr.y,20))continue;if(!zoneOpen(ZONES[zid(tr.x,tr.y)].id))continue;
       const by=tr.y+6;for(let s=-1;s<=1;s+=2){const len=3+((i*5+s+7)%4);R(tr.x+(s<0?-len:1),by,len,.5,"#232a33");R(tr.x+(s<0?-len:1+len)-.5,by-.25,1,1,(Math.sin(t*3+i+s)>.3)?"#5dffb0":"#2d6b4f")}}}
 }
-function digiTick(){
+function digiTick(){serverTick();
   if(!S||!S.story)return;const lv=digi(),seen=S.story.digi||0;
   let k=seen;while(k<DIGI_STEPS.length&&lv>=DIGI_STEPS[k].at)k++;
   if(k>seen){S.story.digi=k;toast(DIGI_STEPS[k-1].msg,1);dirty()}
+}
+// ---------- digital buildings (they live in DECOR, see 34-decor) ----------
+function dreamer(){return S.pips.find(p=>{const r=rt(p);return r.dream&&performance.now()<r.dream.until})}
+// the dream screen: a sleeping pip's dream at night, scrolling bits by day
+function drawDreamScreen(x,y,t){
+  R(x-.5,y-4,1,4,"#3a3a44");R(x-4,y-1,8,1,"#3a3a44");
+  R(x-8,y-17,16,13,"#1c2230");R(x-7,y-16,14,11,"#0b1612");
+  const p=night&&dreamer();
+  if(p){const bm=DOODLES[rt(p).dream.icon]||DOODLES.heart,h=bm.length,w=bm[0].length,ox=x-w/2,oy=y-10.5-h/2;
+    bm.forEach((row,yy)=>[...row].forEach((v,xx)=>{if(v==="1")R(ox+xx,oy+yy,1,1,"#bfffe0")}));
+    R(x+5,y-15,1,1,`hsl(${p.hue},70%,60%)`)}
+  else if(night){for(let i=0;i<10;i++)R(x-7+Math.floor(Math.random()*14),y-16+Math.floor(Math.random()*11),1,1,"rgba(150,200,180,.35)")}
+  else{for(let c=0;c<7;c++){const yy=(t*(5+c%3*2)+c*5)%11;R(x-6.5+c*2,y-16+yy,1,1,(c+Math.floor(t*2))&1?"#5dffb0":"#2fbf7f")}}
+  R(x-7,y-16,14,.5,"rgba(255,255,255,.12)");
+}
+let srvAt=0;
+function serverTick(){
+  const sv=(S.decor||[]).filter(d=>d.k==="server");if(!sv.length){srvAt=0;return}
+  const now=Date.now();if(!srvAt){srvAt=now;return}if(now-srvAt<150000)return;srvAt=now;
+  addFood(sv.length);sv.forEach(d=>{if(inView(d.x,d.y,10))burst(d.x,d.y-15,"spark",6)});renderHead();dirty();
 }

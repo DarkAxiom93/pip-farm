@@ -76,6 +76,7 @@ function musicTick(){
       let f=mhz(MUS_PENTA[v],392);
       if(glitchy&&Math.random()<.08){mnote(f*pick([.94,1.06]),t,eighth*.6,"square",.06,.005,pick([.5,2]))}
       else if(mode==="sad"||winter){mnote(f,t,eighth*3,"sine",.16,.004);mnote(f*2,t,eighth*1.5,"sine",.05,.004)} // music box, bells in winter
+      else if(digi()>.4&&Math.random()<digi()-.2){mnote(f,t,eighth*.9,"square",.05,.003);if(Math.random()<.5)mnote(f*2,t+eighth*.5,eighth*.4,"square",.03,.002)} // chiptune lead once the farm is digital
       else mnote(f,t,eighth*(mode==="day"?1.4:2.2),"triangle",.14,.008,1.03);
     }
     // a soft shaker on the off-beats in the day

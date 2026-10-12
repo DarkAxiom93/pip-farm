@@ -10,8 +10,13 @@ const DECOR={
   birdbath:{n:"אמבטיית ציפורים",s:20,w:3,d:"ציפורים באות לבקר"},
   scarecrow:{n:"דחליל",s:15,w:5,d:"שומר על השדה. הפיפים מנופפים לו"},
   sign:{n:"שלט",s:8,w:3,d:"שלט עם שם החווה"},
-  fence:{n:"קטע גדר",s:3,w:2,d:"לסמן שבילים ופינות"}
-};
+  fence:{n:"קטע גדר",s:3,w:2,d:"לסמן שבילים ופינות"},
+  // digital things: they open up as the farm turns digital (see 39-digital)
+  server:{n:"שרת קטן",s:40,w:10,d:"מזמזם ומייצר ביט לסל כל שתי דקות וחצי",dig:.15},
+  antenna:{n:"אנטנה",s:35,w:8,d:"קולטת אותות. פיפים שמבקרים בה מוצאים לפעמים ניצוצות",dig:.45},
+  screen:{n:"מסך חלומות",s:50,w:6,d:"בלילה הוא מראה מה הפיפים חולמים",dig:.75}
+} as Record<string,{n:string,s:number,w:number,d:string,dig?:number}>;
+const decorLocked=k=>(DECOR[k].dig||0)>digi();
 let placing=null; // {k, move?: id}
 function decorOk(x,y){
   if(!walkable(x,y))return false;
@@ -22,6 +27,7 @@ function decorOk(x,y){
 }
 function startPlacing(k){
   const D=DECOR[k],inv=(S.decorInv||{})[k]||0;
+  if(decorLocked(k)&&!inv){toast("זה ייפתח כשהחווה תהיה יותר דיגיטלית");return}
   if(!inv&&(S.sparks<D.s||(S.wood||0)<D.w)){toast(`צריך ${D.s} ניצוצות ו-${D.w} עצים`);return}
   placing={k};endStarMode(false);toast(`הקש במפה במקום שבו לשים ${D.n}`,1);renderDecorShop();
 }
@@ -43,10 +49,12 @@ function placeDecorAt(x,y){
 function decorAt(x,y){return (S.decor||[]).find(d=>Math.abs(d.x-x)<7&&y>d.y-14&&y<d.y+3)}
 function openDecor(d){
   const m=popAt(d.x,d.y-14),D=DECOR[d.k];
-  m.innerHTML=`<h4>${D.n}</h4><p>${D.d}</p><button class="btn" data-decor="move" data-id="${d.id}">להזיז</button><button class="btn" data-decor="store" data-id="${d.id}">להחזיר למחסן</button>`;
+  m.innerHTML=`<h4>${D.n}</h4><p>${D.d}</p><button class="btn" data-decor="move" data-id="${d.id}">להזיז</button><button class="btn" data-decor="store" data-id="${d.id}">להחזיר למחסן</button>`+
+    (d.k==="screen"&&dreamer()?`<button class="btn main" data-decor="dream" data-id="${d.id}">להציץ בחלום</button>`:"");
 }
 function decorAction(a,id){
   const d=(S.decor||[]).find(q=>q.id===id);if(!d)return;
+  if(a==="dream"){const p=dreamer();if(p)peekDream(p);return}
   if(a==="move"){placing={k:d.k,move:d.id};toast("הקש במקום החדש",1)}
   else if(a==="store"){S.decor.splice(S.decor.indexOf(d),1);S.decorInv=S.decorInv||{};S.decorInv[d.k]=(S.decorInv[d.k]||0)+1;toast(`${DECOR[d.k].n} חזר למחסן. אפשר לשים אותו שוב בחינם`);dirty()}
   renderDecorShop();
@@ -54,8 +62,8 @@ function decorAction(a,id){
 function renderDecorShop(){
   const el=$("decorBox");if(!el)return;S.decorInv=S.decorInv||{};
   el.innerHTML=(placing?`<div class="row" style="margin-bottom:6px"><p class="label" style="flex:1;margin:0">ממקמים: ${DECOR[placing.k].n}. הקש במפה</p><button class="btn" type="button" data-decor-cancel="1">ביטול</button></div>`:"")+
-    `<div class="shop">`+Object.entries(DECOR).map(([k,D])=>{const inv=S.decorInv[k]||0,ok=inv||S.sparks>=D.s&&(S.wood||0)>=D.w;
-      return`<button class="btn" type="button" data-decor-buy="${k}" ${ok?"":"disabled"}><b>${D.n}</b><span>${inv?`במחסן: ${inv} (בחינם)`:`${D.s} ניצוצות · ${D.w} עצים`}</span></button>`}).join("")+`</div>`;
+    `<div class="shop">`+Object.entries(DECOR).map(([k,D])=>{const inv=S.decorInv[k]||0,lock=decorLocked(k)&&!inv,ok=!lock&&(inv||S.sparks>=D.s&&(S.wood||0)>=D.w);
+      return`<button class="btn${D.dig?" digi":""}" type="button" data-decor-buy="${k}" ${ok?"":"disabled"}><b>${lock?"🔒 ":""}${D.n}</b><span>${lock?"נפתח כשהחווה תהיה יותר דיגיטלית":inv?`במחסן: ${inv} (בחינם)`:`${D.s} ניצוצות · ${D.w} עצים`}</span></button>`}).join("")+`</div>`;
 }
 // the pips use the decorations
 function decorWander(p,r){
@@ -71,6 +79,9 @@ function useDecor(p){
   else if(d.k==="swing"){r.act="swing";r.ct=rand(5,8);r.fx=d.x}
   else if(d.k==="flowers"){r.act="nuzzle";r.ct=2.5}
   else if(d.k==="birdbath"){r.act="spin";r.ct=1.5;if(!bird){bird={sp:Math.random()<.3?"robin":"sparrow",x:d.x,y:d.y-6,t:0,d:Math.random()<.5?-1:1};if(Math.random()<.15)collect(spById(bird.sp),d.x,d.y-6)}}
+  else if(d.k==="screen"){r.act="sit";r.ct=rand(5,9);if(Math.random()<.3)say(p,pick(["!!","הו","♪"]),2,"snd","curious")}
+  else if(d.k==="antenna"){r.act="spin";r.ct=1.5;say(p,"📡",1.5,"snd","curious");if(Math.random()<.25){S.sparks+=2;burst(d.x,d.y-18,"spark",8);renderHead();dirty()}}
+  else if(d.k==="server"){r.act="nuzzle";r.ct=2;if(Math.random()<.3)say(p,"בזזז",1.5,"snd","content")}
   else if(d.k==="scarecrow"){r.act="hop";r.ct=1.2;say(p,"👋",1.5,"snd","excited")}
   else{r.act="spin";r.ct=1.5}
 }
@@ -88,9 +99,17 @@ function drawDecorItem(k,x,y,t,a){
     case"birdbath":R(x-1,y-6,2,6,"#9a8f80");R(x-5,y-8,10,2,"#9a8f80");R(x-4,y-8,8,1,"#8cc4ea");R(x-3,y-1,6,1,"#857a6c");break;
     case"scarecrow":R(x,y-16,1,16,"#5a3d2b");R(x-6,y-12,13,1,"#5a3d2b");R(x-2,y-11,5,6,"#c9772f");R(x-2,y-16,5,4,"#e8d5b0");R(x-3,y-17,7,1,"#d9a83a");R(x-1,y-15,1,1,"#2a1830");R(x+1,y-15,1,1,"#2a1830");break;
     case"sign":R(x,y-10,1,10,"#5a3d2b");R(x-6,y-14,13,6,"#a87a42");R(x-5,y-12,11,1,"#5a3d2b");R(x-4,y-10,8,1,"#5a3d2b");break;
+    case"server":R(x-5,y-14,10,14,"#1c2230");R(x-4.5,y-13.5,9,13,"#2f3a52");
+      for(let i=0;i<4;i++){R(x-4,y-12+i*3,8,2,"#141a26");R(x-3,y-11.5+i*3,1,1,Math.sin(t*6+i*2.3+x)>0?"#5dffb0":"#1f5a40");R(x-1.5,y-11.5+i*3,1,1,Math.sin(t*4.3+i*1.7)>.4?"#ffcf4a":"#5a4a1a");R(x+1,y-11.5+i*3,2,.5,"#3d4a66")}
+      R(x-5,y-14,10,.5,"#5c6b8a");break;
+    case"antenna":R(x-.5,y-20,1,20,"#8a93a6");R(x-4,y-1,8,1,"#3a3a44");R(x-3,y-14,6,.5,"#8a93a6");R(x-2,y-17,4,.5,"#8a93a6");R(x-4.5,y-11,9,.5,"#8a93a6");
+      {const on=Math.sin(t*3)>0;R(x-1,y-22,2,2,on?"#ff5d73":"#5a1f2a");if(on)R(x-.5,y-21.5,.5,.5,"#fff")}
+      {const ph=(t*1.2)%1;if(ph<.7){CX.globalAlpha=(.7-ph)*(a||1);R(x-3-ph*6,y-21,.5,2,"#9fe8ff");R(x+3+ph*6,y-21,.5,2,"#9fe8ff");CX.globalAlpha=1}}break;
+    case"screen":drawDreamScreen(x,y,t);break;
     case"fence":R(x-6,y-6,1,6,"#8a6a45");R(x+5,y-6,1,6,"#8a6a45");R(x-1,y-6,1,6,"#8a6a45");R(x-6,y-5,12,1,"#a87a42");R(x-6,y-3,12,1,"#a87a42");break;
   }
 }
 function drawDecorGlow(t){
-  for(const d of S.decor||[]){if(d.k!=="lamp"||!inView(d.x,d.y,30))continue;const g=ctx.createRadialGradient(d.x,d.y-18,1,d.x,d.y-18,34);g.addColorStop(0,"rgba(255,240,180,.34)");g.addColorStop(1,"rgba(255,240,180,0)");ctx.fillStyle=g;ctx.fillRect(d.x-34,d.y-52,68,68)}
+  for(const d of S.decor||[]){if(d.k==="screen"&&inView(d.x,d.y,30)){const g=ctx.createRadialGradient(d.x,d.y-12,1,d.x,d.y-12,22);g.addColorStop(0,"rgba(120,255,200,.22)");g.addColorStop(1,"rgba(120,255,200,0)");ctx.fillStyle=g;ctx.fillRect(d.x-22,d.y-34,44,44)}
+    if(d.k!=="lamp"||!inView(d.x,d.y,30))continue;const g=ctx.createRadialGradient(d.x,d.y-18,1,d.x,d.y-18,34);g.addColorStop(0,"rgba(255,240,180,.34)");g.addColorStop(1,"rgba(255,240,180,0)");ctx.fillStyle=g;ctx.fillRect(d.x-34,d.y-52,68,68)}
 }
