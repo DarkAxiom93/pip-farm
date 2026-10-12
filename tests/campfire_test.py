@@ -23,7 +23,11 @@ async def main():
         await pg.wait_for_timeout(12500)
         print("STORY told",await pg.evaluate("__pip.S.stats.fires"),"moment",await pg.evaluate("(__pip.S.moments||[]).some(m=>m.k==='fire')"))
         await pg.wait_for_function("__pip.fire&&__pip.fire.phase==='glow'",timeout=20000);await pg.evaluate("document.getElementById('story').hidden=true")
-        wd=await pg.evaluate("__pip.S.wood");await tapw(pg,f["x"],f["y"]-3);await pg.wait_for_timeout(300)
+        wd=await pg.evaluate("__pip.S.wood")
+        for i in range(4):
+            await pg.evaluate("__pip.S.story&&(__pip.S.story.glitch=null);document.getElementById('story').hidden=true")
+            await tapw(pg,f["x"],f["y"]-3);await pg.wait_for_timeout(300)
+            if await pg.evaluate("__pip.S.wood")<wd: break
         print("WOOD thrown",wd-await pg.evaluate("__pip.S.wood"),"logs",await pg.evaluate("__pip.fire&&__pip.fire.logs>0"))
         await pg.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)),"fire.png"))
         print("ERR",errs[:8])

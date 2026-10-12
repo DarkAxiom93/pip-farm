@@ -37,7 +37,10 @@ async def main():
             await pg.evaluate("(()=>{const P=__pip,p=P.S.pips[3];p.x=150;p.y=110;p.question=null;const r=P.rt(p);r.state='idle';r.need=null;P.S.pips.forEach(q=>P.clearBubble(q.id));P.langSpeak(p,'food',1)})()");await pg.wait_for_timeout(200)
             if await pg.locator(".bub.ask").count(): break
         print("BUBBLE asks",await pg.locator(".bub.ask").count()>0)
-        await tapw(pg,150,106);await pg.wait_for_timeout(300)
+        for i in range(4):
+            await pg.evaluate("(()=>{const P=__pip,p=P.S.pips[3],r=P.rt(p);p.x=150;p.y=110;r.state='idle';r.wait=9;r.tx=150;r.ty=110;if(P.S.story)P.S.story.glitch=null})()")
+            await tapw(pg,150,106);await pg.wait_for_timeout(300)
+            if await pg.locator("#pmenu [data-wguess]").count(): break
         print("POPUP choices",await pg.locator("#pmenu [data-wguess]").count())
         await pg.locator("#pmenu [data-wguess='food']").click();await pg.wait_for_timeout(300)
         print("WORLD guess right",await pg.evaluate("__pip.S.lex['בלופ'].ok"))
