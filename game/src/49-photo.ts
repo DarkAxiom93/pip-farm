@@ -28,7 +28,12 @@ function takePhoto(){
   g.fillStyle="#cdbfa8";g.font="15px system-ui,'Segoe UI',sans-serif";g.fillText(photoCaption(),W/2,cv.height+pad+56);
   const url=c.toDataURL("image/png");
   S.stats.photos=(S.stats.photos||0)+1;
-  try{const a=document.createElement("a");a.href=url;a.download=`${farmName().replace(/[\\/:*?"<>|]/g,"")}.png`;document.body.appendChild(a);a.click();a.remove()}catch(_){}
+  const filename=`${farmName().replace(/[\\/:*?"<>|]/g,"")||"pip-farm"}.png`;
+  const anchor=()=>{try{const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove()}catch(_){}};
+  // inside a claude.ai artifact a plain download does nothing: ask the viewer through the downloads capability
+  const cl=(window as any).claude;
+  if(cl&&cl.use){c.toBlob(blob=>{cl.use("downloads").then(d=>{if(d&&blob)d.save({filename,data:blob}).catch(()=>{});else anchor()}).catch(anchor)},"image/png")}
+  else anchor();
   // flash
   const fl=$("photoFlash");fl.hidden=false;fl.classList.remove("go");void fl.offsetWidth;fl.classList.add("go");setTimeout(()=>{fl.hidden=true},500);
   tone(1600,.05,"square",0,1,.12);tone(900,.12,"square",.05,1,.1);
