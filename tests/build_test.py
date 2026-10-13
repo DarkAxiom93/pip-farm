@@ -31,7 +31,7 @@ async def main():
         await pg.locator("#buildBar [data-tool='done']").click();await pg.wait_for_timeout(2500)
         await pg.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)),"build.png"))
         # reload
-        await pg.evaluate("localStorage.setItem('pf.noinject','1')");await pg.reload();await pg.wait_for_timeout(2000)
+        await pg.wait_for_timeout(2500);await pg.evaluate("localStorage.setItem('pf.noinject','1')");await pg.reload();await pg.wait_for_timeout(2500)
         r=await pg.evaluate("({n:__pip.PLOTS.length,y3:__pip.PLOTS[3].y,paint:Object.keys(__pip.S.paint||{}).length,plots:__pip.S.plots.length})")
         print("RELOAD kept",r["n"]==n0+1 and r["plots"]==n0+1,"moved",r["y3"]==p3["y"],"paint",r["paint"]>=8)
         print("ERR",errs[:6])

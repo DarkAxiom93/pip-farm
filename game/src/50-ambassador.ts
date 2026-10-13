@@ -72,8 +72,12 @@ function openGuest(g){
   guestSay(g,pick(["הי!","♪",...(g.w||[])]));
 }
 function renderGuests(){
-  const el=$("guestBox");if(!el)return;const gs=(S.guests||[]).filter(g=>g.until>Date.now());
+  const el=$("guestBox");if(!el)return;
+  // keep what the keeper is typing when the farm tab redraws
+  const old=document.getElementById("guestCode") as HTMLInputElement,keep=old?old.value:"",foc=old&&document.activeElement===old;
+  const gs=(S.guests||[]).filter(g=>g.until>Date.now());
   el.innerHTML=`<p class="albtop" style="margin:0 0 6px">קיבלת קוד של פיפ מחבר? הדבק אותו כאן והוא יגיע לביקור של יום. כדי לשלוח פיפ משלך: בחר אותו ← "לשלוח לביקור"</p>
     <div class="row" style="gap:6px"><input id="guestCode" placeholder="PIP1:..." aria-label="קוד של פיפ" style="flex:1;min-width:0"><button class="btn main" type="button" id="guestGo">לקבל</button></div>`+
     (gs.length?`<ul class="mem" style="margin-top:6px">${gs.map(g=>`<li><span>🧳 ${esc(g.n)} מ${esc(g.f)}</span><small>עוד ${Math.max(1,Math.round((g.until-Date.now())/3600000))} שעות</small></li>`).join("")}</ul>`:"");
+  const nw=document.getElementById("guestCode") as HTMLInputElement;if(nw&&keep){nw.value=keep;if(foc)nw.focus()}
 }
