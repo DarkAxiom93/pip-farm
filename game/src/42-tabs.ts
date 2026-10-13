@@ -51,6 +51,7 @@ function renderAlbum(){
   const have=Object.keys(S.album).length;
   $("albTop").innerHTML=`גילית <b>${have}/${albumTotal()}</b>. כל פיפ שנולד יורש את רוב הגנים מההורה, ולפעמים משהו משתנה. פיפ מאושר במיוחד (מצב רוח מעל 90) כשהוא מתפצל מוליד מוטציה פי 2 יותר`;
   const body=$("albBody");body.innerHTML="";
+  {const sec=document.createElement("div");sec.className="alb-sec";sec.innerHTML=timelineHtml();body.appendChild(sec)}
   {const sec=document.createElement("div");sec.className="alb-sec";sec.innerHTML=collectionHtml();body.appendChild(sec)}
   if(S.moments&&S.moments.length){const sec=document.createElement("div");sec.className="alb-sec";
     sec.innerHTML=`<h3>ספר הרגעים<small>${S.moments.length}</small></h3><ul class="mem">${momentsHtml(S.moments,20)}</ul><p class="albtop">רגעים גדולים שעברתם ביחד. מדי פעם פיפ שהיה שם נזכר באחד מהם. כשזה קורה, הקש עליו כדי להיזכר איתו</p>`;
@@ -87,7 +88,7 @@ $("lexList").addEventListener("click",(e:any)=>{const b=e.target.closest("[data-
 
 /* farm tab */
 function renderFarm(){
-  renderShop();renderDecorShop();$("achBox").innerHTML=achHtml();
+  renderShop();renderDecorShop();renderResearch();renderComposer();renderGuests();$("achBox").innerHTML=achHtml();
   const words=new Set(S.pips.flatMap(p=>p.vocab)).size,maxGen=Math.max(...S.pips.map(p=>p.gen));
   $("farmStats").innerHTML=[...(loopN()?[[loopN()+1,"הפעלה"]]:[]),[S.pips.length+"/"+cap(),"פיפים"],[maxGen,"דורות"],[words,"מילים בחווה"],[S.stats.splits,"התפצלויות"],[S.stats.harvests,"קטיפים"],[S.stats.tasksDone,"משימות שסיימת"],[Object.keys(S.lex).length,"מילים פיפיות"],[S.stats.decoded,"פוענחו"],[S.stats.choirs,"מקהלות"],[S.pips.filter(p=>p.mut).length,"מוטנטים"],[S.tribes.length,"שבטים"],[S.wood||0,"עצים"],[Object.values(S.builds).filter((b:any)=>b.done).length+"/3","מבנים"],[Math.round(avgTrust()),"אמון ממוצע"],[S.streak.best||0,"רצף שיא"],[S.stats.focusMin||0,"דקות ריכוז"],[S.statue?(S.statue.done?"גמור":Math.round(S.statue.p)+"%"):"—","פסל"],[unlockedCount()+1+"/"+ZONES.length,"אזורים"],[S.stats.calmed,"ויכוחים שהרגעת"]]
     .map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
@@ -105,6 +106,15 @@ $("optStory").addEventListener("change",e=>{S.fastStory=e.target.checked;dirty()
 $("optSeason").addEventListener("change",e=>{S.fastSeasons=e.target.checked;seasonT=0;dirty()});
 $("optAi").addEventListener("change",e=>{S.ai=e.target.checked;voiceNote();dirty()});
 function soundBtn(){const b=$("hSound");b.textContent="צליל: "+(S.sound?"פועל":"כבוי");b.setAttribute("aria-pressed",String(S.sound))}
+$("zPhoto").addEventListener("click",()=>{audio();togglePhoto()});
+$("photoShoot").addEventListener("click",()=>takePhoto());
+$("photoCancel").addEventListener("click",()=>togglePhoto(false));
+$("photoClose").addEventListener("click",()=>{$("photoPrev").hidden=true});
+$("photoName").addEventListener("keydown",(e:any)=>{e.stopPropagation();if(e.key==="Enter")takePhoto();if(e.key==="Escape")togglePhoto(false)});
+$("guestBox").addEventListener("click",(e:any)=>{if(e.target.id==="guestGo"){audio();const inp=$("guestCode") as HTMLInputElement;if(receiveGuest(inp.value))inp.value=""}});
+$("guestBox").addEventListener("keydown",(e:any)=>{e.stopPropagation();if(e.key==="Enter"&&e.target.id==="guestCode"){if(receiveGuest(e.target.value))e.target.value=""}});
+$("composerBox").addEventListener("click",(e:any)=>{const b=e.target.closest("button");if(b&&!b.disabled)compClick(b)});
+$("researchBox").addEventListener("click",(e:any)=>{const b=e.target.closest("button[data-res]");if(!b||b.disabled)return;audio();doResearch(b.dataset.res)});
 $("decorBox").addEventListener("click",(e:any)=>{const b=e.target.closest("button");if(!b||b.disabled)return;audio();if(b.dataset.decorBuy)startPlacing(b.dataset.decorBuy);else if(b.dataset.decorCancel)cancelPlacing()});
 addEventListener("keydown",e=>{if(e.key==="Escape"){cancelPlacing();if(buildMode)toggleBuild(false);if(starMode)endStarMode(false)}});
 $("hBuild").addEventListener("click",()=>{audio();toggleBuild()});

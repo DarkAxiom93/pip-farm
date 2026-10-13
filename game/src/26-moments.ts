@@ -5,6 +5,8 @@
    while it remembers, they remember together: trust grows and the pip draws the moment on the ground.
    Moments also come back on their anniversaries (a week, a month, a year). */
 const MOMENTS={
+  guest:{i:"heart",x:m=>`האורח הראשון מחווה של חבר: ${m.v}`},
+  song:{i:"heart",x:m=>`השיר הראשון שכתבת לפיפים: ${m.v}`},
   compile:{i:"chip",x:m=>`היום ש${m.n} בנה את עצמו מהביטים שאכל`},
   upload:{i:"chip",x:m=>`היום ש${m.v} עלה לרשת`},
   network:{i:"screen",x:m=>`היום שהרשת כולה הפכה לשלכם`},

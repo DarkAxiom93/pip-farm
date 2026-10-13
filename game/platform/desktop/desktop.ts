@@ -16,7 +16,7 @@ function notify(title:string,body:string,force?:boolean){
   try{pipDesktop.notify(title,body)}catch(_){}
 }
 function deskSnapshot(){
-  try{pipDesktop.snapshot({night,season:curSeason,total:S.pips.length,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,word:deskWord(p),hue:Math.round(p.hue),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep"}))})}catch(_){}
+  try{pipDesktop.snapshot({night,season:curSeason,total:S.pips.length,net:S.net||0,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,word:deskWord(p),hue:Math.round(p.hue),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep",ds:p.ds||0,dc:(p.ds||0)?dcol(p):null,dmod:p.dmod??0}))})}catch(_){}
 }
 setInterval(deskSnapshot,2500);
 // a word this pip says on the desktop: one you understand, or any of its own

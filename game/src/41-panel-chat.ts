@@ -50,11 +50,13 @@ function renderHead(){
   <div class="row" style="margin-top:10px">
     <button class="btn" id="petBtn" type="button">ללטף</button>
     <button class="btn" id="feedBtn" type="button" ${S.basket?"":"disabled"}>להאכיל <small>סל ${S.basket}</small></button>
-  </div>`;
+  </div>
+  <button class="linkbtn" id="ambBtn" type="button" style="margin-top:6px">🧳 לשלוח לביקור אצל חבר</button>`;
   $("portraitSlot").replaceWith(portrait(p));
   $("moreBox").addEventListener("toggle",e=>{moreOpen=e.target.open});
   $("renameBtn").onclick=()=>{$("renameForm").hidden=!$("renameForm").hidden;if(!$("renameForm").hidden)$("renameInput").focus()};
   $("renameForm").onsubmit=e=>{e.preventDefault();const v=$("renameInput").value.trim().slice(0,14);if(v){p.name=v;say(p,v+"!",2,"word","excited");renderAll();dirty()}};
+  $("ambBtn").onclick=()=>{audio();sendAmbassador(p)};
   $("petBtn").onclick=()=>{audio();pet(p);if(rt(p).need&&rt(p).need.type==="pet")fulfill(p)};
   $("feedBtn").onclick=()=>{audio();if(S.basket>0){feed(p);if(rt(p).need&&rt(p).need.type==="food")fulfill(p)}};
   refresh();

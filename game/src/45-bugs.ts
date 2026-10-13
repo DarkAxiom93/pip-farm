@@ -26,7 +26,7 @@ function bugTick(dt){
   for(let i=bugs.length-1;i>=0;i--){const b=bugs[i];b.t+=dt;b.life-=dt;b.hop-=dt;
     if(b.hop<=0){b.hop=rand(.25,.7);const a=rand(0,7);b.x=clamp(b.x+Math.cos(a)*rand(2,6),4,WW-4);b.y=clamp(b.y+Math.sin(a)*rand(1,4),10,WH-4)}
     b.steal-=dt;
-    if(b.steal<=0){b.steal=rand(7,11);binFix();const sum=S.bin[0]+S.bin[1]+S.bin[2];
+    if(b.steal<=0){b.steal=rand(7,11)*(res("bugtrap")?2:1);binFix();const sum=S.bin[0]+S.bin[1]+S.bin[2];
       if(sum>0&&b.loot<6){const k=S.bin.findIndex(v=>v>0);S.bin[k]--;S.basket--;b.loot++;
         parts.push({x:b.x,y:b.y-4,vx:0,vy:-14,life:.8,kind:"px",c:"#5dffb0"});renderHead();dirty()}}
     if(b.life<=0){bugs.splice(i,1);if(b.loot&&inView(b.x,b.y,0))toast(`באג ברח עם ${b.loot} ביטים`)}

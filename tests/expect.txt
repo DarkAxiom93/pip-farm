@@ -159,3 +159,34 @@ bugs_test|STEAL 1 loot 1
 bugs_test|CATCH tap True back 2 book True
 bugs_test|CHASE caught 2
 bugs_test|ERR []
+virus_test|VIRUS card וירוס!
+virus_test|FROZEN True
+virus_test|SPREAD 2
+virus_test|POPUP 1
+virus_test|SENT antenna first True
+virus_test|CLEAN done 1 vaccinated True
+virus_test|ERR []
+buddy_test|NET line True
+research_test|BANK 12
+research_test|SHOWN 8 locked 1
+research_test|DONE basket True paid True
+research_test|PREREQ blocked True
+research_test|WATER True
+research_test|FASTC ready at 12 True
+research_test|SAVED research ['basket', 'fastc', 'water'] bank 60
+research_test|ERR []
+extras_test|COMP grid 64
+extras_test|COMP notes 2,4,5,-1,3,-1,-1,-1
+extras_test|COMP played 1
+extras_test|COMP saved 1 in music True
+extras_test|PHOTO on True bar True
+extras_test|PHOTO file True preview True name החווה של הבדיקה
+extras_test|CODE ok True reads back True
+extras_test|BAD code True
+extras_test|GUEST arrived True listed 1
+extras_test|GUEST no dup 1
+extras_test|GUEST popup פי1 · אורח gift 10
+extras_test|SEND code shown True
+extras_test|TIMELINE True events True
+extras_test|SAVED songs 1 guests 1 name החווה של הבדיקה hist True
+extras_test|ERR []

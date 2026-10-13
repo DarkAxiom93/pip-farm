@@ -26,6 +26,12 @@ async def main():
         # the break sign
         await pg.evaluate("__cb.brk()");await pg.wait_for_timeout(5000)
         await pg.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)),"buddy.png"))
+        # digital pips and the network line on the desktop
+        dp=[dict(pp,ds=k%5,dc=["#5dffb0","#ffcf4a","#c9a2ff"][k%3],dmod=k%3) for k,pp in enumerate(pips)]
+        await pg.evaluate(f"__cb.snap({json.dumps({'night':False,'season':'autumn','total':6,'net':60,'pips':dp})})");await pg.wait_for_timeout(800)
+        line=await pg.evaluate("(()=>{const c=document.getElementById('c'),g=c.getContext('2d'),d=g.getImageData(0,c.height-1,c.width,1).data;let k=0;for(let i=0;i<c.width;i++)if(d[i*4+3]&&d[i*4+1]>200)k++;return k>c.width*.5})()")
+        print("NET line",line)
+        await pg.screenshot(path=os.path.join(os.path.dirname(os.path.abspath(__file__)),"buddy_digital.png"))
         print("ERR",errs[:5])
         await b.close()
 asyncio.run(main())

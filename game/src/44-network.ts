@@ -12,13 +12,14 @@ const NET_STEPS=[
 function netNow(){
   let v=0;for(const p of S.pips){const s=dstage(p);v+=s>=4?3:s===3?1:s===2?.5:s===1?.25:0}
   v+=(S.uploaded||[]).length*5;
-  v+=(S.decor||[]).filter(d=>d.k==="server"||d.k==="antenna").length*2;
+  v+=(S.decor||[]).filter(d=>d.k==="server"||d.k==="antenna").length*(res("strongnet")?4:2);
   return Math.min(100,Math.floor(v));
 }
 let netT=0;
 function netTick(dt){
   netT-=dt;if(netT>0)return;netT=2;
   const v=netNow();if(v>(S.net||0)){S.net=v;dirty()}
+  histTick();
   const n=S.net||0,ch=$("hNetChip");if(ch){ch.hidden=n<1;$("hNet").textContent=n+"%"}
   let k=S.netM||0;
   if(k<NET_STEPS.length&&n>=NET_STEPS[k].at&&!cardOn&&!hide&&!night){

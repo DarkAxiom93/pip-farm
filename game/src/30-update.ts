@@ -8,7 +8,7 @@ function update(dt){
   socialT-=dt;if(socialT<=0){socialT=rand(2,4);social()}
   updateChoir(dt);updateArgs(dt);updateWeather(dt);updateFocus(dt);seasonTick(dt);spawnWild(dt);
   storyT-=dt;if(storyT<=0){storyT=2;try{storyTick()}catch(e){console.error(e)}}
-  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);netTick(dt);bugTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
+  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);netTick(dt);bugTick(dt);virusTick(dt);guestTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
   if(camGoal){const k=Math.min(1,dt*5);cam.x+=(camGoal.x-cam.x)*k;cam.y+=(camGoal.y-cam.y)*k;clampCam();if(Math.hypot(camGoal.x-cam.x,camGoal.y-cam.y)<.5)camGoal=null}
   tribeT-=dt;if(tribeT<=0){tribeT=6;updateTribes();updateLoyalty()}
   choirT-=dt;if(choirT<=0){choirT=rand(150,300);if(!night&&!focusing()&&S.pips.length>=4)startChoir(false)}
@@ -64,6 +64,7 @@ function updPip(p,dt){
         else if(r.goal==="push"){r.state="push";r.ct=rand(10,16);r.dir=1}
         else if(r.goal==="decor"){useDecor(p)}
         else if(r.goal==="bug"){bugArrive(p,r)}
+        else if(r.goal==="clean"){cleanArrive(p,r)}
         else if(r.goal==="fire"){fireArrive(p)}
         else if(r.goal==="hide"){r.state="hidden";r.goal=null;clearBubble(p.id)}
         else if(r.goal==="story"){r.state="sbuild3";r.workT=r.workMax=3}
@@ -80,6 +81,7 @@ function updPip(p,dt){
       }else if(r.ride||rideStart(p,r,d)){rideStep(p,r,dt)}
       else{const s=Math.min(d,speed*dt);p.x+=dx/d*s;p.y+=dy/d*s;if(Math.abs(dx)>.5)r.dir=dx>0?1:-1}
       break}
+    case "clean":r.workT-=dt;if(Math.random()<dt*6)parts.push({x:p.x+rand(-6,6),y:p.y-rand(4,10),vx:0,vy:-10,life:.5,kind:"px",c:Math.random()<.5?"#ff4fd8":"#7dffbf"});if(r.workT<=0)cleanDone(p,r);break;
     case "work":r.workT-=dt;if(Math.random()<dt*3)burst(p.x+r.dir*5,p.y-2,"dust",1);if(r.workT<=0)finishJob(p);break;
     case "sleep":
       p.energy=Math.min(100,p.energy+dt*4);

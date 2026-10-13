@@ -87,6 +87,7 @@ function tapAt(e){
   if(hideTap(x,y))return; // during hide and seek the search comes first
   if(S.story&&S.story.glitch&&Math.hypot(x-S.story.glitch.x,y-(S.story.glitch.y-6))<11){takeGlitch();return}
   if(fireTap(x,y))return; // the fire sits in a ring of pips, so it is checked before them
+  {const g=guestAt(x,y);if(g){openGuest(g);return}}
   // a pip that is remembering something is tapped first, even in a crowd
   const ord=S.pips.filter(p=>inView(p.x,p.y,20)&&rt(p).state!=="hidden").sort((a,b)=>tapPriority(b)-tapPriority(a)||b.y-a.y);
   for(const p of ord){
@@ -196,6 +197,7 @@ function openPlot(i){
   const[sl,st]=scr(g.x+PW/2,g.y),[,sb]=scr(0,g.y+PH+4);m.style.left=clamp(sl,22,78)+"%";const below=st<38;m.style.top=(below?sb:st)+"%";m.style.transform=below?"translate(-50%,0)":"translate(-50%,-104%)";
   let h="";
   if(!pl.owned){const cost=PLOT_COST[i];h=`<h4>חלקה חדשה</h4><p>עוד מקום לגדל ביטים</p><button class="btn main" data-act="buy" ${S.sparks<cost?"disabled":""}>לקנות · ${cost} ניצוצות</button>`}
+  else if(infected(i))h=virusPopup(i);
   else if(pl.pending)h=`<h4>פיפ בדרך</h4><p>הוא יגיע עוד רגע</p>`;
   else if(!pl.crop){
     h=`<h4>מה לשתול?</h4>`+CROPS.map((c,k)=>S.seeds[k]?`<button class="btn" data-act="plant" data-seed="${k}">${c.name}<small>${fmtT(c.grow)}</small></button>`:"").join("");
@@ -210,6 +212,7 @@ function openPlot(i){
 function closePlot(){$("pmenu").hidden=true;openPlotIdx=-1}
 $("pmenu").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b||b.disabled)return;
+  if(b.dataset.amb){copyCode();return}
   if(b.dataset.decor){decorAction(b.dataset.decor,b.dataset.id);closePlot();return}
   if(b.dataset.wguess){guessWord(b.dataset.w,b.dataset.wguess,b.dataset.p&&byId(b.dataset.p));closePlot();return}
   if(b.dataset.build){const k=b.dataset.build,B=BUILD[k];if((S.wood||0)>=B.cost&&!S.builds[k]){S.wood-=B.cost;S.builds[k]={p:0,done:false};SFX.coin();toast(`התחילו לבנות ${B.n}. הפיפים יבנו אותו`,1);dirty()}closePlot();refresh();return}
@@ -218,6 +221,7 @@ $("pmenu").addEventListener("click",e=>{
   if(b.dataset.thank){const d=S.drawings.find(x=>String(x.t)===b.dataset.thank);if(d){const a=byId(d.by);S.drawings.splice(S.drawings.indexOf(d),1);if(a){bond(a,4,"thanked");a.mood=Math.min(100,a.mood+12);select(a.id,true);const r=rt(a);r.state="celebrate";r.ct=1.4;burst(a.x,a.y-10,"heart",1);SFX.happy(a.pitch);toast(`${a.name} שמח שראית את הציור`)}dirty()}closePlot();return}
   if(b.dataset.zone){const z=ZONES.find(q=>q.id===b.dataset.zone);if(z&&S.sparks>=z.cost){S.sparks-=z.cost;S.zones[z.id]=true;quest("zone");SFX.level();burst(z.x+z.w/2,z.y+z.h/2,"confetti",40);toast(`נפתח: ${z.name}! הפיפים יוצאים לחקור`);lookAt(z.x+z.w/2,z.y+z.h/2);syncLocks();renderFarm();dirty()}closePlot();refresh();return}
   const i=openPlotIdx,pl=S.plots[i],a=b.dataset.act;
+  if(a==="clean"){sendCleaner(i);closePlot();return}
   if(a==="buy"){const cost=PLOT_COST[i];if(S.sparks>=cost){S.sparks-=cost;pl.owned=true;SFX.coin();burst(PLOTS[i].x+24,PLOTS[i].y+15,"spark",16);toast("חלקה חדשה בחווה");dirty()}}
   else if(a==="plant"){S.lastSeed=+b.dataset.seed;queueJob("plant",i,+b.dataset.seed)}
   else if(a==="water")queueJob("water",i);

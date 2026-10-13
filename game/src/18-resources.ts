@@ -1,5 +1,5 @@
 /* wood, food, buildings */
-function basketMax(){return 40+2*Math.min(S.pips.length,40)+(S.builds&&S.builds.storage&&S.builds.storage.done?60:0)+(S.items&&S.items.sack?20:0)}
+function basketMax(){return 40+2*Math.min(S.pips.length,40)+(S.builds&&S.builds.storage&&S.builds.storage.done?60:0)+(S.items&&S.items.sack?20:0)+(res("basket")?30:0)}
 let fullWarn=0;
 function addFood(n){const m=basketMax();if(S.basket+n>m&&Date.now()-fullWarn>120000){fullWarn=Date.now();toast(S.builds.storage&&S.builds.storage.done?"הסל מלא":"הסל מלא. בנו מחסן כדי לאגור יותר אוכל")}S.basket=Math.min(m,S.basket+n)}
 function treeUp(i){const t=S.treeCut[i];return t==null||Date.now()-t>360000}

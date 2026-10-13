@@ -17,18 +17,19 @@ const DMOD=[
 ];
 const DATA_W=[3,5,8]; // data per meal: bit, chip, star pixel
 const dstage=p=>p.ds||0;
+const dNeed=s=>Math.round(DSTAGE[s].need*(res("fastc")?.8:1));
 const pipMod=p=>dstage(p)>=2?(p.dmod??0):-1;
 function dmain(p){const d=p.diet||[0,0,0];return d[2]>d[1]&&d[2]>d[0]?2:d[1]>d[0]?1:0}
 const dcol=p=>DMOD[p.dmod??dmain(p)].c;
 function dReady(p){
   const s=dstage(p);if(s>=DMAX||s>=DSTAGE.length)return false;
   const st=DSTAGE[s],ch=S.story?S.story.ch||0:0,end=!!(S.story&&S.story.ending);
-  return (p.data||0)>=st.need&&(st.ch===99?end:(end||ch>=st.ch));
+  return (p.data||0)>=dNeed(s)&&(st.ch===99?end:(end||ch>=st.ch));
 }
 function dWaitText(p){
   const s=dstage(p);if(s>=DSTAGE.length)return "שלב אחרון";
   if(s>=DMAX)return "השלב הבא עוד לא נפתח";
-  const st=DSTAGE[s];if((p.data||0)<st.need)return `עוד ${st.need-(p.data||0)} דאטה לשלב ${st.n}`;
+  const st=DSTAGE[s];if((p.data||0)<dNeed(s))return `עוד ${dNeed(s)-(p.data||0)} דאטה לשלב ${st.n}`;
   return st.ch===99?"מחכה לסוף הסיפור":"מחכה להמשך הסיפור";
 }
 // ---------- the basket knows what's in it ----------
@@ -49,7 +50,7 @@ function takeFood(){
 }
 function eatFood(p){
   const k=takeFood();if(k==null)return null;
-  if(k>=0){p.data=(p.data||0)+DATA_W[k];p.diet=p.diet||[0,0,0];p.diet[k]++}
+  if(k>=0){p.data=(p.data||0)+DATA_W[k];bankData(DATA_W[k]);p.diet=p.diet||[0,0,0];p.diet[k]++}
   return k;
 }
 // ---------- compiling ----------
@@ -100,7 +101,7 @@ function dataPanelText(p){
   const s=dstage(p),m=pipMod(p);
   return `${s?DSTAGE[s-1].n:"רגיל"}${m>=0?` · ${DMOD[m].n}`:""} · ${dWaitText(p)}`;
 }
-function dataFrac(p){const s=dstage(p);if(s>=DSTAGE.length)return 100;const prev=s?DSTAGE[s-1].need:0,need=DSTAGE[s].need;return clamp(((p.data||0)-prev)/(need-prev)*100,0,100)}
+function dataFrac(p){const s=dstage(p);if(s>=DSTAGE.length)return 100;const prev=s?dNeed(s-1):0,need=dNeed(s);return clamp(((p.data||0)-prev)/(need-prev)*100,0,100)}
 
 // stage 3+ eyes and glitchy edges, stage 4 scanlines; drawn after the face
 function drawPipDataTop(p,r,x0,y0,bww,bh2,el,er,ey,sleep,t){

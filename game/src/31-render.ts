@@ -110,7 +110,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(r.state==="walk"&&mut!=="wings"){const st=Math.floor(r.anim*10)%2;R(x0+1+st,py-.5,2,.5,out);R(x0+1.5+st,py-1,1,.5,dark);R(x0+bww-3-st,py-.5,2,.5,out);R(x0+bww-2.5-st,py-1,1,.5,dark)}
   if(rainy()&&RT.get(p.id)===r&&r.state!=="sleep"&&r.state!=="choir"&&S.weather){R(cx-4,y0-7,9,1,"#3f8f3a");R(cx-3,y0-8,7,1,"#6fcf5a");R(cx-1,y0-9,3,1,"#6fcf5a");R(cx,y0-6,1,4,"#2f6a33")}
   if(r.state==="gather"&&NODES[r.node]&&NODES[r.node].k==="fish"){const fx=dir>0?x0+bww:x0-1;for(let k=0;k<5;k++)R(fx+dir*k,y0+1-k,1,1,"#8a6a45");R(fx+dir*5,y0-4,1,7,"rgba(230,230,230,.7)")}
-  if(r.state==="work"||r.state==="gather"||r.state==="build"||r.state==="sbuild"||r.state==="construct"||r.state==="sbuild3"){const pr=1-r.workT/(r.workMax||1);R(x0-1,y0-6,bww+2,2,"rgba(20,14,24,.7)");R(x0-1,y0-6,Math.round((bww+2)*pr),2,"#86d47f");
+  if(r.state==="work"||r.state==="clean"||r.state==="gather"||r.state==="build"||r.state==="sbuild"||r.state==="construct"||r.state==="sbuild3"){const pr=1-r.workT/(r.workMax||1);R(x0-1,y0-6,bww+2,2,"rgba(20,14,24,.7)");R(x0-1,y0-6,Math.round((bww+2)*pr),2,"#86d47f");
     R(dir>0?x0+bww:x0-2,y0+bh-4+Math.round(Math.sin(r.anim*16)),2,2,"#c89c63")}
   if(r.state==="eat"){const ex=dir>0?x0+bww-1:x0-1;R(ex,ey+3,2,2,"#5dffb0");R(ex,ey+3,1,1,"#0d3d2a");if(Math.random()<.3)R(ex+(dir>0?2:-1),ey+2-Math.random()*3,.5,.5,"#9dffd0")}
   drawPipDataTop(p,r,x0,y0,bww,bh2,el,er,ey,sleep,t);
@@ -163,12 +163,14 @@ function render(t){
   });
   drawSeasonGround(t);drawWild(t);drawBuildings(t);drawDoodles(t);drawStreakBed(t);drawHoliday(t);drawMeteor(t);
   for(let i=0;i<PLOTS.length;i++){if(PLOTS[i].z&&!zoneOpen(PLOTS[i].z))continue;drawPlot(i,t)}
+  drawVirus(t);
   drawStatue(t);
   for(const tr of S.tribes)drawCamp(tr,t);
   drawTrees(t);
   drawStory(t);drawHide(t);drawLanterns(t);drawNature(t);drawBugs(t);drawDecor(t);drawNetLines(t);drawEcho(t);drawFire(t);
   const ord=S.pips.filter(p=>inView(p.x,p.y,24)&&rt(p).state!=="hidden").sort((a,b)=>a.y-b.y);
   for(const p of ord)drawPip(p,t,p.id===sel);
+  drawGuests(t);
   drawFireGlow(t);drawHover(t);
   drawVisitor(t);
   drawParticles();drawRain(t);

@@ -16,7 +16,7 @@ const jobs=[];
 function autoWork(p){
   const r=rt(p);
   for(let i=0;i<S.plots.length;i++){
-    const pl=S.plots[i];if(!pl.owned||pl.pending)continue;
+    const pl=S.plots[i];if(!pl.owned||pl.pending||infected(i))continue;
     let type=null;
     if(pl.crop&&cropFrac(pl.crop)>=1)type="harvest";
     else if(!pl.crop&&S.pips.length>=3)type="plant";
@@ -61,10 +61,10 @@ function finishJob(p){
   const r=rt(p),j=r.job,pl=S.plots[j.plot],g=PLOTS[j.plot];
   jobs.splice(jobs.indexOf(j),1);r.job=null;pl.pending=false;
   p.energy=Math.max(0,p.energy-6);
-  if(j.type==="plant"&&!pl.crop){pl.crop={type:j.seed,planted:Date.now(),water:!!(S.builds.well&&S.builds.well.done)};SFX.plop();quest("plant");burst(g.x+24,g.y+15,"dust",8);award(p,10,j.auto?null:"work")}
+  if(j.type==="plant"&&!pl.crop){pl.crop={type:j.seed,planted:Date.now(),water:!!(S.builds.well&&S.builds.well.done)||res("water")};SFX.plop();quest("plant");burst(g.x+24,g.y+15,"dust",8);award(p,10,j.auto?null:"work")}
   else if(j.type==="water"&&pl.crop&&!pl.crop.water){pl.crop.water=true;SFX.water();burst(g.x+24,g.y+15,"drop",12);award(p,6,j.auto?null:"work");langSpeak(p,"water",.3)}
   else if(j.type==="harvest"&&pl.crop&&cropFrac(pl.crop)>=1){
-    const ct=pl.crop.type,c=CROPS[ct];pl.crop=null;S.sparks+=c.spark;const extra=pipMod(p)===1&&Math.random()<.3?1:0;addBits(ct,c.yld+(curSeason==="autumn"?1:0)+extra);if(extra)say(p,"+1",1.2,"snd","happy");S.stats.harvests++;quest("harvest");goal("harvest");if([1,25,100,500].includes(S.stats.harvests))moment("harvest",null,S.stats.harvests,false);
+    const ct=pl.crop.type,c=CROPS[ct];pl.crop=null;S.sparks+=c.spark;const cb=pipMod(p)===1&&Math.random()<.3?1:0,extra=cb+(res("yield")?1:0);addBits(ct,c.yld+(curSeason==="autumn"?1:0)+extra);if(cb)say(p,"+1",1.2,"snd","happy");S.stats.harvests++;quest("harvest");goal("harvest");if([1,25,100,500].includes(S.stats.harvests))moment("harvest",null,S.stats.harvests,false);
     SFX.coin();burst(g.x+24,g.y+12,"spark",14);award(p,22,j.auto?null:"work");
     if(c.star){S.pips.forEach(q=>q.mood=Math.min(100,q.mood+20));toast("פרח כוכב! כל הפיפים שמחים")}
     if(!j.auto)toast(`${p.name} קטף ${c.name}: ‎+${c.spark} ניצוצות, ‎+${c.yld} לסל`);

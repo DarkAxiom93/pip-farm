@@ -63,7 +63,7 @@ function musicTick(){
   while(MUS.next<AC.currentTime+.4){
     const t=MUS.next,s=MUS.step%16;
     if(s===0){MUS.chord=Math.floor(MUS.step/16)%prog.length;
-      if(MUS.chord===0&&(MUS.motifAge++%2===0||!MUS.motif.length))MUS.motif=newMotif(mode);
+      if(MUS.chord===0&&(MUS.motifAge++%2===0||!MUS.motif.length))MUS.motif=songMotif()||newMotif(mode);
       else if(Math.random()<.35){const k=ri(0,7);MUS.motif[k]=MUS.motif[k]<0?ri(2,7):clamp(MUS.motif[k]+pick([-1,1]),0,MUS_PENTA.length-1)}}
     const ch=prog[MUS.chord],bar=eighth*16;MUS.cur=ch;
     // pad: the whole chord, slow in and out
