@@ -4,6 +4,8 @@
    Daily goals: three small goals picked for the day (the same three all day). Each pays sparks, and
    finishing all three also counts as a day in the streak. */
 const ACH=[
+  {id:"bugs10",n:"מדביר",d:"לתפוס 10 באגים דיגיטליים",r:15,v:()=>S.stats.bugs||0,g:10},
+  {id:"bugs100",n:"צייד באגים",d:"לתפוס 100 באגים דיגיטליים",r:50,v:()=>S.stats.bugs||0,g:100},
   {id:"pips10",n:"משפחה",d:"10 פיפים בחווה",r:10,v:()=>S.pips.length,g:10},
   {id:"pips50",n:"כפר",d:"50 פיפים בחווה",r:30,v:()=>S.pips.length,g:50},
   {id:"pips100",n:"עיר פיפים",d:"100 פיפים בחווה",r:60,v:()=>S.pips.length,g:100},

@@ -33,7 +33,7 @@ async def main():
         print("GATE s4 no end",await pg.evaluate("(()=>{const p=__pip.S.pips[0];p.ds=3;return __pip.dReady(p)})()"),"end",await pg.evaluate("(()=>{__pip.S.story.ending='free';const r=__pip.dReady(__pip.S.pips[0]);__pip.S.story.ending=null;__pip.S.pips[0].ds=2;__pip.S.pips[0].data=100;__pip.S.story.ch=2;return r})()"))
         # stage 3 rides the circuits on a long walk
         r=await pg.evaluate("""(()=>{const p=__pip.S.pips[1],r=__pip.rt(p);p.ds=3;p.dmod=0;__pip.S.story.ch=4;p.x=100;p.y=150;r.state='walk';r.goal=null;r.tx=260;r.ty=200;return __pip.rideStart(p,r,Math.hypot(160,50))})()""")
-        await pg.wait_for_function("(__pip.S.stats.rides||0)>=1",timeout=8000);print("RIDE started",r,"arrived",await pg.evaluate("!__pip.rt(__pip.S.pips[1]).ride"))
+        print("RIDE started",r,"arrived",await pg.evaluate("(()=>{const p=__pip.S.pips[1],r=__pip.rt(p);for(let i=0;i<60&&r.ride;i++)__pip.rideStep(p,r,.05);return !r.ride&&Math.abs(p.x-260)<1&&Math.abs(p.y-200)<1})()"))
         # child inherits half
         await skip(pg);await pg.locator('#sChoices button').first.click();await pg.wait_for_timeout(300)
         await pg.evaluate("(()=>{const p=__pip.S.pips[0];p.data=100;p.growth=9999;p.food=90;__pip.doSplit(p)})()");await pg.wait_for_timeout(300)

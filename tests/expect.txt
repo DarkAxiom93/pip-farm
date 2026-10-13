@@ -153,3 +153,9 @@ network_test|ECHO on True
 network_test|END True title הרשת שלנו moment True
 network_test|SAVED net 100 uploaded 2 done True
 network_test|ERR []
+bugs_test|BUGS before digital 0
+bugs_test|BUGS spawn True
+bugs_test|STEAL 1 loot 1
+bugs_test|CATCH tap True back 2 book True
+bugs_test|CHASE caught 2
+bugs_test|ERR []

@@ -8,7 +8,7 @@ function update(dt){
   socialT-=dt;if(socialT<=0){socialT=rand(2,4);social()}
   updateChoir(dt);updateArgs(dt);updateWeather(dt);updateFocus(dt);seasonTick(dt);spawnWild(dt);
   storyT-=dt;if(storyT<=0){storyT=2;try{storyTick()}catch(e){console.error(e)}}
-  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);netTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
+  if(drag&&drag.hold&&drag.pip&&!drag.held){const p=byId(drag.pip);if(p&&rt(p).state==="cuddle")cuddleTick(p,dt)}updateMeteor();updateVisitor(dt);outsideTick(dt);titleTick(dt);digiTick();pipDataTick(dt);netTick(dt);bugTick(dt);recallTick(dt);hideTick(dt);achTick(dt);nightTick(dt);natureTick(dt);fireTick(dt);humTick(dt);glideTick(dt);
   if(camGoal){const k=Math.min(1,dt*5);cam.x+=(camGoal.x-cam.x)*k;cam.y+=(camGoal.y-cam.y)*k;clampCam();if(Math.hypot(camGoal.x-cam.x,camGoal.y-cam.y)<.5)camGoal=null}
   tribeT-=dt;if(tribeT<=0){tribeT=6;updateTribes();updateLoyalty()}
   choirT-=dt;if(choirT<=0){choirT=rand(150,300);if(!night&&!focusing()&&S.pips.length>=4)startChoir(false)}
@@ -36,6 +36,7 @@ function updPip(p,dt){
       if(p.growth>=splitNeed()&&p.food>=30&&S.pips.length<cap()){r.state="split";r.ct=2.2;SFX.chirp(p.pitch*1.5);say(p,"?!",1.6,"snd","curious");break}
       if(p.food<25&&S.basket>0){eatFood(p);p.food=Math.min(100,p.food+30);p.mood=Math.min(100,p.mood+6);r.state="eat";r.ct=1.4;SFX.crunch();langSpeak(p,"food",.55);dirty();break}
       if(tryCompile(p))break;
+      if(r.wait<=0&&chaseBug(p,r))break;
       if(night&&!stormy()&&S.items&&S.items.lamp&&p.energy>55&&Math.random()<.3&&r.wait<=0&&autoWork(p))break;
       if(night||stormy()){r.goal="sleep";r.state="walk";const tt=tribeOf(p);if(tt&&tt.huts){const h=hutSpot(tt,ri(0,tt.huts-1));setT(p,h.x+rand(-6,6),h.y+rand(2,7))}else setT(p,rand(16,52),rand(56,70));langSpeak(p,"night",.2);break}
       if(p.energy<12){r.state="sleep";r.nap=true;langSpeak(p,"sleep",.45);break}
@@ -62,6 +63,7 @@ function updPip(p,dt){
         else if(r.goal==="form"){r.state="form";r.ct=60;r.dir=1}
         else if(r.goal==="push"){r.state="push";r.ct=rand(10,16);r.dir=1}
         else if(r.goal==="decor"){useDecor(p)}
+        else if(r.goal==="bug"){bugArrive(p,r)}
         else if(r.goal==="fire"){fireArrive(p)}
         else if(r.goal==="hide"){r.state="hidden";r.goal=null;clearBubble(p.id)}
         else if(r.goal==="story"){r.state="sbuild3";r.workT=r.workMax=3}

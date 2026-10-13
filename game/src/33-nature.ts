@@ -117,6 +117,7 @@ function drawNature(t){
 }
 // a tap on the world: returns true when nature used it
 function natureTap(x,y){
+  if(bugTap(x,y))return true;
   for(const c of critters)if(Math.hypot(c.x-x,c.y-y)<6){critters.splice(critters.indexOf(c),1);collect(c.sp,c.x,c.y);tone(1200,.06,"triangle",0,1.4,.2);return true}
   for(const f of fishes)if(Math.hypot(f.x-x,f.y-y)<6){fishes.splice(fishes.indexOf(f),1);ripples.push({x:f.x,y:f.y,t:0});SFX.water();collect(f.sp,f.x,f.y);return true}
   if(digTap(x,y))return true;
