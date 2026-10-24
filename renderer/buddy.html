@@ -5,6 +5,10 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden}
 canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .tag{position:absolute;transform:translate(-50%,-100%);font:700 13px system-ui,"Segoe UI",sans-serif;direction:rtl;white-space:nowrap;pointer-events:none;
   background:#e3f1ff;color:#2a1830;border-radius:10px;padding:2px 8px;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.menu{position:absolute;transform:translate(-50%,-100%);display:flex;gap:4px;background:#2a1f33;border:2px solid #8a6a45;border-radius:10px;padding:4px;direction:rtl;font:600 13px system-ui,"Segoe UI",sans-serif}
+.menu button{background:#3d2f4a;color:#f5eddc;border:0;border-radius:7px;padding:4px 8px;font:inherit;cursor:pointer;white-space:nowrap}
+.menu button:hover{background:#5a4670}
+.menu button:disabled{opacity:.45;cursor:default}
 .tag.sign{background:#f5eddc;border:2px solid #8a6a45;border-radius:4px;padding:3px 9px;font-size:14px}
 </style></head><body>
 <canvas id="c"></canvas>
@@ -44,7 +48,7 @@ function tone(f,d,type,vol){try{if(!AC)AC=new AudioContext();const t=AC.currentT
 const chirp=p=>tone(500+(p.hue%200),.15,"triangle",.12);
 
 function drawPip(w,t){
-  const p=w.p,base=H-2-w.y,bw=p.g&&p.g.body?11:9,bh=bw-1;
+  const p=w.p,gg=p.g||{},sz=gg.size===1?-1:gg.size===2?2:0,sh=gg.shape||0,base=H-2-w.y,bw=Math.max(6,(gg.body?11:9)+sz+(sh===2?2:sh===1?-1:0)),bh=Math.max(5,bw-1+(sh===1?3:sh===2?-2:0));
   const hop=w.hop>0?Math.abs(Math.sin(w.hop*12))*6:(w.moving?Math.abs(Math.sin(w.anim*11))*1.5:0);
   const x0=Math.round(w.x-bw/2),y0=Math.round(base-bh-hop);
   const hue=p.mut==="rainbow"?(p.hue+t*70)%360:p.hue,sat=p.elder?45:80;
@@ -58,7 +62,11 @@ function drawPip(w,t){
   R(x0+1,y0,bw-2,bh,C(72));R(x0,y0+1,bw,bh-2,C(72));R(x0+1,y0+bh-2,bw-2,2,C(52));R(x0+1,y0+1,2,1,C(86));
   g.globalAlpha=1;
   drawDigital(w,p,ds,dc,x0,y0,bw,bh,t);
-  const cx=x0+(bw>>1);
+  const cx=x0+(bw>>1),acc=p.mut==="gold"?"hsl(36,90%,45%)":`hsl(${p.hue2??hue+150},72%,58%)`,eyeC=["#2a1830","#1f3f9f","#9a1f3a","#1f7a44"][gg.eyec||0];
+  if(sh===3){R(cx-1,y0-2,3,1,C(24));R(cx-1,y0-1,3,1,C(72))}
+  if(gg.pattern===1){R(x0+1,y0+bh-4,2,2,acc);R(x0+bw-3,y0+2,2,2,acc)}
+  else if(gg.pattern===2){R(x0+1,y0,bw-2,1,acc);R(x0,y0+1,bw,1,acc)}
+  else if(gg.pattern===3){R(cx-2,y0+bh-3,4,2,C(86))}
   if(p.sprout===0){R(cx,y0-2,1,2,"#3f8f3a");R(cx-2,y0-3,2,1,"#6fcf5a");R(cx+1,y0-4,2,1,"#6fcf5a")}
   else if(p.sprout===1){R(x0+1,y0-2,2,2,C(72));R(x0+bw-3,y0-2,2,2,C(72))}
   else if(p.sprout===2){R(cx,y0-3,1,3,C(52));R(cx-1,y0-5,3,2,C(86))}
@@ -70,10 +78,10 @@ function drawPip(w,t){
   const mx=mouse.x/S,my=mouse.y/S;if(performance.now()-mouse.t<3000&&Math.abs(mx-w.x)<50){off=mx>w.x?1:0;lookUp=my<y0?-1:0}
   const ey=y0+3+lookUp,el=cx-2+off,er=cx+1+off;
   const asleep=p.sleep||w.mode==="nap";
-  if(asleep){R(el,ey+1,2,1,"#2a1830");R(er,ey+1,2,1,"#2a1830");if(Math.sin(t*2+w.anim)>.6)R(x0+bw+1,y0-3-Math.round((t*4+w.anim)%4),2,1,"#cfe0ff")}
-  else if(Math.sin(t*1.3+w.anim)>.97){R(el,ey+1,1,1,"#2a1830");R(er,ey+1,1,1,"#2a1830")}
+  if(asleep){R(el,ey+1,2,1,eyeC);R(er,ey+1,2,1,eyeC);if(Math.sin(t*2+w.anim)>.6)R(x0+bw+1,y0-3-Math.round((t*4+w.anim)%4),2,1,"#cfe0ff")}
+  else if(Math.sin(t*1.3+w.anim)>.97){R(el,ey+1,1,1,eyeC);R(er,ey+1,1,1,eyeC)}
   else if(ds>=3){R(el,ey,2,2,"#0b1612");R(er,ey,2,2,"#0b1612");R(el,ey,1,1,dc);R(er,ey,1,1,dc)}
-  else{R(el,ey,1,2,"#2a1830");R(er,ey,1,2,"#2a1830");R(el,ey,1,1,"#fff")}
+  else{R(el,ey,1,2,eyeC);R(er,ey,1,2,eyeC);R(el,ey,1,1,"#fff")}
   if(p.mood>55&&!asleep){R(el-1,ey+2,1,1,"#ff9db5");R(er+1,ey+2,1,1,"#ff9db5")}
   if(p.elder){R(cx-2+off,ey+3,4,2,"#f4f1ea")}
   if(snap.season==="winter")R(x0,y0+bh-4,bw,1,"#e8433f");
@@ -110,11 +118,62 @@ function drawNet(t){
   g.globalAlpha=Math.min(.5,.15+n/250);R(0,H-1,W,1,"#5dffb0");g.globalAlpha=1;
   const k=Math.max(1,Math.floor(n/25));for(let i=0;i<k;i++){const x=((t*40+i*W/k)%W);R(x,H-1,2,1,"#d6ffe9")}
 }
+// ---------- things to do with them on the desktop ----------
+// right-click a pip: pet it, feed it from the basket, throw it a ball, or open it in the farm
+let menu=null,ball=null,fx=[];
+function closeMenu(){if(menu){menu.el.remove();menu=null;setOver(!!drag)}}
+function openMenu(w){
+  closeMenu();const el=document.createElement("div");el.className="menu";
+  const fed=(snap.basket||0)>0;
+  el.innerHTML=`<button data-m="pet">💕 ללטף</button><button data-m="feed" ${fed?"":"disabled"} title="${fed?"":"הסל ריק"}">🍏 להאכיל</button><button data-m="ball">⚽ כדור</button><button data-m="open">🏠 לחווה</button>`;
+  const base=H-2-w.y;el.style.left=Math.max(110,Math.min(innerWidth-110,w.x*S))+"px";el.style.top=((base-16)*S)+"px";
+  el.addEventListener("mousedown",e=>e.stopPropagation());
+  el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled)return;doMenu(b.dataset.m,w);closeMenu()});
+  let shut=setTimeout(closeMenu,6000);
+  el.addEventListener("mouseenter",()=>{setOver(true);clearTimeout(shut)});
+  el.addEventListener("mouseleave",()=>{shut=setTimeout(closeMenu,2000)});
+  document.body.appendChild(el);menu={el,w};setOver(true);
+}
+function doMenu(k,w){
+  const p=w.p;
+  if(k==="pet"){w.hop=.6;for(let i=0;i<5;i++)fx.push({k:"heart",x:w.x+rand(-4,4),y:H-14-w.y-rand(0,6),vy:-rand(8,14),l:1.4});tone(880,.12,"sine",.1);setTimeout(()=>tone(1175,.15,"sine",.1),120);pipDesktop.buddyCommand({type:"pet",id:p.id});if(p.need==="pet")p.need=null}
+  else if(k==="feed"){w.hop=.3;w.eat=1.4;for(let i=0;i<6;i++)fx.push({k:"bit",x:w.x+w.dir*4,y:H-8-w.y,vx:rand(-10,10),vy:-rand(10,25),l:.8});tone(660,.06,"square",.06);setTimeout(()=>tone(990,.06,"square",.06),80);pipDesktop.buddyCommand({type:"feed",id:p.id});if(p.need==="food")p.need=null;snap.basket=Math.max(0,(snap.basket||0)-1)}
+  else if(k==="ball"){spawnBall(w.x+w.dir*10,24)}
+  else if(k==="open")pipDesktop.buddyCommand({type:"open",id:p.id});
+}
+function spawnBall(x,h){ball={x,h,vx:rand(-20,20),vh:0,spin:0,idle:0};tone(520,.1,"triangle",.1)}
+function ballTick(dt,list){
+  if(!ball)return;const b=ball;
+  if(!(drag&&drag.ball)){b.vh-=260*dt;b.h+=b.vh*dt;b.x+=b.vx*dt;b.spin+=b.vx*dt*.4;
+    if(b.h<=0){b.h=0;if(b.vh<-40){b.vh=-b.vh*.55;tone(300,.05,"sine",.05)}else b.vh=0;b.vx*=Math.pow(.25,dt)}
+    if(b.x<3){b.x=3;b.vx=Math.abs(b.vx)*.7}if(b.x>W-3){b.x=W-3;b.vx=-Math.abs(b.vx)*.7}}
+  b.idle+=dt;if(Math.abs(b.vx)>3||b.h>0)b.idle=0;
+  if(b.idle>40){for(let i=0;i<6;i++)fx.push({k:"bit",x:b.x,y:H-4,vx:rand(-15,15),vy:-rand(10,30),l:.7});ball=null;return}
+  // awake pips chase it and kick it
+  for(const w of list){if(w.p.sleep||w.mode==="nap"||(drag&&drag.w===w))continue;
+    const d=b.x-w.x;if(Math.abs(d)<60||w.chase){w.chase=true;w.tx=b.x-Math.sign(d||1)*3;w.wait=1}
+    if(Math.abs(d)<5&&b.h<4&&(w.kickCd||0)<=0){w.kickCd=.8;const dir=d>=0?1:-1;b.vx=dir*rand(50,110);b.vh=rand(60,120);w.hop=.4;w.dir=dir;tone(400+((w.p.hue|0)%300),.08,"triangle",.1);pipDesktop.buddyCommand({type:"kick",id:w.p.id})}
+    w.kickCd=(w.kickCd||0)-dt;}
+}
+function drawBall(t){
+  if(!ball)return;const x=ball.x,y=H-3-ball.h;
+  g.globalAlpha=.25;R(x-2,H-2,5,1,"#000");g.globalAlpha=1;
+  R(x-2,y-4,5,5,"#f5eddc");R(x-3,y-3,7,3,"#f5eddc");R(x-1,y-5,3,1,"#f5eddc");R(x-1,y+1,3,1,"#f5eddc");
+  const k=Math.floor(ball.spin)&3;R(x-1+(k&1),y-3+(k>>1),2,2,"#2a1830");R(x+2-(k&1),y-1,1,1,"#2a1830");
+}
+function fxTick(dt){
+  for(let i=fx.length-1;i>=0;i--){const q=fx[i];q.l-=dt;q.y+=q.vy*dt;if(q.vx)q.x+=q.vx*dt;if(q.k==="bit")q.vy+=60*dt;if(q.l<=0){fx.splice(i,1);continue}
+    g.globalAlpha=Math.min(1,q.l);
+    if(q.k==="heart"){R(q.x-1,q.y,1,1,"#ff7aa2");R(q.x+1,q.y,1,1,"#ff7aa2");R(q.x-1,q.y+1,3,1,"#ff7aa2");R(q.x,q.y+2,1,1,"#ff7aa2")}
+    else R(q.x,q.y,1,1,"#5dffb0");
+    g.globalAlpha=1}
+}
 let last=performance.now(),tagT=0;
 function frame(now){
   const dt=Math.min(.1,(now-last)/1000);last=now;const t=now/1000;
   g.clearRect(0,0,W,H);
   drawNet(t);
+  ballTick(dt,[...walkers.values()]);drawBall(t);
   for(let i=trail.length-1;i>=0;i--){const q=trail[i];q.l-=dt;q.y-=dt*6;if(q.l<=0){trail.splice(i,1);continue}g.globalAlpha=q.l/.6;R(q.x,q.y,1,1,q.c);g.globalAlpha=1}
   const working=idle<5,away=idle>300,list=[...walkers.values()];
   if(away){tagT+=dt}else tagT=0;
@@ -137,7 +196,7 @@ function frame(now){
       if(Math.abs(d)<1){w.moving=false;w.wait-=dt*(working?.35:1);if(w.wait<=0){w.tx=Math.max(8,Math.min(W-8,w.x+rand(-120,120)));w.wait=rand(2,8)}}
       else{w.moving=true;w.dir=d>0?1:-1;
         if((w.p.ds||0)>=3&&(snap.net||0)>=10&&Math.abs(d)>60&&!w.ride)w.ride=true;
-        w.x+=Math.sign(d)*Math.min(Math.abs(d),(w.ride?90:12)*dt);if(Math.abs(w.tx-w.x)<1)w.ride=false}
+        w.x+=Math.sign(d)*Math.min(Math.abs(d),(w.ride?90:w.chase?34:12)*dt);if(Math.abs(w.tx-w.x)<1)w.ride=false}
     }
     // now and then a word in their language, or a sound
     w.nextSay-=dt;if(w.nextSay<=0&&!w.p.sleep&&w.mode!=="nap"){w.nextSay=rand(20,60);if(!w.p.need&&Math.random()<.6){w.say=w.p.word&&Math.random()<.6?w.p.word:pick(["פיפ!","♪","בלופ","מי?","הה"]);w.sayT=2.5}}
@@ -145,23 +204,29 @@ function frame(now){
     w.ride=false;
     drawPip(w,t);
   }
+  fxTick(dt);
+  if(!ball)for(const w of list)w.chase=false;
   if(breakSign){breakSign.t+=dt;if(breakSign.t>90)breakSign=null}
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+function hitBall(e){if(!ball)return false;const x=e.clientX/S,y=e.clientY/S,by=H-3-ball.h-1;return Math.abs(x-ball.x)<5&&Math.abs(y-by)<5}
 function hit(e){const x=e.clientX/S,y=e.clientY/S;for(const w of walkers.values()){const base=H-2-w.y;if(Math.abs(x-w.x)<8&&y>base-26&&y<base+3)return w}return null}
 let over=false;
 function setOver(o){if(o!==over){over=o;pipDesktop.buddyMouse(o);c.style.cursor=o?"grab":"default"}}
 addEventListener("mousemove",e=>{
   mouse={x:e.clientX,y:e.clientY,t:performance.now()};
-  const w=hit(e);setOver(!!w||!!drag);
+  const w=hit(e);setOver(!!w||!!drag||hitBall(e)||!!menu);
+  if(drag&&drag.ball){const nx=e.clientX/S,nh=Math.max(0,H-3-e.clientY/S);const now=performance.now(),dtm=Math.max(16,now-drag.t)/1000;ball.vx=(nx-ball.x)/dtm*.6;ball.vh=(nh-ball.h)/dtm*.6;ball.x=nx;ball.h=nh;drag.t=now;return}
   if(drag){if(Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)>6)drag.moved=true;return}
   if(w&&!w.p.sleep&&performance.now()-lastHover>1500){lastHover=performance.now();w.hop=.4}
 });
 addEventListener("mouseleave",()=>{if(!drag)setOver(false)});
-addEventListener("mousedown",e=>{const w=hit(e);if(!w)return;drag={w,sx:e.clientX,sy:e.clientY,moved:false};c.style.cursor="grabbing"});
+addEventListener("contextmenu",e=>{e.preventDefault();const w=hit(e);if(w)openMenu(w);else closeMenu()});
+addEventListener("mousedown",e=>{if(e.button===2)return;if(menu&&!e.target.closest(".menu"))closeMenu();if(hitBall(e)){drag={ball:true,t:performance.now()};return}const w=hit(e);if(!w)return;drag={w,sx:e.clientX,sy:e.clientY,moved:false};c.style.cursor="grabbing"});
 addEventListener("mouseup",e=>{
   if(!drag)return;const d=drag;drag=null;c.style.cursor="grab";
+  if(d.ball){tone(600,.08,"triangle",.08);return}
   if(d.moved){d.w.tx=d.w.x;tone(700,.12,"sine",.1);return}
   const w=d.w;
   if(breakSign&&breakSign.w===w){breakSign=null;for(const o of walkers.values())o.hop=.6;tone(660,.2,"triangle",.12);setTimeout(()=>tone(880,.2,"triangle",.12),150);pipDesktop.buddyCommand({type:"break"});return}

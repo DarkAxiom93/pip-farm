@@ -190,3 +190,12 @@ extras_test|SEND code shown True
 extras_test|TIMELINE True events True
 extras_test|SAVED songs 1 guests 1 name החווה של הבדיקה hist True
 extras_test|ERR []
+buddy_test|MENU buttons 4
+buddy_test|MENU pet sent True closed True
+buddy_test|MENU feed sent True
+buddy_test|BALL kicked True
+genes_test|OLD SAVE genes True
+genes_test|CHILD close colour True mostly same genes True
+genes_test|VARIETY True
+genes_test|ALBUM sections True
+genes_test|ERR []

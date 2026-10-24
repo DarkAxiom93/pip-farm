@@ -4,14 +4,14 @@
    language, the farm's pips greet it, and tapping it shows where it came from (and a gift). */
 const GUEST_DAY=86400000;
 function pipCode(p){
-  const o={n:p.name,h:Math.round(p.hue),s:p.sprout,g:p.g,m:p.mut||null,d:p.ds||0,dm:p.dmod??0,gn:p.gen,f:farmName(),w:Object.values(p.lang||{}).slice(0,4),t:Date.now()};
+  const o={n:p.name,h:Math.round(p.hue),h2:Math.round(p.hue2??p.hue),s:p.sprout,g:p.g,m:p.mut||null,d:p.ds||0,dm:p.dmod??0,gn:p.gen,f:farmName(),w:Object.values(p.lang||{}).slice(0,4),t:Date.now()};
   return "PIP1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 }
 function readCode(code){
   try{const c=String(code||"").trim();if(!c.startsWith("PIP1:"))return null;
     const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(5)))));
     if(!o||typeof o.n!=="string"||typeof o.h!=="number")return null;
-    return {n:o.n.slice(0,14),h:clamp(o.h,0,360),s:clamp(o.s|0,0,5),g:o.g&&typeof o.g==="object"?{pattern:o.g.pattern|0,tail:o.g.tail|0,eyes:o.g.eyes|0,body:o.g.body|0}:{pattern:0,tail:0,eyes:0,body:0},
+    return {n:o.n.slice(0,14),h:clamp(o.h,0,360),s:clamp(o.s|0,0,5),g:o.g&&typeof o.g==="object"?{pattern:o.g.pattern|0,tail:o.g.tail|0,eyes:o.g.eyes|0,body:o.g.body|0,shape:clamp(o.g.shape|0,0,3),size:clamp(o.g.size|0,0,2),eyec:clamp(o.g.eyec|0,0,3)}:{pattern:0,tail:0,eyes:0,body:0},h2:clamp(+o.h2||0,0,360),
       m:MUTS.includes(o.m)?o.m:null,d:clamp(o.d|0,0,4),dm:clamp(o.dm|0,0,2),gn:o.gn|0,f:String(o.f||"חווה רחוקה").slice(0,30),w:Array.isArray(o.w)?o.w.filter(x=>typeof x==="string").map(x=>x.slice(0,10)).slice(0,4):[],t:+o.t||0};
   }catch(_){return null}
 }
@@ -54,7 +54,7 @@ let guestBubble=null;
 function guestSay(g,text){guestBubble={id:g.id,text,until:performance.now()+2600}}
 function drawGuests(t){
   for(const g of S.guests||[]){if(!inView(g.x,g.y,20))continue;
-    const p={id:g.id,name:g.n,hue:g.h,sprout:g.s,g:g.g,mut:g.m,xp:60,mood:80,food:80,c:{work:0,talk:0,pet:0,task:0},born:g.t||1,ds:g.d,dmod:g.dm,diet:[1,0,0]};
+    const p={id:g.id,name:g.n,hue:g.h,hue2:g.h2,sprout:g.s,g:g.g,mut:g.m,xp:60,mood:80,food:80,c:{work:0,talk:0,pet:0,task:0},born:g.t||1,ds:g.d,dmod:g.dm,diet:[1,0,0]};
     drawPip(p,t,false,{state:night?"sleep":g.tx!==g.x?"walk":"idle",dir:g.dir||1,anim:g.anim||0,blink:2,talk:guestBubble&&guestBubble.id===g.id?.2:0,ct:0},g.x,g.y);
     // a little suitcase so you know it's a visitor
     R(g.x+5,g.y-4,3,3,"#a87a42");R(g.x+5.5,g.y-5,2,1,"#5a3d2b");R(g.x+6,g.y-3,1,.5,"#ffd166");

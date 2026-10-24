@@ -16,13 +16,16 @@ function notify(title:string,body:string,force?:boolean){
   try{pipDesktop.notify(title,body)}catch(_){}
 }
 function deskSnapshot(){
-  try{pipDesktop.snapshot({night,season:curSeason,total:S.pips.length,net:S.net||0,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,word:deskWord(p),hue:Math.round(p.hue),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep",ds:p.ds||0,dc:(p.ds||0)?dcol(p):null,dmod:p.dmod??0}))})}catch(_){}
+  try{pipDesktop.snapshot({night,season:curSeason,total:S.pips.length,net:S.net||0,basket:S.basket,pips:S.pips.slice(0,60).map(p=>({id:p.id,name:p.name,word:deskWord(p),hue:Math.round(p.hue),hue2:Math.round(p.hue2??p.hue+150),sprout:p.sprout,g:p.g,mut:p.mut||null,elder:isElder(p),need:rt(p).need?rt(p).need.type:null,mood:Math.round(p.mood),sleep:rt(p).state==="sleep",ds:p.ds||0,dc:(p.ds||0)?dcol(p):null,dmod:p.dmod??0}))})}catch(_){}
 }
 setInterval(deskSnapshot,2500);
 // a word this pip says on the desktop: one you understand, or any of its own
 function deskWord(p){const ws=Object.values(p.lang||{}) as string[];if(!ws.length)return null;const known=ws.filter(w=>S.lex[w]&&S.lex[w].ok);return pick(known.length&&Math.random()<.7?known:ws)}
 pipDesktop.onCommand(cmd=>{if(cmd&&cmd.type==="flush"){saveNow();return}
-  if(cmd&&cmd.type==="break"){S.stats.breaks=(S.stats.breaks||0)+1;S.pips.slice(0,8).forEach(p=>{const r=rt(p);if(r.state==="idle"){r.state="celebrate";r.ct=1.2}});notify("הפסקה 💧","קום, תמתח, תשתה מים. הפיפים מחכים לך",true);dirty();return}const p=cmd&&cmd.id&&byId(cmd.id);if(!p)return;audio();if(cmd.type==="tap")tapPip(p);else if(cmd.type==="open"){select(p.id,true)}deskSnapshot()});
+  if(cmd&&cmd.type==="break"){S.stats.breaks=(S.stats.breaks||0)+1;S.pips.slice(0,8).forEach(p=>{const r=rt(p);if(r.state==="idle"){r.state="celebrate";r.ct=1.2}});notify("הפסקה 💧","קום, תמתח, תשתה מים. הפיפים מחכים לך",true);dirty();return}const p=cmd&&cmd.id&&byId(cmd.id);if(!p)return;audio();if(cmd.type==="tap")tapPip(p);else if(cmd.type==="open"){select(p.id,true)}
+  else if(cmd.type==="pet"){pet(p);if(rt(p).need&&rt(p).need.type==="pet")fulfill(p)}
+  else if(cmd.type==="feed"){if(S.basket>0){feed(p);if(rt(p).need&&rt(p).need.type==="food")fulfill(p)}}
+  else if(cmd.type==="kick"){S.stats.deskKicks=(S.stats.deskKicks||0)+1;p.mood=Math.min(100,p.mood+3);bond(p,1,"play");if(rt(p).need&&rt(p).need.type==="play")fulfill(p);dirty()}deskSnapshot()});
 function platformVoiceNote(n:HTMLElement):boolean{
   if(!sample&&S.ai){n.textContent="הפיפים מבינים לפי מילות מפתח. אפשר להוסיף מפתח Claude בהגדרות כדי שיבינו יותר";return true}
   return false;

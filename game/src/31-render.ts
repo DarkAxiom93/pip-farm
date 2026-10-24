@@ -34,7 +34,8 @@ function drawPip(p,t,isSel,r?,px?,py?){
   r=r||rt(p);px=px??p.x;py=py??p.y;
   if(r.ride){if(r.state==="walk"){drawRide(p,r,t);return}r.ride=null}
   const g=p.g||{},mut=p.mut,lv=level(p);
-  const bw=Math.max(5,7+Math.floor(Math.min(lv,10)*.4)+(g.body?2:0)-(mut==="tiny"?2:0)),bh=bw-1-(g.body?1:0);
+  const sz=g.size===1?-1:g.size===2?2:0,sh=g.shape||0;
+  const bw=Math.max(5,7+Math.floor(Math.min(lv,10)*.4)+(g.body?2:0)-(mut==="tiny"?2:0)+sz+(sh===2?2:sh===1?-1:0)),bh=Math.max(4,bw-1-(g.body?1:0)+(sh===1?3:sh===2?-2:0));
   let hop=0;
   if(r.state==="walk")hop=Math.abs(Math.sin(r.anim*11))*1.6;
   if(r.state==="celebrate")hop=Math.abs(Math.sin(r.anim*12))*5;
@@ -71,9 +72,12 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(mut==="crystal"){const k=Math.floor(t*3)%Math.max(1,bww-2);R(x0+1+k,y0+1+(k%3),1,1,"#ffffff")}
   if(mut==="gold"){const k=Math.floor(t*7)%(bww+8)-4;if(k>=0&&k<bww)R(x0+k,y0+1,1,Math.max(1,bh2-2),"rgba(255,255,225,.75)")}
   const cx=x0+(bww>>1);
+  if(sh===3){R(cx-2,y0-1,4,1,out);R(cx-1.5,y0-.5,3,1,body);R(cx-1,y0-1.5,2,.5,out);R(cx-.5,y0-1,1,.5,body);R(cx-1,y0,1,.5,lite)}
   // coat pattern
-  if(g.pattern===1){R(x0+1,y0+bh2-4,1,1,dark);R(x0+bww-2,y0+bh2-5,1,1,dark);R(x0+bww-3,y0+1,1,1,dark)}
-  else if(g.pattern===2){R(x0+1,y0,bww-2,1,dark);R(x0,y0+1,bww,1,dark)}
+  // markings use the pip's second colour, so families share an accent
+  const acc=mut==="gold"?"hsl(36,90%,45%)":`hsl(${p.hue2??hue+150},72%,${eld?62:58}%)`;
+  if(g.pattern===1){R(x0+1,y0+bh2-4,1.5,1.5,acc);R(x0+bww-2.5,y0+bh2-5,1.5,1.5,acc);R(x0+bww-3,y0+1,1,1,acc);R(x0+2,y0+1.5,1,1,acc)}
+  else if(g.pattern===2){R(x0+1,y0,bww-2,1,acc);R(x0,y0+1,bww,1,acc)}
   else if(g.pattern===3){R(cx-2,y0+bh2-3,4,2,lite)}
   drawPipData(p,r,x0,y0,bww,bh2,t,r.dir||1);
   // head feature
@@ -85,7 +89,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   else if(p.sprout===5){R(x0+1,y0-2,1,2,"#f5eddc");R(x0+bww-2,y0-2,1,2,"#f5eddc");R(x0+1,y0-3,1,1,"#cdbfa8");R(x0+bww-2,y0-3,1,1,"#cdbfa8")}
   if(lv>=6){const d=dom(p),cc=d?TRAIT_COL[d]:"#ffd166";R(x0+bww-3,y0-1,2,2,cc);R(x0+bww-2,y0-2,1,1,cc)}
   // face
-  const big=g.eyes===1,ey=y0+Math.max(2,Math.floor(bh*.36)),off=dir>0?1:0,el=cx-(big?3:2)+off,er=cx+1+off,ew=big?2:1,eye="#2a1830";
+  const big=g.eyes===1,ey=y0+Math.max(2,Math.floor(bh*.36)),off=dir>0?1:0,el=cx-(big?3:2)+off,er=cx+1+off,ew=big?2:1,eye=EYEC[g.eyec||0];
   const happy=r.state==="celebrate"||r.state==="cuddle"||(p.mood>88&&r.state!=="work");
   const stare=r.state==="stare"||r.state==="form";
   if(sleep){R(el,ey+1,2,1,eye);R(er,ey+1,2,1,eye)}
@@ -98,7 +102,7 @@ function drawPip(p,t,isSel,r?,px?,py?){
   if(p.awake&&!sleep&&!stare){R(el,ey,1,1,"#9fe8ff");R(er,ey,1,1,"#9fe8ff")}
   if(p.mood>55&&!sleep&&!p.blank){R(el-1,ey+2,1.5,.5,"rgba(255,140,170,.85)");R(er+ew-.5,ey+2,1.5,.5,"rgba(255,140,170,.85)");R(el-.5,ey+2.5,.5,.5,"rgba(255,140,170,.5)");R(er+ew,ey+2.5,.5,.5,"rgba(255,140,170,.5)")}
   if(p.blank&&!sleep)R(cx-1+off,ey+3,3,1,"#5a2a3a");
-  if(g.pattern===4){R(el,ey+3,1,1,dark);R(er+ew-1,ey+3,1,1,dark)}
+  if(g.pattern===4){R(el,ey+3,1,1,acc);R(er+ew-1,ey+3,1,1,acc);R(el+.5,ey+3.5,.5,.5,acc)}
   if(eld&&!sleep){R(cx-2+off,ey+3,4,2,"#f4f1ea");R(cx-1+off,ey+5,2,1,"#f4f1ea");R(el,ey-1,ew,1,"#f4f1ea");R(er,ey-1,ew,1,"#f4f1ea")}
   if((p.trust??30)<-20&&r.state!=="argue"&&!sleep){R(el,ey-1,ew,1,dark);R(er,ey-1,ew,1,dark)}
   if((p.trust??30)>75&&RT.get(p.id)===r&&Math.random()<.002){burst(px,y0-4,"heart",1);const hh=parts[parts.length-1];hh.vx=0;hh.vy=-10}
